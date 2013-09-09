@@ -80,11 +80,13 @@
   <ItemGroup>
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
+    <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphicsclass.h" />
+    <ClInclude Include="d3dclass.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="systemclass.h" />
   </ItemGroup>
