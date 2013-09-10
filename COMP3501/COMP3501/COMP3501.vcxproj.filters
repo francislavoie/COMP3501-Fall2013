@@ -31,6 +31,27 @@
     <Filter Include="Header Files\Main">
       <UniqueIdentifier>{ca0eb21a-437b-4ce3-b867-7ed184c4d70a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{cc187899-cad9-4815-b799-fa4d68c550fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{8ef2f32e-7a49-4fd5-b01e-52406c43c182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Shaders">
+      <UniqueIdentifier>{3a7cd38b-63f9-424d-a50f-187d40cfb216}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Camera">
+      <UniqueIdentifier>{e6354911-a84f-4810-b095-d2e8f6c7833e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Camera">
+      <UniqueIdentifier>{894bb54a-ac64-4c00-8eb6-66390115c3d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{ea869218-4459-4f5e-8063-eed2cfac73e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Shaders">
+      <UniqueIdentifier>{6de81287-4fa4-4792-af71-0470d9d73724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dclass.cpp">
@@ -48,6 +69,15 @@
     <ClCompile Include="systemclass.cpp">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="modelclass.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="cameraclass.cpp">
+      <Filter>Source Files\Graphics\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dclass.h">
@@ -62,5 +92,22 @@
     <ClInclude Include="systemclass.h">
       <Filter>Header Files\Main</Filter>
     </ClInclude>
+    <ClInclude Include="modelclass.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshaderclass.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="cameraclass.h">
+      <Filter>Header Files\Graphics\Camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="color.ps.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="color.vs.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
