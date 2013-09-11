@@ -79,28 +79,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cameraclass.cpp" />
-    <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
+    <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="systemclass.cpp" />
+    <ClCompile Include="textureclass.cpp" />
+    <ClCompile Include="lightshaderclass.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h" />
-    <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="inputclass.h" />
+    <ClInclude Include="lightclass.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="systemclass.h" />
+    <ClInclude Include="textureclass.h" />
+    <ClInclude Include="lightshaderclass.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="color.vs.hlsl">
+    <None Include="light.ps.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="light.vs.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

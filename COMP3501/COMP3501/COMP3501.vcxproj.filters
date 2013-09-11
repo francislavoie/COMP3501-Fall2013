@@ -48,6 +48,7 @@
     </Filter>
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{ea869218-4459-4f5e-8063-eed2cfac73e5}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
     </Filter>
     <Filter Include="Source Files\Graphics\Shaders">
       <UniqueIdentifier>{6de81287-4fa4-4792-af71-0470d9d73724}</UniqueIdentifier>
@@ -75,7 +76,13 @@
     <ClCompile Include="cameraclass.cpp">
       <Filter>Source Files\Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
+    <ClCompile Include="textureclass.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="lightshaderclass.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="lightclass.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,18 +102,24 @@
     <ClInclude Include="modelclass.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
-      <Filter>Header Files\Graphics\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="cameraclass.h">
       <Filter>Header Files\Graphics\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="textureclass.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="lightshaderclass.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="lightclass.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps.hlsl">
+    <None Include="light.vs.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="color.vs.hlsl">
+    <None Include="light.ps.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
