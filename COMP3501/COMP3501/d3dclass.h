@@ -44,6 +44,9 @@ public:
 
 	void GetVideoCardInfo(char*, int&);
 
+	void TurnZBufferOn();
+	void TurnZBufferOff();
+
 private:
 	bool m_vsync_enabled;
 	int m_videoCardMemory;
@@ -54,6 +57,7 @@ private:
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11Texture2D* m_depthStencilBuffer;
 	ID3D11DepthStencilState* m_depthStencilState;
+	ID3D11DepthStencilState* m_depthDisabledStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterState;
 	D3DXMATRIX m_projectionMatrix;

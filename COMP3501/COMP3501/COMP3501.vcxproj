@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bitmapclass.cpp" />
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
@@ -89,9 +90,11 @@
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
     <ClCompile Include="lightshaderclass.cpp" />
+    <ClCompile Include="textureshaderclass.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitmapclass.h" />
     <ClInclude Include="cameraclass.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="d3dclass.h" />
@@ -101,6 +104,7 @@
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="textureclass.h" />
     <ClInclude Include="lightshaderclass.h" />
+    <ClInclude Include="textureshaderclass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="light.ps.hlsl">
@@ -109,6 +113,8 @@
     <None Include="light.vs.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="texture.ps.hlsl" />
+    <None Include="texture.vs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\rocky.dds" />

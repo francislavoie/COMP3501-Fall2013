@@ -9,7 +9,9 @@ GraphicsClass::GraphicsClass() {
 	m_Camera = 0;
 	m_Model = 0;
 	m_LightShader = 0;
+	m_TextureShader = 0;
 	m_Light = 0;
+	m_Bitmap = 0;
 }
 
 
@@ -41,12 +43,23 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
 	
+	// Create the texture shader object.
+	m_TextureShader = new TextureShaderClass;
+	if(!m_TextureShader) return false;
+
+	// Initialize the texture shader object.
+	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Create the model object.
 	m_Model = new ModelClass;
 	if(!m_Model) return false;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid2.txt", L"data/rocky.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/rocky.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -74,11 +87,36 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetSpecularPower(32.0f);
 
+	// Create the bitmap object.
+	m_Bitmap = new BitmapClass;
+	if(!m_Bitmap) return false;
+
+	// Initialize the bitmap object.
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/seafloor.dds", 100, 100);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
 
 void GraphicsClass::Shutdown() {
+
+	// Release the bitmap object.
+	if(m_Bitmap) {
+		m_Bitmap->Shutdown();
+		delete m_Bitmap;
+		m_Bitmap = 0;
+	}
+
+	// Release the texture shader object.
+	if(m_TextureShader) {
+		m_TextureShader->Shutdown();
+		delete m_TextureShader;
+		m_TextureShader = 0;
+	}
 
 	// Release the light object.
 	if(m_Light) {
@@ -137,7 +175,7 @@ bool GraphicsClass::Frame() {
 
 
 bool GraphicsClass::Render(float time) {
-	D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
 
 	// Start going to the right
@@ -197,6 +235,7 @@ bool GraphicsClass::Render(float time) {
 	m_Camera->GetViewMatrix(viewMatrix);
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 
@@ -254,6 +293,22 @@ bool GraphicsClass::Render(float time) {
 						   m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if(!result) return false;
 	}
+
+	D3DXMatrixIdentity(&worldMatrix);
+
+	// Turn off the Z buffer to begin all 2D rendering.
+	m_D3D->TurnZBufferOff();
+
+	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 100, 100);
+	if(!result) return false;
+
+	// Render the bitmap with the texture shader.
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
+	if(!result) return false;
+
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
