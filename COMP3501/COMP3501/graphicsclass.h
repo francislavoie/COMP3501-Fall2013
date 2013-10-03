@@ -15,6 +15,7 @@
 #include "textureshaderclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
+#include "textclass.h"
 
 /////////////
 // GLOBALS //
@@ -49,6 +50,7 @@ private:
 	TextureShaderClass* m_TextureShader;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
+	TextClass* m_Text;
 };
 
 #endif

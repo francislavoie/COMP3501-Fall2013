@@ -12,6 +12,7 @@ GraphicsClass::GraphicsClass() {
 	m_TextureShader = 0;
 	m_Light = 0;
 	m_Bitmap = 0;
+	m_Text = 0;
 }
 
 
@@ -23,7 +24,7 @@ GraphicsClass::~GraphicsClass() { }
 
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	bool result;
-
+	D3DXMATRIX baseViewMatrix;
 		
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
@@ -39,6 +40,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	// Create the camera object.
 	m_Camera = new CameraClass;
 	if(!m_Camera) return false;
+
+	// Initialize a base view matrix with the camera for 2D user interface rendering.
+	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(baseViewMatrix);
+
+	// Create the text object.
+	m_Text = new TextClass;
+	if(!m_Text) return false;
+
+	// Initialize the text object.
+	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
@@ -103,6 +120,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 
 
 void GraphicsClass::Shutdown() {
+
+	// Release the text object.
+	if(m_Text) {
+		m_Text->Shutdown();
+		delete m_Text;
+		m_Text = 0;
+	}
 
 	// Release the bitmap object.
 	if(m_Bitmap) {
@@ -177,48 +201,31 @@ bool GraphicsClass::Frame() {
 bool GraphicsClass::Render(float time) {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
-
-	// Start going to the right
+	bool result;
 	static int direction = 1;
-
-	// Start moving, state false means rotating
 	static bool state = true;
-
-	// Start facing right
 	static float bodyrotation = (float)D3DX_PI/2;
 	static float x = 0.0f;
-
-	// Set the patrol range (left bound, right bound)
 	float armrotation, left = -10.0f, right = 10.0f;
-	bool result;
 	
-	// Calculate the cumulative
 	armrotation = (float)D3DX_PI * 0.03f * time;
 
-	// If turning around, change rotation angle
 	if(!state) bodyrotation -= direction * (float)D3DX_PI * 0.015f;
-
-	// If moving, add to position
 	if(state) x += direction * 0.2f;
 
-	// Scale and rotate body
 	D3DXMatrixScaling(&scale, 0.8f, 0.3f, 0.3f);
 	D3DXMatrixRotationY(&rotate, bodyrotation);
 
-	// Arm Z rotation using sin and divide to limit the range
 	D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
 
-	// Translate based on calculated x pos
 	D3DXMatrixTranslation(&robotPosition, x, 0.0f, 0.0f);
 
-	// Once reaching either side, change state and fix pos and direction
 	if(x > right || x < left) {
 		direction *= -1;
 		x = direction==1 ? left : right;
 		state = false;
 	}
 
-	// Once finishing rotate, fix angle and change state
 	if(bodyrotation < (float)D3DX_PI/2 || bodyrotation > (float)(3*D3DX_PI)/2) {
 		bodyrotation = direction==1 ? (float)D3DX_PI/2 : (float)(3*D3DX_PI)/2;
 		state = true;
@@ -298,6 +305,16 @@ bool GraphicsClass::Render(float time) {
 
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();
+
+	// Turn on the alpha blending before rendering the text.
+	m_D3D->TurnOnAlphaBlending();
+
+	// Render the text strings.
+	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+	if(!result) return false;
+
+	// Turn off alpha blending after rendering the text.
+	m_D3D->TurnOffAlphaBlending();
 
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 100, 100);

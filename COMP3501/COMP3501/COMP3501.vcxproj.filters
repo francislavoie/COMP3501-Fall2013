@@ -59,6 +59,15 @@
     <Filter Include="Resource Files\Models">
       <UniqueIdentifier>{f9783964-16ee-451d-8324-07ebd5b05754}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Text">
+      <UniqueIdentifier>{8e19c791-6473-4ac9-b042-b8f3543b8325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Text">
+      <UniqueIdentifier>{3d9dfcbd-3b90-498c-b78f-eaffb16848e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Fonts">
+      <UniqueIdentifier>{a1c3aa17-ad54-4747-a84c-7553e7552ff5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dclass.cpp">
@@ -97,6 +106,15 @@
     <ClCompile Include="textureshaderclass.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="fontclass.cpp">
+      <Filter>Source Files\Graphics\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="textclass.cpp">
+      <Filter>Source Files\Graphics\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="fontshaderclass.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dclass.h">
@@ -132,6 +150,15 @@
     <ClInclude Include="bitmapclass.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="fontclass.h">
+      <Filter>Header Files\Graphics\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="textclass.h">
+      <Filter>Header Files\Graphics\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="fontshaderclass.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs.hlsl">
@@ -146,6 +173,18 @@
     <None Include="texture.vs.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="color.ps.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="color.vs.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="font.ps.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="font.vs.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\rocky.dds">
@@ -154,10 +193,16 @@
     <Image Include="data\seafloor.dds">
       <Filter>Resource Files\Textures</Filter>
     </Image>
+    <Image Include="data\font.dds">
+      <Filter>Resource Files\Fonts</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="data\cube.txt">
       <Filter>Resource Files\Models</Filter>
+    </Text>
+    <Text Include="data\fontdata.txt">
+      <Filter>Resource Files\Fonts</Filter>
     </Text>
   </ItemGroup>
 </Project>
