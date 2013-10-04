@@ -68,6 +68,12 @@
     <Filter Include="Resource Files\Fonts">
       <UniqueIdentifier>{a1c3aa17-ad54-4747-a84c-7553e7552ff5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Main\Utils">
+      <UniqueIdentifier>{83c2ac79-5f75-4448-9f38-65418f1f5a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Main\Util">
+      <UniqueIdentifier>{c451b756-15e8-470a-939f-25d6a0ddd485}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dclass.cpp">
@@ -118,6 +124,15 @@
     <ClCompile Include="mousecursor.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="fpsclass.cpp">
+      <Filter>Source Files\Main\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="cpuclass.cpp">
+      <Filter>Source Files\Main\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="timerclass.cpp">
+      <Filter>Source Files\Main\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dclass.h">
@@ -164,6 +179,15 @@
     </ClInclude>
     <ClInclude Include="mousecursor.h">
       <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="fpsclass.h">
+      <Filter>Header Files\Main\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="cpuclass.h">
+      <Filter>Header Files\Main\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="timerclass.h">
+      <Filter>Header Files\Main\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

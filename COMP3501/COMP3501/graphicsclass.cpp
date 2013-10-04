@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "graphicsclass.h"
 
-
 GraphicsClass::GraphicsClass() {
 	m_D3D = 0;
 	m_Camera = 0;
@@ -197,12 +196,20 @@ void GraphicsClass::Shutdown() {
 }
 
 
-bool GraphicsClass::Frame(int mouseX, int mouseY) {
+bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime) {
 	bool result;
 
-	// Set the location of the mouse.
-	result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
+	// Set the frames per second.
+	result = m_Text->SetFps(fps, m_D3D->GetDeviceContext());
 	if(!result) return false;
+
+	// Set the cpu usage.
+	result = m_Text->SetCpu(cpu, m_D3D->GetDeviceContext());
+	if(!result) return false;
+
+	// Set the location of the mouse.
+	//result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
+	//if(!result) return false;
 
 	m_Cursor->setPosition(mouseX, mouseY);
 
@@ -213,7 +220,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY) {
 }
 
 
-bool GraphicsClass::Render() {
+bool GraphicsClass::Render(float time) {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
 	bool result;
@@ -221,15 +228,13 @@ bool GraphicsClass::Render() {
 	static bool state = true;
 	static float bodyrotation = (float)D3DX_PI/2;
 	static float x = 0.0f;
-	static float time = 0.0f;
-	float armrotation, left = -10.0f, right = 10.0f;
-	
-	time += 1;
+	static float armrotation = 0.0f;
+	float left = -10.0f, right = 10.0f;
 
-	armrotation = (float)D3DX_PI * 0.03f * time;
+	armrotation += (float)D3DX_PI * 0.001f * time;
 
-	if(!state) bodyrotation -= direction * (float)D3DX_PI * 0.015f;
-	if(state) x += direction * 0.2f;
+	if(!state) bodyrotation -= direction * (float)D3DX_PI * 0.001f * time;
+	if(state) x += direction * 0.01f * time;
 
 	D3DXMatrixScaling(&scale, 0.8f, 0.3f, 0.3f);
 	D3DXMatrixRotationY(&rotate, bodyrotation);
