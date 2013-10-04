@@ -89,6 +89,7 @@
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="modelclass.cpp" />
+    <ClCompile Include="mousecursor.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="textclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="modelclass.h" />
+    <ClInclude Include="mousecursor.h" />
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="textclass.h" />
     <ClInclude Include="textureclass.h" />

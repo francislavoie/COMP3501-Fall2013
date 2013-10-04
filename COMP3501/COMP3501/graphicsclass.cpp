@@ -12,6 +12,7 @@ GraphicsClass::GraphicsClass() {
 	m_TextureShader = 0;
 	m_Light = 0;
 	m_Bitmap = 0;
+	m_Cursor = 0;
 	m_Text = 0;
 }
 
@@ -115,6 +116,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 		return false;
 	}
 
+	// Create the bitmap object.
+	m_Cursor = new MouseCursor;
+	if(!m_Cursor) return false;
+
+	// Initialize the bitmap object.
+	result = m_Cursor->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/cursor.dds", 25, 25);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -133,6 +145,13 @@ void GraphicsClass::Shutdown() {
 		m_Bitmap->Shutdown();
 		delete m_Bitmap;
 		m_Bitmap = 0;
+	}
+
+	// Release the bitmap object.
+	if(m_Cursor) {
+		m_Cursor->Shutdown();
+		delete m_Cursor;
+		m_Cursor = 0;
 	}
 
 	// Release the texture shader object.
@@ -178,27 +197,23 @@ void GraphicsClass::Shutdown() {
 }
 
 
-bool GraphicsClass::Frame() {
+bool GraphicsClass::Frame(int mouseX, int mouseY) {
 	bool result;
 
-	//static float rotation = 0.0f;
-	static float time = 0.0f;
-
-	// Update the rotation variable each frame.
-	//rotation += (float)D3DX_PI * 0.005f;
-	//if(rotation > 360.0f) rotation -= 360.0f;
-
-	time += 1;
-	
-	// Render the graphics scene.
-	result = Render(time);
+	// Set the location of the mouse.
+	result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
 	if(!result) return false;
+
+	m_Cursor->setPosition(mouseX, mouseY);
+
+	// Set the position of the camera.
+	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
 
 	return true;
 }
 
 
-bool GraphicsClass::Render(float time) {
+bool GraphicsClass::Render() {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
 	bool result;
@@ -206,8 +221,11 @@ bool GraphicsClass::Render(float time) {
 	static bool state = true;
 	static float bodyrotation = (float)D3DX_PI/2;
 	static float x = 0.0f;
+	static float time = 0.0f;
 	float armrotation, left = -10.0f, right = 10.0f;
 	
+	time += 1;
+
 	armrotation = (float)D3DX_PI * 0.03f * time;
 
 	if(!state) bodyrotation -= direction * (float)D3DX_PI * 0.015f;
@@ -234,6 +252,8 @@ bool GraphicsClass::Render(float time) {
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+
+
 
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
@@ -306,16 +326,6 @@ bool GraphicsClass::Render(float time) {
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();
 
-	// Turn on the alpha blending before rendering the text.
-	m_D3D->TurnOnAlphaBlending();
-
-	// Render the text strings.
-	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
-	if(!result) return false;
-
-	// Turn off alpha blending after rendering the text.
-	m_D3D->TurnOffAlphaBlending();
-
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 100, 100);
 	if(!result) return false;
@@ -323,6 +333,22 @@ bool GraphicsClass::Render(float time) {
 	// Render the bitmap with the texture shader.
 	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
 	if(!result) return false;
+
+	// Turn on the alpha blending before rendering the text.
+	m_D3D->TurnOnAlphaBlending();
+
+	// Render the text strings.
+	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+	if(!result) return false;
+
+	result = m_Cursor->Render(m_D3D->GetDeviceContext());
+	if(!result) return false;
+
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Cursor->GetTexture());
+	if(!result) return false;
+
+	// Turn off alpha blending after rendering the text.
+	m_D3D->TurnOffAlphaBlending();
 
 	// Turn the Z buffer back on now that all 2D rendering has completed.
 	m_D3D->TurnZBufferOn();
