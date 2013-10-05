@@ -17,12 +17,15 @@ BitmapClass::BitmapClass(const BitmapClass& other) { }
 BitmapClass::~BitmapClass() { }
 
 
-bool BitmapClass::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, int bitmapWidth, int bitmapHeight) {
+bool BitmapClass::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, int bitmapWidth, int bitmapHeight) {
 	bool result;
 
 	// Store the screen size.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
+
+	// Store the base view matrix.
+	m_baseViewMatrix = baseViewMatrix;
 
 	// Store the size in pixels that this bitmap should be rendered at.
 	m_bitmapWidth = bitmapWidth;
@@ -293,4 +296,9 @@ void BitmapClass::ReleaseTexture() {
 	}
 
 	return;
+}
+
+
+D3DXMATRIX BitmapClass::GetViewMatrix() {
+	return m_baseViewMatrix;
 }

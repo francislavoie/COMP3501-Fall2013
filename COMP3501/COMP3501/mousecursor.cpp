@@ -20,12 +20,15 @@ MouseCursor::MouseCursor(const MouseCursor& other) { }
 MouseCursor::~MouseCursor() { }
 
 
-bool MouseCursor::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, int bitmapWidth, int bitmapHeight) {
+bool MouseCursor::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, int bitmapWidth, int bitmapHeight) {
 	bool result;
 
 	// Store the screen size.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
+
+	// Store the base view matrix.
+	m_baseViewMatrix = baseViewMatrix;
 
 	// Store the size in pixels that this bitmap should be rendered at.
 	m_bitmapWidth = bitmapWidth;
@@ -303,4 +306,9 @@ void MouseCursor::setPosition(int x, int y) {
 	m_posY = y;
 
 	return;
+}
+
+
+D3DXMATRIX MouseCursor::GetViewMatrix() {
+	return m_baseViewMatrix;
 }

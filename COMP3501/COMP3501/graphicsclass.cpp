@@ -13,6 +13,8 @@ GraphicsClass::GraphicsClass() {
 	m_Bitmap = 0;
 	m_Cursor = 0;
 	m_Text = 0;
+	m_ModelList = 0;
+	m_Frustum = 0;
 }
 
 
@@ -76,7 +78,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Model) return false;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/rocky.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "data/sphere.txt", L"data/rocky.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -109,7 +111,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Bitmap) return false;
 
 	// Initialize the bitmap object.
-	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/seafloor.dds", 100, 100);
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/seafloor.dds", baseViewMatrix, 100, 100);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
@@ -120,17 +122,45 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Cursor) return false;
 
 	// Initialize the bitmap object.
-	result = m_Cursor->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/cursor.dds", 25, 25);
+	result = m_Cursor->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/cursor.dds", baseViewMatrix, 25, 25);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
 	}
+
+	// Create the model list object.
+	m_ModelList = new ModelListClass;
+	if(!m_ModelList) return false;
+
+	// Initialize the model list object.
+	result = m_ModelList->Initialize(200);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the model list object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the frustum object.
+	m_Frustum = new FrustumClass;
+	if(!m_Frustum) return false;
 
 	return true;
 }
 
 
 void GraphicsClass::Shutdown() {
+
+	// Release the frustum object.
+	if(m_Frustum) {
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
+	// Release the model list object.
+	if(m_ModelList) {
+		m_ModelList->Shutdown();
+		delete m_ModelList;
+		m_ModelList = 0;
+	}
 
 	// Release the text object.
 	if(m_Text) {
@@ -196,7 +226,7 @@ void GraphicsClass::Shutdown() {
 }
 
 
-bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime) {
+bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime, float rotationY) {
 	bool result;
 
 	// Set the frames per second.
@@ -216,6 +246,8 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	// Set the position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
 
+	m_Camera->SetRotation(0.0f, rotationY, 0.0f);
+
 	return true;
 }
 
@@ -223,10 +255,13 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 bool GraphicsClass::Render(float time) {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
-	bool result;
+	bool renderModel, result;
+	int modelCount, renderCount, index;
+	float positionX, positionY, positionZ, radius;
+	D3DXVECTOR4 color;
 	static int direction = 1;
 	static bool state = true;
-	static float bodyrotation = (float)D3DX_PI/2;
+	static float bodyrotation = (float)D3DX_PI/2.0f;
 	static float x = 0.0f;
 	static float armrotation = 0.0f;
 	float left = -10.0f, right = 10.0f;
@@ -268,6 +303,51 @@ bool GraphicsClass::Render(float time) {
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
+
+	// Construct the frustum.
+	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
+	// Get the number of models that will be rendered.
+	modelCount = m_ModelList->GetModelCount();
+
+	// Initialize the count of models that have been rendered.
+	renderCount = 0;
+
+	// Go through all the models and render them only if they can be seen by the camera view.
+	for(index=0; index<modelCount; index++) {
+		// Get the position and color of the sphere model at this index.
+		m_ModelList->GetData(index, positionX, positionY, positionZ, color);
+
+		// Set the radius of the sphere to 1.0 since this is already known.
+		radius = 1.0f;
+
+		// Check if the sphere model is in the view frustum.
+		renderModel = m_Frustum->CheckSphere(positionX, positionY, positionZ, radius);
+
+		// If it can be seen then render it, if not skip this model and check the next sphere.
+		if(renderModel) {
+			// Move the model to the location it should be rendered at.
+			D3DXMatrixTranslation(&worldMatrix, positionX, positionY, positionZ); 
+
+			// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+			m_Model->Render(m_D3D->GetDeviceContext());
+
+			// Render the model using the light shader.
+			m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+					   m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), color, 
+				       m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+
+			// Reset to the original world matrix.
+			m_D3D->GetWorldMatrix(worldMatrix);
+
+			// Since this model was rendered then increase the count for this frame.
+			renderCount++;
+		}
+	}
+
+	// Set the number of models that was actually rendered this frame.
+	result = m_Text->SetRenderCount(renderCount, m_D3D->GetDeviceContext());
+	if(!result) return false;
 
 	m_Model->Render(m_D3D->GetDeviceContext());
 
@@ -336,7 +416,7 @@ bool GraphicsClass::Render(float time) {
 	if(!result) return false;
 
 	// Render the bitmap with the texture shader.
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
 	if(!result) return false;
 
 	// Turn on the alpha blending before rendering the text.
@@ -349,7 +429,7 @@ bool GraphicsClass::Render(float time) {
 	result = m_Cursor->Render(m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Cursor->GetTexture());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, m_Cursor->GetViewMatrix(), orthoMatrix, m_Cursor->GetTexture());
 	if(!result) return false;
 
 	// Turn off alpha blending after rendering the text.

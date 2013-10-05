@@ -156,9 +156,8 @@ void InputClass::ProcessInput() {
 }
 
 
-bool InputClass::IsEscapePressed() {
-	// Do a bitwise and on the keyboard state to check if the escape key is currently being pressed.
-	if(m_keyboardState[DIK_ESCAPE] & 0x80) return true;
+bool InputClass::IsKeyPressed(int key) {
+	if(m_keyboardState[key] & 0x80) return true;
 
 	return false;
 }

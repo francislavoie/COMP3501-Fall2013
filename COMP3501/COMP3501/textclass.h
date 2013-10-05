@@ -40,6 +40,7 @@ public:
 
 	bool SetFps(int, ID3D11DeviceContext*);
 	bool SetCpu(int, ID3D11DeviceContext*);
+	bool SetRenderCount(int, ID3D11DeviceContext*);
 
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
@@ -52,8 +53,7 @@ private:
 	FontShaderClass* m_FontShader;
 	int m_screenWidth, m_screenHeight;
 	D3DXMATRIX m_baseViewMatrix;
-	SentenceType* m_sentence1;
-	SentenceType* m_sentence2;
+	SentenceType *m_sentence1, *m_sentence2, *m_sentence3;
 };
 
 #endif

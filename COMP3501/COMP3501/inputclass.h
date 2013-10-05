@@ -37,7 +37,7 @@ public:
 	void Shutdown();
 	bool Frame();
 
-	bool IsEscapePressed();
+	bool IsKeyPressed(int);
 	void GetMouseLocation(int&, int&);
 
 private:

@@ -17,6 +17,9 @@
 #include "lightshaderclass.h"
 #include "lightclass.h"
 #include "textclass.h"
+#include "modellistclass.h"
+#include "frustumclass.h"
+
 
 /////////////
 // GLOBALS //
@@ -39,7 +42,7 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 
-	bool Frame(int, int, int, int, float);
+	bool Frame(int, int, int, int, float, float);
 	bool Render(float);
 
 private:
@@ -52,6 +55,8 @@ private:
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	TextClass* m_Text;
+	ModelListClass* m_ModelList;
+	FrustumClass* m_Frustum;
 };
 
 #endif

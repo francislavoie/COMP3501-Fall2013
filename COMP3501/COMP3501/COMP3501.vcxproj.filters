@@ -133,6 +133,15 @@
     <ClCompile Include="timerclass.cpp">
       <Filter>Source Files\Main\Util</Filter>
     </ClCompile>
+    <ClCompile Include="frustumclass.cpp">
+      <Filter>Source Files\Graphics\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="modellistclass.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="positionclass.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dclass.h">
@@ -188,6 +197,15 @@
     </ClInclude>
     <ClInclude Include="timerclass.h">
       <Filter>Header Files\Main\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="frustumclass.h">
+      <Filter>Header Files\Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="modellistclass.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="positionclass.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

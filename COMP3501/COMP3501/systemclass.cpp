@@ -9,20 +9,19 @@ SystemClass::SystemClass() {
 	m_Fps = 0;
 	m_Cpu = 0;
 	m_Timer = 0;
+	m_Position = 0;
 }
 
-SystemClass::SystemClass(const SystemClass& other) {
-}
+SystemClass::SystemClass(const SystemClass& other) { }
 
 
-SystemClass::~SystemClass() {
-}
+SystemClass::~SystemClass() { }
+
 
 bool SystemClass::Initialize() {
 	int screenWidth, screenHeight;
 	bool result;
-
-
+	
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	screenWidth = 0;
 	screenHeight = 0;
@@ -73,11 +72,21 @@ bool SystemClass::Initialize() {
 		MessageBox(m_hwnd, L"Could not initialize the Timer object.", L"Error", MB_OK);
 		return false;
 	}
+
+	// Create the position object.
+	m_Position = new PositionClass;
+	if(!m_Position) return false;
 	
 	return true;
 }
 
 void SystemClass::Shutdown() {
+
+	// Release the position object.
+	if(m_Position) {
+		delete m_Position;
+		m_Position = 0;
+	}
 
 	// Release the timer object.
 	if(m_Timer) {
@@ -122,7 +131,6 @@ void SystemClass::Run() {
 	MSG msg;
 	bool done, result;
 
-
 	// Initialize the message structure.
 	ZeroMemory(&msg, sizeof(MSG));
 	
@@ -148,7 +156,7 @@ void SystemClass::Run() {
 		}
 
 		// Check if the user pressed escape and wants to quit.
-		if(m_Input->IsEscapePressed() == true) done = true;
+		if(m_Input->IsKeyPressed(DIK_ESCAPE) == true) done = true;
 
 	}
 
@@ -157,8 +165,9 @@ void SystemClass::Run() {
 
 
 bool SystemClass::Frame() {
-	bool result;
+	bool keyDown, result;
 	int mouseX, mouseY;
+	float rotationY;
 
 	// Update the system stats.
 	m_Timer->Frame();
@@ -169,11 +178,21 @@ bool SystemClass::Frame() {
 	result = m_Input->Frame();
 	if(!result) return false;
 
+	// Set the frame time for calculating the updated position.
+	m_Position->SetFrameTime(m_Timer->GetTime());
+
+	// Check if the left or right arrow key has been pressed, if so rotate the camera accordingly.
+	m_Position->TurnLeft(m_Input->IsKeyPressed(DIK_LEFT));
+	m_Position->TurnRight(m_Input->IsKeyPressed(DIK_RIGHT));
+
+	// Get the current view point rotation.
+	m_Position->GetRotation(rotationY);
+
 	// Get the location of the mouse from the input object,
 	m_Input->GetMouseLocation(mouseX, mouseY);
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(mouseX, mouseY, m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime());
+	result = m_Graphics->Frame(mouseX, mouseY, m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime(), rotationY);
 	if(!result) return false;
 
 	// Finally render the graphics to the screen.
