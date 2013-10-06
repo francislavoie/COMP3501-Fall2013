@@ -42,7 +42,7 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 
-	bool Frame(int, int, int, int, float, float);
+	bool Frame(int, int, int, int, float, float, float);
 	bool Render(float);
 
 private:

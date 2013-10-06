@@ -38,9 +38,9 @@ bool ModelListClass::Initialize(int numModels) {
 		m_ModelInfoList[i].color = D3DXVECTOR4(red, green, blue, 1.0f);
 
 		// Generate a random position in front of the viewer for the mode.
-		m_ModelInfoList[i].positionX = (((float)rand()-(float)rand())/RAND_MAX) * 10.0f;
-		m_ModelInfoList[i].positionY = (((float)rand()-(float)rand())/RAND_MAX) * 10.0f;
-		m_ModelInfoList[i].positionZ = ((((float)rand()-(float)rand())/RAND_MAX) * 10.0f) + 5.0f;
+		m_ModelInfoList[i].positionX = (((float)rand()-(float)rand())/RAND_MAX) * 50.0f;
+		m_ModelInfoList[i].positionY = (((float)rand()-(float)rand())/RAND_MAX) * 50.0f;
+		m_ModelInfoList[i].positionZ = ((((float)rand()-(float)rand())/RAND_MAX) * 50.0f) + 5.0f;
 	}
 
 	return true;

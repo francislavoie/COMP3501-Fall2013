@@ -78,7 +78,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Model) return false;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "data/sphere.txt", L"data/rocky.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/rocky.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -226,7 +226,7 @@ void GraphicsClass::Shutdown() {
 }
 
 
-bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime, float rotationY) {
+bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime, float rotationX, float rotationY) {
 	bool result;
 
 	// Set the frames per second.
@@ -246,7 +246,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	// Set the position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
 
-	m_Camera->SetRotation(0.0f, rotationY, 0.0f);
+	m_Camera->SetRotation(rotationX, rotationY, 0.0f);
 
 	return true;
 }
