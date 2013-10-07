@@ -148,8 +148,11 @@
     <Image Include="data\seafloor.dds" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="data\asteroid1.txt" />
+    <Text Include="data\asteroid2.txt" />
     <Text Include="data\cube.txt" />
     <Text Include="data\fontdata.txt" />
+    <Text Include="data\sphere.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="color.ps.hlsl">

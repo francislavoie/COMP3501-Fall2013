@@ -16,7 +16,7 @@ CpuClass::~CpuClass() { }
 void CpuClass::Initialize() {
 	PDH_STATUS status;
 
-		// Initialize the flag indicating whether this object can read the system cpu usage or not.
+	// Initialize the flag indicating whether this object can read the system cpu usage or not.
 	m_canReadCpu = true;
 
 	// Create a query object to poll cpu usage.

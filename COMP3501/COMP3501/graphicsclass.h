@@ -24,6 +24,7 @@
 /////////////
 // GLOBALS //
 /////////////
+const bool FULL_SCREEN_WINDOWED = true;
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;

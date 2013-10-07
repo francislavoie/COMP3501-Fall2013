@@ -252,5 +252,14 @@
     <Text Include="data\fontdata.txt">
       <Filter>Resource Files\Fonts</Filter>
     </Text>
+    <Text Include="data\asteroid1.txt">
+      <Filter>Resource Files\Models</Filter>
+    </Text>
+    <Text Include="data\asteroid2.txt">
+      <Filter>Resource Files\Models</Filter>
+    </Text>
+    <Text Include="data\sphere.txt">
+      <Filter>Resource Files\Models</Filter>
+    </Text>
   </ItemGroup>
 </Project>

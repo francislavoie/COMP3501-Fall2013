@@ -260,10 +260,11 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight) {
 		// Set the position of the window to the top left corner.
 		posX = posY = 0;
 	} else {
-		// If windowed then set it to 800x600 resolution.
-		screenWidth  = 800;
-		screenHeight = 600;
-
+		if(!FULL_SCREEN_WINDOWED) {
+			// If windowed then set it to 800x600 resolution.
+			screenWidth  = 800;
+			screenHeight = 600;
+		}
 		// Place the window in the middle of the screen.
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth)  / 2;
 		posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
