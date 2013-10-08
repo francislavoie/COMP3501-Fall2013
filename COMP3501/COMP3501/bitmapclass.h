@@ -41,6 +41,9 @@ public:
 	ID3D11ShaderResourceView* GetTexture();
 	D3DXMATRIX GetViewMatrix();
 
+	int GetCenterX();
+	int GetCenterY();
+
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();

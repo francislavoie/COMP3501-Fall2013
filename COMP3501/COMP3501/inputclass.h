@@ -39,6 +39,7 @@ public:
 
 	bool IsKeyPressed(int);
 	void GetMouseLocation(int&, int&);
+	void GetMouseDelta(int&, int&);
 
 private:
 	bool ReadKeyboard();
@@ -55,6 +56,7 @@ private:
 
 	int m_screenWidth, m_screenHeight;
 	int m_mouseX, m_mouseY;
+	int m_deltaX, m_deltaY;
 };
 
 #endif

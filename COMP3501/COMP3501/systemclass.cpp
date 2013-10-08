@@ -166,8 +166,6 @@ void SystemClass::Run() {
 
 bool SystemClass::Frame() {
 	bool result;
-	int mouseX, mouseY;
-	float rotationY, rotationX;
 
 	// Update the system stats.
 	m_Timer->Frame();
@@ -178,23 +176,8 @@ bool SystemClass::Frame() {
 	result = m_Input->Frame();
 	if(!result) return false;
 
-	// Set the frame time for calculating the updated position.
-	m_Position->SetFrameTime(m_Timer->GetTime());
-
-	// Check keys have been pressed, if so rotate the camera accordingly.
-	m_Position->TurnLeft(m_Input->IsKeyPressed(DIK_A));
-	m_Position->TurnRight(m_Input->IsKeyPressed(DIK_D));
-	m_Position->TurnUp(m_Input->IsKeyPressed(DIK_W));
-	m_Position->TurnDown(m_Input->IsKeyPressed(DIK_S));
-
-	// Get the current view point rotation.
-	m_Position->GetRotation(rotationX, rotationY);
-
-	// Get the location of the mouse from the input object,
-	m_Input->GetMouseLocation(mouseX, mouseY);
-
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(mouseX, mouseY, m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime(), rotationX, rotationY);
+	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime(), m_Input);
 	if(!result) return false;
 
 	// Finally render the graphics to the screen.
@@ -262,7 +245,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight) {
 	} else {
 		if(!FULL_SCREEN_WINDOWED) {
 			// If windowed then set it to 800x600 resolution.
-			screenWidth  = 800;
+			screenWidth = 800;
 			screenHeight = 600;
 		}
 		// Place the window in the middle of the screen.
@@ -272,8 +255,8 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight) {
 
 	// Create the window with the screen settings and get the handle to it.
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_applicationName, m_applicationName, 
-				WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
-				posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+		posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
 
 	// Bring the window up on the screen and set it as main focus.
 	ShowWindow(m_hwnd, SW_SHOW);

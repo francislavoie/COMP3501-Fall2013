@@ -302,3 +302,13 @@ void BitmapClass::ReleaseTexture() {
 D3DXMATRIX BitmapClass::GetViewMatrix() {
 	return m_baseViewMatrix;
 }
+
+
+int BitmapClass::GetCenterX() {
+	return m_screenWidth / 2 - m_bitmapWidth / 2;
+}
+
+
+int BitmapClass::GetCenterY() {
+	return m_screenHeight / 2 - m_bitmapHeight / 2;
+}

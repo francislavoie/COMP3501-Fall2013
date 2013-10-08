@@ -3,14 +3,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "cameraclass.h"
 
-CameraClass::CameraClass() {
-	m_positionX = 0.0f;
-	m_positionY = 0.0f;
-	m_positionZ = 0.0f;
 
-	m_rotationX = 0.0f;
-	m_rotationY = 0.0f;
-	m_rotationZ = 0.0f;
+CameraClass::CameraClass() {
+	m_position = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	D3DXQuaternionIdentity(&m_quatOrientation);
+	D3DXMatrixIdentity(&m_viewMatrix);
+
+	upToDate = true;
+}
+
+CameraClass::CameraClass(D3DXVECTOR3 pos) {
+	m_position = pos;
+
+	D3DXQuaternionIdentity(&m_quatOrientation);
+	D3DXMatrixIdentity(&m_viewMatrix);
+	
+	upToDate = false;
 }
 
 
@@ -21,73 +30,207 @@ CameraClass::~CameraClass() { }
 
 
 void CameraClass::SetPosition(float x, float y, float z) {
-	m_positionX = x;
-	m_positionY = y;
-	m_positionZ = z;
+	m_position = D3DXVECTOR3(x, y, z);
+	upToDate = false;
 	return;
 }
 
 
-void CameraClass::SetRotation(float x, float y, float z) {
-	m_rotationX = x;
-	m_rotationY = y;
-	m_rotationZ = z;
+void CameraClass::SetPosition(D3DXVECTOR3 v) {
+	m_position = v;
+	upToDate = false;
 	return;
 }
 
 
-D3DXVECTOR3 CameraClass::GetPosition() {
-	return D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
-}
-
-
-D3DXVECTOR3 CameraClass::GetRotation() {
-	return D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
-}
-
-void CameraClass::Render() {
-	D3DXVECTOR3 up, position, lookAt;
-	float yaw, pitch, roll;
-	D3DXMATRIX rotationMatrix;
-
-	// Setup the vector that points upwards.
-	up.x = 0.0f;
-	up.y = 1.0f;
-	up.z = 0.0f;
-
-	// Setup the position of the camera in the world.
-	position.x = m_positionX;
-	position.y = m_positionY;
-	position.z = m_positionZ;
-
-	// Setup where the camera is looking by default.
-	lookAt.x = 0.0f;
-	lookAt.y = 0.0f;
-	lookAt.z = 1.0f;
-
-	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-	pitch = m_rotationX * 0.0174532925f;
-	yaw   = m_rotationY * 0.0174532925f;
-	roll  = m_rotationZ * 0.0174532925f;
-
-	// Create the rotation matrix from the yaw, pitch, and roll values.
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, yaw, pitch, roll);
-
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
-	D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
-
-	// Translate the rotated camera position to the location of the viewer.
-	lookAt = position + lookAt;
-
-	// Finally create the view matrix from the three updated vectors.
-	D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
-
+void CameraClass::SetOrientation(D3DXQUATERNION quatOrient) {
+	m_quatOrientation = quatOrient;
+	upToDate = false;
 	return;
+}
+
+
+void CameraClass::Update() {
+	D3DXMATRIX matTranslation;
+
+	D3DXMatrixTranslation(&matTranslation, -m_position.x, -m_position.y , -m_position.z);
+
+	// Calculate rotation by taking the conjugate of the quaternion
+	D3DXMATRIX matRotation;
+	D3DXMatrixRotationQuaternion(
+		&matRotation, 
+		&D3DXQUATERNION(
+			-m_quatOrientation.x, 
+			-m_quatOrientation.y, 
+			-m_quatOrientation.z,
+			m_quatOrientation.w
+		)
+	);
+
+	// Apply rotation & translation matrix at view matrix
+	D3DXMatrixMultiply(&m_viewMatrix, &matTranslation, &matRotation);
+
+	upToDate = true;
 }
 
 
 void CameraClass::GetViewMatrix(D3DXMATRIX& viewMatrix) {
+	if(!upToDate) Update();
 	viewMatrix = m_viewMatrix;
 	return;
+}
+
+
+const D3DXVECTOR3 CameraClass::GetAxisX() const {	
+	D3DXVECTOR3 vAxis;
+	vAxis.x = m_viewMatrix._11;
+	vAxis.y = m_viewMatrix._21;
+	vAxis.z = m_viewMatrix._31;
+	return vAxis;
+}
+
+const D3DXVECTOR3 CameraClass::GetAxisY() const {
+	D3DXVECTOR3 vAxis;
+	vAxis.x = m_viewMatrix._12;
+	vAxis.y = m_viewMatrix._22;
+	vAxis.z = m_viewMatrix._32;
+	return vAxis;
+}
+
+const D3DXVECTOR3 CameraClass::GetAxisZ() const {
+	D3DXVECTOR3 vAxis;
+	vAxis.x = m_viewMatrix._13;
+	vAxis.y = m_viewMatrix._23;
+	vAxis.z = m_viewMatrix._33;
+	return vAxis;
+}
+
+void CameraClass::ApplyTranslation(float fDistance , eDir ceDir) {
+	D3DXVECTOR3 vDir;
+
+	switch (ceDir) {
+		case MOVE: {
+			vDir = GetAxisZ();
+			break;
+		}
+		case STRAFE: {
+			vDir = GetAxisX();
+			break;
+		}
+		case UPWARDS: {
+			vDir = GetAxisY();
+			break;
+		}
+	}
+	
+	m_position += vDir * fDistance * 10;
+
+	upToDate = false;
+
+	return;
+}
+
+bool CameraClass::RotateXAxis(D3DXQUATERNION *pOrientation, float fAngle) { 
+	bool bSuccess = false;
+
+	if(pOrientation) {
+		D3DXQUATERNION Rotation;
+
+		D3DXQuaternionRotationAxis(	
+			&Rotation, 
+			TransformVector(
+				pOrientation, 
+				&D3DXVECTOR3(1.0f, 0.0f, 0.0f)
+			), fAngle);
+
+		*pOrientation *= Rotation;
+
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+
+bool CameraClass::RotateYAxis(D3DXQUATERNION *pOrientation, float fAngle) { 
+	bool bSuccess = false;
+
+	if(pOrientation) {
+		D3DXQUATERNION Rotation;
+
+		D3DXQuaternionRotationAxis(
+			&Rotation, 
+			TransformVector(
+				pOrientation, 
+				&D3DXVECTOR3(0.0f, 1.0f, 0.0f)
+			), fAngle);
+
+		*pOrientation *= Rotation;
+
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+
+bool CameraClass::RotateZAxis(D3DXQUATERNION *pOrientation, float fAngle) { 
+	bool bSuccess = false;
+
+	if(pOrientation) {
+		D3DXQUATERNION Rotation;
+		
+		D3DXQuaternionRotationAxis(	
+			&Rotation, 
+			TransformVector(
+				pOrientation, 
+				&D3DXVECTOR3(0.0f, 0.0f, 1.0f)
+			), fAngle);
+
+		*pOrientation *= Rotation;
+
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+void CameraClass::ApplyRotate(float fAngle, eOrient oeOrient) {
+	switch( oeOrient ) {
+		case PITCH: {
+			RotateXAxis(&m_quatOrientation, fAngle);
+			break;
+		}
+		case YAW: {
+			RotateYAxis(&m_quatOrientation, fAngle);
+			break;
+		}
+		case ROLL: {
+			RotateZAxis(&m_quatOrientation, fAngle);
+			break;
+		}
+	}
+
+	D3DXQuaternionNormalize(&m_quatOrientation, &m_quatOrientation);
+
+	upToDate = false;
+
+	return;
+}
+
+D3DXVECTOR3* CameraClass::TransformVector(D3DXQUATERNION *pOrientation, D3DXVECTOR3 *pAxis) {
+	D3DVECTOR vNewAxis;
+	D3DXMATRIX matRotation;
+
+	// Build a matrix from the quaternion.
+	D3DXMatrixRotationQuaternion(&matRotation, pOrientation); 
+
+	// Transform the queried axis vector by the matrix.
+	vNewAxis.x = (pAxis->x * matRotation._11) + (pAxis->y * matRotation._21) + (pAxis->z * matRotation._31) + matRotation._41; 
+	vNewAxis.y = (pAxis->x * matRotation._12) + (pAxis->y * matRotation._22) + (pAxis->z * matRotation._32) + matRotation._42;
+	vNewAxis.z = (pAxis->x * matRotation._13) + (pAxis->y * matRotation._23) + (pAxis->z * matRotation._33) + matRotation._43;
+
+	memcpy(pAxis, &vNewAxis, sizeof(vNewAxis)); // Copy axis.
+	
+	return pAxis;
 }

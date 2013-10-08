@@ -41,18 +41,19 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	if(FAILED(result)) return false;
 
 	// Set the cooperative level of the keyboard to not share with other programs.
-	result = m_keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+	result = m_keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if(FAILED(result)) return false;
 
-	// Now acquire the keyboard.
-	result = m_keyboard->Acquire();
-	if(FAILED(result)) return false;
+	do {
+		// Now acquire the keyboard.
+		result = m_keyboard->Acquire();
+	} while (FAILED(result));
 
 	// Initialize the direct input interface for the mouse.
 	result = m_directInput->CreateDevice(GUID_SysMouse, &m_mouse, NULL);
 	if(FAILED(result)) return false;
 
-	// Set the data format for the mouse using the pre-defined mouse data format.
+	// Set the data format for the mouse using the predefined mouse data format.
 	result = m_mouse->SetDataFormat(&c_dfDIMouse);
 	if(FAILED(result)) return false;
 
@@ -60,9 +61,10 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	result = m_mouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if(FAILED(result)) return false;
 
-	// Acquire the mouse.
-	result = m_mouse->Acquire();
-	if(FAILED(result)) return false;
+	do {
+		// Acquire the mouse.
+		result = m_mouse->Acquire();
+	} while (FAILED(result));
 
 	return true;
 }
@@ -143,8 +145,8 @@ bool InputClass::ReadMouse() {
 
 void InputClass::ProcessInput() {
 	// Update the location of the mouse cursor based on the change of the mouse location during the frame.
-	m_mouseX += m_mouseState.lX;
-	m_mouseY += m_mouseState.lY;
+	m_mouseX += m_deltaX = m_mouseState.lX;
+	m_mouseY += m_deltaY = m_mouseState.lY;
 
 	// Ensure the mouse location doesn't exceed the screen width or height.
 	if(m_mouseX < 0) m_mouseX = 0;
@@ -166,5 +168,12 @@ bool InputClass::IsKeyPressed(int key) {
 void InputClass::GetMouseLocation(int& mouseX, int& mouseY) {
 	mouseX = m_mouseX;
 	mouseY = m_mouseY;
+	return;
+}
+
+
+void InputClass::GetMouseDelta(int& deltaX, int& deltaY) {
+	deltaX = m_deltaX;
+	deltaY = m_deltaY;
 	return;
 }

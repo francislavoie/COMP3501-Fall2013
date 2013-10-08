@@ -9,15 +9,8 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{637e2ae7-811f-41c3-84ce-7594bd6a69bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input">
-      <UniqueIdentifier>{31ee3ab3-8a84-45bb-8590-8fec8f60e259}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Main">
       <UniqueIdentifier>{a00fbadc-0533-461e-9982-45e35683f6ce}</UniqueIdentifier>
@@ -46,18 +39,8 @@
     <Filter Include="Source Files\Graphics\Camera">
       <UniqueIdentifier>{894bb54a-ac64-4c00-8eb6-66390115c3d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders">
-      <UniqueIdentifier>{ea869218-4459-4f5e-8063-eed2cfac73e5}</UniqueIdentifier>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Source Files\Graphics\Shaders">
       <UniqueIdentifier>{6de81287-4fa4-4792-af71-0470d9d73724}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Textures">
-      <UniqueIdentifier>{3ec2bc63-8649-4e9a-8b55-a900dad2e192}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Models">
-      <UniqueIdentifier>{f9783964-16ee-451d-8324-07ebd5b05754}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Graphics\Text">
       <UniqueIdentifier>{8e19c791-6473-4ac9-b042-b8f3543b8325}</UniqueIdentifier>
@@ -65,14 +48,31 @@
     <Filter Include="Source Files\Graphics\Text">
       <UniqueIdentifier>{3d9dfcbd-3b90-498c-b78f-eaffb16848e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Fonts">
-      <UniqueIdentifier>{a1c3aa17-ad54-4747-a84c-7553e7552ff5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Main\Utils">
       <UniqueIdentifier>{83c2ac79-5f75-4448-9f38-65418f1f5a29}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Main\Util">
       <UniqueIdentifier>{c451b756-15e8-470a-939f-25d6a0ddd485}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{ea869218-4459-4f5e-8063-eed2cfac73e5}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files\Textures">
+      <UniqueIdentifier>{3ec2bc63-8649-4e9a-8b55-a900dad2e192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Models">
+      <UniqueIdentifier>{f9783964-16ee-451d-8324-07ebd5b05754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Fonts">
+      <UniqueIdentifier>{a1c3aa17-ad54-4747-a84c-7553e7552ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{31ee3ab3-8a84-45bb-8590-8fec8f60e259}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +243,18 @@
     </Image>
     <Image Include="data\font.dds">
       <Filter>Resource Files\Fonts</Filter>
+    </Image>
+    <Image Include="data\Am8.dds">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="data\Am13.dds">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="data\crosshairs.dds">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="data\cursor.dds">
+      <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

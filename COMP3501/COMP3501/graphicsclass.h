@@ -20,6 +20,8 @@
 #include "modellistclass.h"
 #include "frustumclass.h"
 
+#include "inputclass.h"
+
 
 /////////////
 // GLOBALS //
@@ -43,13 +45,18 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 
-	bool Frame(int, int, int, int, float, float, float);
+	bool Frame(int, int, float, InputClass*);
 	bool Render(float);
 
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
+
 	ModelClass* m_Model;
+	ModelClass* m_Model2;
+
+	ModelClass* m_Bullet;
+
 	BitmapClass* m_Bitmap;
 	MouseCursor* m_Cursor;
 	TextureShaderClass* m_TextureShader;
@@ -58,6 +65,8 @@ private:
 	TextClass* m_Text;
 	ModelListClass* m_ModelList;
 	FrustumClass* m_Frustum;
+
+	D3DXVECTOR3 bulletVelocity, bulletPosition;
 };
 
 #endif

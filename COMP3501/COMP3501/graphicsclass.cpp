@@ -6,7 +6,11 @@
 GraphicsClass::GraphicsClass() {
 	m_D3D = 0;
 	m_Camera = 0;
+
 	m_Model = 0;
+	m_Model2 = 0;
+	m_Bullet = 0;
+
 	m_LightShader = 0;
 	m_TextureShader = 0;
 	m_Light = 0;
@@ -45,7 +49,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 
 	// Initialize a base view matrix with the camera for 2D user interface rendering.
 	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
-	m_Camera->Render();
 	m_Camera->GetViewMatrix(baseViewMatrix);
 
 	// Create the text object.
@@ -78,7 +81,29 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Model) return false;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/rocky.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/Am13.dds");
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the model object.
+	m_Model2 = new ModelClass;
+	if(!m_Model2) return false;
+
+	// Initialize the model object.
+	result = m_Model2->Initialize(m_D3D->GetDevice(), "data/asteroid2.txt", L"data/Am8.dds");
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the model object.
+	m_Bullet = new ModelClass;
+	if(!m_Bullet) return false;
+
+	// Initialize the model object.
+	result = m_Bullet->Initialize(m_D3D->GetDevice(), "data/cube.txt", L"data/Am8.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -111,7 +136,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Bitmap) return false;
 
 	// Initialize the bitmap object.
-	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/seafloor.dds", baseViewMatrix, 100, 100);
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/crosshairs.dds", baseViewMatrix, 50, 50);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
@@ -133,7 +158,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_ModelList) return false;
 
 	// Initialize the model list object.
-	result = m_ModelList->Initialize(200);
+	result = m_ModelList->Initialize(500);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model list object.", L"Error", MB_OK);
 		return false;
@@ -203,6 +228,20 @@ void GraphicsClass::Shutdown() {
 		m_LightShader = 0;
 	}
 
+	// Release the bullet object.
+	if(m_Bullet) {
+		m_Bullet->Shutdown();
+		delete m_Bullet;
+		m_Bullet = 0;
+	}
+
+	// Release the model object.
+	if(m_Model2) {
+		m_Model2->Shutdown();
+		delete m_Model2;
+		m_Model2 = 0;
+	}
+
 	// Release the model object.
 	if(m_Model) {
 		m_Model->Shutdown();
@@ -226,8 +265,9 @@ void GraphicsClass::Shutdown() {
 }
 
 
-bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameTime, float rotationX, float rotationY) {
+bool GraphicsClass::Frame(int fps, int cpu, float time, InputClass* input) {
 	bool result;
+	int mouseX, mouseY, deltaX, deltaY;
 
 	// Set the frames per second.
 	result = m_Text->SetFps(fps, m_D3D->GetDeviceContext());
@@ -241,12 +281,40 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	//result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
 	//if(!result) return false;
 
+	input->GetMouseLocation(mouseX, mouseY);
+	input->GetMouseDelta(deltaX, deltaY);
+
 	m_Cursor->setPosition(mouseX, mouseY);
 
-	// Set the position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
+	// Mouse controls
+	m_Camera->Yaw(deltaX * 0.005f);
+	m_Camera->Pitch(deltaY * 0.005f);
 
-	m_Camera->SetRotation(rotationX, rotationY, 0.0f);
+	// Keyboard camera controls
+	if(input->IsKeyPressed(DIK_W)) m_Camera->Pitch(-0.005f * time);
+	if(input->IsKeyPressed(DIK_S)) m_Camera->Pitch(0.005f * time);
+	if(input->IsKeyPressed(DIK_A)) m_Camera->Yaw(-0.005f * time);
+	if(input->IsKeyPressed(DIK_D)) m_Camera->Yaw(0.005f * time);
+	if(input->IsKeyPressed(DIK_Q)) m_Camera->Roll(0.005f * time);
+	if(input->IsKeyPressed(DIK_E)) m_Camera->Roll(-0.005f * time);
+	
+	// Movement controls
+	if(input->IsKeyPressed(DIK_LSHIFT))
+		m_Camera->Move(0.01f * time);
+	else
+		m_Camera->Move(0.002f * time);
+
+	// Stop movement
+	if(input->IsKeyPressed(DIK_LCONTROL))
+		m_Camera->Move(-0.002f * time);
+
+	// Bullet controls
+	if(input->IsKeyPressed(DIK_SPACE)) {
+		bulletVelocity = m_Camera->GetAxisZ() * 0.1f;
+		bulletPosition = m_Camera->GetPosition() + 10*bulletVelocity - 0.6f * m_Camera->GetAxisY();
+	} else {
+		bulletPosition += bulletVelocity * time;
+	}
 
 	return true;
 }
@@ -254,17 +322,24 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 bool GraphicsClass::Render(float time) {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
-	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
-	bool renderModel, result;
-	int modelCount, renderCount, index;
-	float positionX, positionY, positionZ, radius;
+	bool renderModel, result, visible;
+	int modelCount, renderCount, index, modelType;
+	float radius;
 	D3DXVECTOR4 color;
+	D3DXVECTOR3 position;
+	D3DXQUATERNION rotation;
+
+	////////////////////////////////////////////////////////////////////////////
+	//			ROBOT MATH
+	////////////////////////////////////////////////////////////////////////////
+	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
 	static int direction = 1;
 	static bool state = true;
 	static float bodyrotation = (float)D3DX_PI/2.0f;
 	static float x = 0.0f;
 	static float armrotation = 0.0f;
 	float left = -10.0f, right = 10.0f;
+	int armCount = 8;
 
 	armrotation += (float)D3DX_PI * 0.001f * time;
 
@@ -273,9 +348,7 @@ bool GraphicsClass::Render(float time) {
 
 	D3DXMatrixScaling(&scale, 0.8f, 0.3f, 0.3f);
 	D3DXMatrixRotationY(&rotate, bodyrotation);
-
 	D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-
 	D3DXMatrixTranslation(&robotPosition, x, 0.0f, 0.0f);
 
 	if(x > right || x < left) {
@@ -288,15 +361,13 @@ bool GraphicsClass::Render(float time) {
 		bodyrotation = direction==1 ? (float)D3DX_PI/2 : (float)(3*D3DX_PI)/2;
 		state = true;
 	}
+	////////////////////////////////////////////////////////////////////////////
+	//			ROBOT MATH
+	////////////////////////////////////////////////////////////////////////////
 
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
-
-
-
-	// Generate the view matrix based on the camera's position.
-	m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
@@ -314,34 +385,58 @@ bool GraphicsClass::Render(float time) {
 	renderCount = 0;
 
 	// Go through all the models and render them only if they can be seen by the camera view.
-	for(index=0; index<modelCount; index++) {
+	for(index=0; index < modelCount; index++) {
 		// Get the position and color of the sphere model at this index.
-		m_ModelList->GetData(index, positionX, positionY, positionZ, color);
+		m_ModelList->GetData(index, position, color, rotation, visible, modelType, time);
 
-		// Set the radius of the sphere to 1.0 since this is already known.
-		radius = 1.0f;
-
-		// Check if the sphere model is in the view frustum.
-		renderModel = m_Frustum->CheckSphere(positionX, positionY, positionZ, radius);
-
-		// If it can be seen then render it, if not skip this model and check the next sphere.
-		if(renderModel) {
-			// Move the model to the location it should be rendered at.
-			D3DXMatrixTranslation(&worldMatrix, positionX, positionY, positionZ); 
-
-			// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-			m_Model->Render(m_D3D->GetDeviceContext());
-
-			// Render the model using the light shader.
-			m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-					   m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), color, 
-				       m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-
-			// Reset to the original world matrix.
-			m_D3D->GetWorldMatrix(worldMatrix);
-
-			// Since this model was rendered then increase the count for this frame.
-			renderCount++;
+		// If the model is visible, display it
+		if (visible) {
+			// Set the radius of the sphere to 1.0 since this is already known.
+			radius = 1.0f;
+	
+			// Check if the asteroid model is in the view frustum.
+			renderModel = m_Frustum->CheckSphere(position.x, position.y, position.z, radius);
+	
+			// Check if asteroid collides with ship
+			if(m_ModelList->GetDistance(index, m_Camera->GetPosition()) < radius + 2.0f) {
+				m_ModelList->Hide(index);
+			}
+	
+			// Check if asteroid collides with bullet
+			if(m_ModelList->GetDistance(index, bulletPosition) < radius + 0.15f) {
+				m_ModelList->Hide(index);
+			}
+	
+			// If it can be seen then render it, if not skip this model and check the next sphere.
+			if(renderModel) {
+				D3DXMATRIX local, rot, tran;
+	
+				// Rotate the model
+				D3DXMatrixRotationQuaternion(&rot, &rotation);
+	
+				// Move the model to the location it should be rendered at.
+				D3DXMatrixTranslation(&tran, position.x, position.y, position.z); 
+	
+				// Compose the transformations
+				local = rot * tran * worldMatrix;
+	
+				// Draw model based on type
+				if(modelType == 0) {
+					m_Model->Render(m_D3D->GetDeviceContext());
+					m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+						m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
+						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+				} else {
+					m_Model2->Render(m_D3D->GetDeviceContext());
+					m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+						m_Model2->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
+						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+				}
+	
+				
+				// Since this model was rendered then increase the count for this frame.
+				renderCount++;
+			}
 		}
 	}
 
@@ -349,78 +444,86 @@ bool GraphicsClass::Render(float time) {
 	result = m_Text->SetRenderCount(renderCount, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
+	////////////////////////////////////////////////////////////////////////////
+	//			BULLET DRAWING
+	////////////////////////////////////////////////////////////////////////////
+	D3DXMATRIX translationMatrix, scalingMatrix;
+	D3DXMatrixTranslation(&translationMatrix, bulletPosition.x, bulletPosition.y, bulletPosition.z);
+	D3DXMatrixScaling(&scalingMatrix, 0.15f, 0.15f, 0.15f);
+	worldMatrix = scalingMatrix * translationMatrix;
+	
+	m_Bullet->Render(m_D3D->GetDeviceContext());
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if(!result) return false;
+
+	m_D3D->GetWorldMatrix(worldMatrix);
+	////////////////////////////////////////////////////////////////////////////
+	//			BULLET DRAWING
+	////////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////////////////
+	//			ROBOT DRAWING
+	////////////////////////////////////////////////////////////////////////////
 	m_Model->Render(m_D3D->GetDeviceContext());
 
-	// Multiply pos with rotation of the entire robot
+	// Multiply position with rotation of the entire robot
 	worldMatrix = rotate * robotPosition;
 
 	// Render the model using the light shader.
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-				       m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-				       m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
-	int armCount = 8;
-
 	parent = worldMatrix;
-
 	for(int i = 0; i < armCount; i++) {
-
 		D3DXMATRIX translate, backtranslate, local, rotateZ;
-		
 		D3DXMatrixTranslation(&backtranslate, -0.8f, 0.0f, 0.0f);
-
 		D3DXMatrixTranslation(&translate, 1.6f, 0.0f, 0.0f);
-
 		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-
 		local = scale * translate * rotateZ * backtranslate * parent;
-
 		parent = translate * rotateZ * parent;
-
 		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						   m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-						   m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if(!result) return false;
 	}
 
 	parent = worldMatrix;
-
 	for(int i = 0; i < armCount; i++) {
-
 		D3DXMATRIX translate, backtranslate, local, rotateZ;
-		
 		D3DXMatrixTranslation(&backtranslate, 0.8f, 0.0f, 0.0f);
-
 		D3DXMatrixTranslation(&translate, -1.6f, 0.0f, 0.0f);
-
 		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-
 		local = scale * translate * rotateZ * backtranslate * parent;
-
 		parent = translate * rotateZ * parent;
-
 		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						   m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-						   m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if(!result) return false;
 	}
 
-	D3DXMatrixIdentity(&worldMatrix);
+	m_D3D->GetWorldMatrix(worldMatrix);
+	////////////////////////////////////////////////////////////////////////////
+	//			ROBOT DRAWING
+	////////////////////////////////////////////////////////////////////////////
 
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();
 
+	// Turn on the alpha blending before rendering the text.
+	m_D3D->TurnOnAlphaBlending();
+
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 100, 100);
+	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenterX(), m_Bitmap->GetCenterY());
 	if(!result) return false;
 
 	// Render the bitmap with the texture shader.
 	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
 	if(!result) return false;
-
-	// Turn on the alpha blending before rendering the text.
-	m_D3D->TurnOnAlphaBlending();
 
 	// Render the text strings.
 	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);

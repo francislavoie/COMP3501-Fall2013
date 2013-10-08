@@ -17,22 +17,50 @@
 class CameraClass {
 public:
 	CameraClass();
+	CameraClass(D3DXVECTOR3);
 	CameraClass(const CameraClass&);
 	~CameraClass();
 
+	void SetOrientation(D3DXQUATERNION);
+	void SetLookAt(D3DXVECTOR3, D3DXVECTOR3, D3DXVECTOR3);
+
+	void SetPosition(D3DXVECTOR3);
 	void SetPosition(float, float, float);
-	void SetRotation(float, float, float);
 
-	D3DXVECTOR3 GetPosition();
-	D3DXVECTOR3 GetRotation();
+	D3DXVECTOR3 GetPosition() const { return m_position; }
+	D3DXQUATERNION GetRotation() const { return m_quatOrientation; }
 
-	void Render();
 	void GetViewMatrix(D3DXMATRIX&);
 
+	void Pitch(float angle) { ApplyRotate(angle, PITCH); }
+	void Roll(float angle)	{ ApplyRotate(angle, ROLL); }
+	void Yaw(float angle) { ApplyRotate(angle, YAW); }
+
+	void Move(float distance ) { ApplyTranslation(distance, MOVE); }
+	void Strafe(float distance ) { ApplyTranslation(distance, STRAFE); }
+	void Up(float distance) { ApplyTranslation(distance, UPWARDS); }
+
+	const D3DXVECTOR3 GetAxisZ() const;
+	const D3DXVECTOR3 GetAxisY() const;
+	const D3DXVECTOR3 GetAxisX() const;
+
 private:
-	float m_positionX, m_positionY, m_positionZ;
-	float m_rotationX, m_rotationY, m_rotationZ;
+	D3DXVECTOR3 m_position;
+	D3DXQUATERNION	m_quatOrientation;
 	D3DXMATRIX m_viewMatrix;
+	bool upToDate;
+
+	enum eDir { MOVE, STRAFE, UPWARDS };
+	enum eOrient { PITCH, ROLL, YAW };
+
+	void Update();
+	static bool RotateZAxis(D3DXQUATERNION*, float);
+	static bool RotateYAxis(D3DXQUATERNION*, float);
+	static bool RotateXAxis(D3DXQUATERNION*, float);
+	static D3DXVECTOR3* TransformVector(D3DXQUATERNION*, D3DXVECTOR3*);
+
+	void ApplyTranslation(float, eDir); 
+	void ApplyRotate(float, eOrient);
 };
 
 #endif

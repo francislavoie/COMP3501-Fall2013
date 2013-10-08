@@ -143,6 +143,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="data\Am13.dds" />
+    <Image Include="data\Am8.dds" />
+    <Image Include="data\crosshairs.dds" />
+    <Image Include="data\cursor.dds" />
     <Image Include="data\font.dds" />
     <Image Include="data\rocky.dds" />
     <Image Include="data\seafloor.dds" />
