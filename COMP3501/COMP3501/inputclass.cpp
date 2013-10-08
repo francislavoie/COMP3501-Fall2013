@@ -46,6 +46,7 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 
 	do {
 		// Now acquire the keyboard.
+		if(FAILED(result)) Sleep(100);
 		result = m_keyboard->Acquire();
 	} while (FAILED(result));
 
@@ -63,6 +64,7 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 
 	do {
 		// Acquire the mouse.
+		if(FAILED(result)) Sleep(100);
 		result = m_mouse->Acquire();
 	} while (FAILED(result));
 
