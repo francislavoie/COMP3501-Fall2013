@@ -44,7 +44,7 @@ public:
 	int GetCenterX();
 	int GetCenterY();
 
-private:
+protected:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	bool UpdateBuffers(ID3D11DeviceContext*, int, int);
@@ -53,7 +53,7 @@ private:
 	bool LoadTexture(ID3D11Device*, WCHAR*);
 	void ReleaseTexture();
 
-private:
+protected:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	D3DXMATRIX m_baseViewMatrix;

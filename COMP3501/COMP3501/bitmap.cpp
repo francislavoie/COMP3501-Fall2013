@@ -182,8 +182,7 @@ bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, in
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	VertexType* verticesPtr;
 	HRESULT result;
-
-
+	
 	// If the position we are rendering this bitmap to has not changed then don't update the vertex buffer since it
 	// currently has the correct parameters.
 	if((positionX == m_previousPosX) && (positionY == m_previousPosY)) return true;

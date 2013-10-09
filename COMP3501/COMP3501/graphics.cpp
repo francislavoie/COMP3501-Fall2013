@@ -12,8 +12,7 @@ Graphics::Graphics() {
 	m_Bullet = 0;
 	m_Turret = 0;
 
-	m_LightShader = 0;
-	m_TextureShader = 0;
+	m_ShaderManager = 0;
 	m_Light = 0;
 	m_Bitmap = 0;
 	m_Cursor = 0;
@@ -66,14 +65,14 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -20.0f);
 	
-	// Create the texture shader object.
-	m_TextureShader = new TextureShader;
-	if(!m_TextureShader) return false;
+	// Create the shader manager object.
+	m_ShaderManager = new ShaderManager;
+	if(!m_ShaderManager) return false;
 
-	// Initialize the texture shader object.
-	result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+	// Initialize the shader manager object.
+	result = m_ShaderManager->Initialize(m_D3D->GetDevice(), hwnd);
 	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the shader manager object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -118,17 +117,6 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	result = m_Turret->Initialize(m_D3D->GetDevice(), "data/turret.obj", L"data/bulletrust.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the light shader object.
-	m_LightShader = new LightShader;
-	if(!m_LightShader) return false;
-
-	// Initialize the light shader object.
-	result = m_LightShader->Initialize(m_D3D->GetDevice(), hwnd);
-	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the light shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -220,24 +208,17 @@ void Graphics::Shutdown() {
 		m_Cursor = 0;
 	}
 
-	// Release the texture shader object.
-	if(m_TextureShader) {
-		m_TextureShader->Shutdown();
-		delete m_TextureShader;
-		m_TextureShader = 0;
+	// Release the shader manager object.
+	if(m_ShaderManager) {
+		m_ShaderManager->Shutdown();
+		delete m_ShaderManager;
+		m_ShaderManager = 0;
 	}
 
 	// Release the light object.
 	if(m_Light) {
 		delete m_Light;
 		m_Light = 0;
-	}
-
-	// Release the light shader object.
-	if(m_LightShader) {
-		m_LightShader->Shutdown();
-		delete m_LightShader;
-		m_LightShader = 0;
 	}
 
 	// Release the bullet object.
@@ -303,7 +284,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 
-	m_Cursor->setPosition(mouseX, mouseY);
+	m_Cursor->SetPosition(mouseX, mouseY);
 
 	// Mouse controls
 	m_Camera->Yaw(deltaX * 0.005f);
@@ -451,12 +432,12 @@ bool Graphics::Render(float time) {
 				// Draw model based on type
 				if(modelType == 0) {
 					m_Model->Render(m_D3D->GetDeviceContext());
-					m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+					m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 						m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
 						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 				} else {
 					m_Model2->Render(m_D3D->GetDeviceContext());
-					m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+					m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 						m_Model2->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
 						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 				}
@@ -481,7 +462,7 @@ bool Graphics::Render(float time) {
 	worldMatrix = rotationMatrix * translationMatrix;
 	
 	m_Bullet->Render(m_D3D->GetDeviceContext());
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -491,7 +472,7 @@ bool Graphics::Render(float time) {
 	worldMatrix = rotationMatrix * translationMatrix;
 
 	m_Turret->Render(m_D3D->GetDeviceContext());
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Turret->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -511,7 +492,7 @@ bool Graphics::Render(float time) {
 	worldMatrix = rotate * robotPosition;
 
 	// Render the model using the light shader.
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -524,7 +505,7 @@ bool Graphics::Render(float time) {
 		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
 		local = scale * translate * rotateZ * backtranslate * parent;
 		parent = translate * rotateZ * parent;
-		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+		result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if(!result) return false;
@@ -538,7 +519,7 @@ bool Graphics::Render(float time) {
 		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
 		local = scale * translate * rotateZ * backtranslate * parent;
 		parent = translate * rotateZ * parent;
-		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+		result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if(!result) return false;
@@ -560,7 +541,7 @@ bool Graphics::Render(float time) {
 	if(!result) return false;
 
 	// Render the bitmap with the texture shader.
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
+	result = m_ShaderManager->RenderTextureShader(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
 	if(!result) return false;
 
 	// Render the text strings.
@@ -570,7 +551,7 @@ bool Graphics::Render(float time) {
 	result = m_Cursor->Render(m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, m_Cursor->GetViewMatrix(), orthoMatrix, m_Cursor->GetTexture());
+	result = m_ShaderManager->RenderTextureShader(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, m_Cursor->GetViewMatrix(), orthoMatrix, m_Cursor->GetTexture());
 	if(!result) return false;
 
 	// Turn off alpha blending after rendering the text.

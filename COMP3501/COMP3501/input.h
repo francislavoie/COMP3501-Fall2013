@@ -57,6 +57,8 @@ private:
 	int m_screenWidth, m_screenHeight;
 	int m_mouseX, m_mouseY;
 	int m_deltaX, m_deltaY;
+
+	float m_mouseFactor;
 };
 
 #endif

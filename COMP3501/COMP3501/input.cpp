@@ -68,6 +68,11 @@ bool Input::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int scre
 		result = m_mouse->Acquire();
 	} while (FAILED(result));
 
+	// Get the mouse speed
+	int speed;
+	SystemParametersInfo(SPI_GETMOUSESPEED, 0, &speed, 0);
+	m_mouseFactor = speed / 7.5f;
+
 	return true;
 }
 
@@ -147,8 +152,8 @@ bool Input::ReadMouse() {
 
 void Input::ProcessInput() {
 	// Update the location of the mouse cursor based on the change of the mouse location during the frame.
-	m_mouseX += m_deltaX = m_mouseState.lX;
-	m_mouseY += m_deltaY = m_mouseState.lY;
+	m_mouseX += m_deltaX = int(m_mouseState.lX * m_mouseFactor);
+	m_mouseY += m_deltaY = int(m_mouseState.lY * m_mouseFactor);
 
 	// Ensure the mouse location doesn't exceed the screen width or height.
 	if(m_mouseX < 0) m_mouseX = 0;

@@ -2,6 +2,7 @@
 // Filename: systemclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "system.h"
+#include <iostream>
 
 SystemClass::SystemClass() {
 	m_Input = 0;
@@ -55,11 +56,11 @@ bool SystemClass::Initialize() {
 	// Initialize the fps object.
 	m_Fps->Initialize();
 
-	// Create the cpu object.
+	// Create the CPU object.
 	m_Cpu = new Cpu;
 	if(!m_Cpu) return false;
 
-	// Initialize the cpu object.
+	// Initialize the CPU object.
 	m_Cpu->Initialize();
 
 	// Create the timer object.
@@ -76,7 +77,7 @@ bool SystemClass::Initialize() {
 	// Create the position object.
 	m_Position = new Position;
 	if(!m_Position) return false;
-	
+
 	return true;
 }
 

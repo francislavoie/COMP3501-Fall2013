@@ -142,6 +142,15 @@
     <ClCompile Include="texture.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="shadermanager.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="bumpmapshader.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="bumpmodel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mousecursor.h">
@@ -210,6 +219,15 @@
     <ClInclude Include="light.h">
       <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="shadermanager.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="bumpmapshader.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="bumpmodel.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs.hlsl">
@@ -234,6 +252,12 @@
       <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="font.vs.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="bumpmap.vs.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="bumpmap.ps.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>

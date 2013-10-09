@@ -19,14 +19,14 @@
 #include "text.h"
 #include "modellist.h"
 #include "frustum.h"
-
+#include "shadermanager.h"
 #include "input.h"
 
 
 /////////////
 // GLOBALS //
 /////////////
-const bool FULL_SCREEN_WINDOWED = true;
+const bool FULL_SCREEN_WINDOWED = false;
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -60,9 +60,10 @@ private:
 
 	Bitmap* m_Bitmap;
 	MouseCursor* m_Cursor;
-	TextureShader* m_TextureShader;
-	LightShader* m_LightShader;
+
+	ShaderManager* m_ShaderManager;
 	Light* m_Light;
+
 	Text* m_Text;
 	ModelList* m_ModelList;
 	Frustum* m_Frustum;
