@@ -1,26 +1,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: bitmapclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
-#include "mousecursor.h"
+#include "bitmap.h"
 
 
-MouseCursor::MouseCursor() {
+Bitmap::Bitmap() {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
 	m_Texture = 0;
-
-	m_posX = 0;
-	m_posY = 0;
 }
 
 
-MouseCursor::MouseCursor(const MouseCursor& other) { }
+Bitmap::Bitmap(const Bitmap& other) { }
 
 
-MouseCursor::~MouseCursor() { }
+Bitmap::~Bitmap() { }
 
 
-bool MouseCursor::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, int bitmapWidth, int bitmapHeight) {
+bool Bitmap::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, int bitmapWidth, int bitmapHeight) {
 	bool result;
 
 	// Store the screen size.
@@ -50,7 +47,7 @@ bool MouseCursor::Initialize(ID3D11Device* device, int screenWidth, int screenHe
 }
 
 
-void MouseCursor::Shutdown() {
+void Bitmap::Shutdown() {
 	// Release the bitmap texture.
 	ReleaseTexture();
 
@@ -61,12 +58,12 @@ void MouseCursor::Shutdown() {
 }
 
 
-bool MouseCursor::Render(ID3D11DeviceContext* deviceContext) {
+bool Bitmap::Render(ID3D11DeviceContext* deviceContext, int positionX, int positionY) {
 	bool result;
 
 
 	// Re-build the dynamic vertex buffer for rendering to possibly a different location on the screen.
-	result = UpdateBuffers(deviceContext);
+	result = UpdateBuffers(deviceContext, positionX, positionY);
 	if(!result) return false;
 
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
@@ -76,24 +73,25 @@ bool MouseCursor::Render(ID3D11DeviceContext* deviceContext) {
 }
 
 
-int MouseCursor::GetIndexCount() {
+int Bitmap::GetIndexCount() {
 	return m_indexCount;
 }
 
 
-ID3D11ShaderResourceView* MouseCursor::GetTexture() {
+ID3D11ShaderResourceView* Bitmap::GetTexture() {
 	return m_Texture->GetTexture();
 }
 
 
-bool MouseCursor::InitializeBuffers(ID3D11Device* device) {
+bool Bitmap::InitializeBuffers(ID3D11Device* device) {
 	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
-	
+
+
 	// Set the number of vertices in the vertex array.
 	m_vertexCount = 6;
 
@@ -161,7 +159,7 @@ bool MouseCursor::InitializeBuffers(ID3D11Device* device) {
 }
 
 
-void MouseCursor::ShutdownBuffers() {
+void Bitmap::ShutdownBuffers() {
 	// Release the index buffer.
 	if(m_indexBuffer) {
 		m_indexBuffer->Release();
@@ -178,25 +176,30 @@ void MouseCursor::ShutdownBuffers() {
 }
 
 
-bool MouseCursor::UpdateBuffers(ID3D11DeviceContext* deviceContext) {
+bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, int positionY) {
 	float left, right, top, bottom;
 	VertexType* vertices;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	VertexType* verticesPtr;
 	HRESULT result;
-	
+
+
 	// If the position we are rendering this bitmap to has not changed then don't update the vertex buffer since it
 	// currently has the correct parameters.
-	if((m_posX == m_previousPosX) && (m_posY == m_previousPosY)) return true;
+	if((positionX == m_previousPosX) && (positionY == m_previousPosY)) return true;
+	
+	// If it has changed then update the position it is being rendered to.
+	m_previousPosX = positionX;
+	m_previousPosY = positionY;
 
 	// Calculate the screen coordinates of the left side of the bitmap.
-	left = (float)((m_screenWidth / 2) * -1) + (float)m_posX;
+	left = (float)((m_screenWidth / 2) * -1) + (float)positionX;
 
 	// Calculate the screen coordinates of the right side of the bitmap.
 	right = left + (float)m_bitmapWidth;
 
 	// Calculate the screen coordinates of the top of the bitmap.
-	top = (float)(m_screenHeight / 2) - (float)m_posY;
+	top = (float)(m_screenHeight / 2) - (float)positionY;
 
 	// Calculate the screen coordinates of the bottom of the bitmap.
 	bottom = top - (float)m_bitmapHeight;
@@ -247,7 +250,7 @@ bool MouseCursor::UpdateBuffers(ID3D11DeviceContext* deviceContext) {
 }
 
 
-void MouseCursor::RenderBuffers(ID3D11DeviceContext* deviceContext) {
+void Bitmap::RenderBuffers(ID3D11DeviceContext* deviceContext) {
 	unsigned int stride;
 	unsigned int offset;
 
@@ -269,7 +272,7 @@ void MouseCursor::RenderBuffers(ID3D11DeviceContext* deviceContext) {
 }
 
 
-bool MouseCursor::LoadTexture(ID3D11Device* device, WCHAR* filename) {
+bool Bitmap::LoadTexture(ID3D11Device* device, WCHAR* filename) {
 	bool result;
 
 	// Create the texture object.
@@ -284,7 +287,7 @@ bool MouseCursor::LoadTexture(ID3D11Device* device, WCHAR* filename) {
 }
 
 
-void MouseCursor::ReleaseTexture() {
+void Bitmap::ReleaseTexture() {
 	// Release the texture object.
 	if(m_Texture) {
 		m_Texture->Shutdown();
@@ -296,19 +299,16 @@ void MouseCursor::ReleaseTexture() {
 }
 
 
-void MouseCursor::setPosition(int x, int y) {
-
-	// If it has changed then update the position it is being rendered to.
-	m_previousPosX = m_posX;
-	m_previousPosY = m_posY;
-
-	m_posX = x;
-	m_posY = y;
-
-	return;
+D3DXMATRIX Bitmap::GetViewMatrix() {
+	return m_baseViewMatrix;
 }
 
 
-D3DXMATRIX MouseCursor::GetViewMatrix() {
-	return m_baseViewMatrix;
+int Bitmap::GetCenterX() {
+	return m_screenWidth / 2 - m_bitmapWidth / 2;
+}
+
+
+int Bitmap::GetCenterY() {
+	return m_screenHeight / 2 - m_bitmapHeight / 2;
 }

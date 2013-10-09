@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: bitmapclass.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _MOUSECURSORCLASS_H_
-#define _MOUSECURSORCLASS_H_
+#ifndef _BITMAPCLASS_H_
+#define _BITMAPCLASS_H_
 
 
 //////////////
@@ -19,9 +19,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class name: MouseCursor
+// Class name: BitmapClass
 ////////////////////////////////////////////////////////////////////////////////
-class MouseCursor {
+class Bitmap {
 private:
 	struct VertexType {
 		D3DXVECTOR3 position;
@@ -29,24 +29,25 @@ private:
 	};
 
 public:
-	MouseCursor();
-	MouseCursor(const MouseCursor&);
-	~MouseCursor();
+	Bitmap();
+	Bitmap(const Bitmap&);
+	~Bitmap();
 
 	bool Initialize(ID3D11Device*, int, int, WCHAR*, D3DXMATRIX, int, int);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*);
-
-	void setPosition(int, int);
+	bool Render(ID3D11DeviceContext*, int, int);
 
 	int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 	D3DXMATRIX GetViewMatrix();
 
+	int GetCenterX();
+	int GetCenterY();
+
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
-	bool UpdateBuffers(ID3D11DeviceContext*);
+	bool UpdateBuffers(ID3D11DeviceContext*, int, int);
 	void RenderBuffers(ID3D11DeviceContext*);
 
 	bool LoadTexture(ID3D11Device*, WCHAR*);
@@ -60,8 +61,6 @@ private:
 	int m_screenWidth, m_screenHeight;
 	int m_bitmapWidth, m_bitmapHeight;
 	int m_previousPosX, m_previousPosY;
-
-	int m_posX, m_posY;
 };
 
 #endif

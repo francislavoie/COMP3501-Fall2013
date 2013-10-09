@@ -14,11 +14,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: LightClass
 ////////////////////////////////////////////////////////////////////////////////
-class LightClass {
+class Light {
 public:
-	LightClass();
-	LightClass(const LightClass&);
-	~LightClass();
+	Light();
+	Light(const Light&);
+	~Light();
 
 	void SetAmbientColor(float, float, float, float);
 	void SetDiffuseColor(float, float, float, float);

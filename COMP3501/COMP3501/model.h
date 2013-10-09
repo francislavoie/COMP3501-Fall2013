@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Filename: bitmapclass.h
+// Filename: modelclass.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _MOUSECURSORCLASS_H_
-#define _MOUSECURSORCLASS_H_
+#ifndef _MODELCLASS_H_
+#define _MODELCLASS_H_
 
 
 //////////////
@@ -11,57 +11,59 @@
 #include <d3d11.h>
 #include <d3dx10math.h>
 
+#include <fstream>
+#include <string>
+using namespace std;
 
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "texture.h"
+#include "arraylist.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class name: MouseCursor
+// Class name: ModelClass
 ////////////////////////////////////////////////////////////////////////////////
-class MouseCursor {
-private:
+class Model {
+protected:
+
 	struct VertexType {
-		D3DXVECTOR3 position;
-	    D3DXVECTOR2 texture;
+		D3DXVECTOR3 pos;
+		D3DXVECTOR2 tex;
+		D3DXVECTOR3 nrm;
 	};
 
 public:
-	MouseCursor();
-	MouseCursor(const MouseCursor&);
-	~MouseCursor();
+	Model();
+	Model(const Model&);
+	~Model();
 
-	bool Initialize(ID3D11Device*, int, int, WCHAR*, D3DXMATRIX, int, int);
+	bool Initialize(ID3D11Device*, char*, WCHAR*);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*);
-
-	void setPosition(int, int);
+	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
-	ID3D11ShaderResourceView* GetTexture();
-	D3DXMATRIX GetViewMatrix();
 
-private:
+	ID3D11ShaderResourceView* GetTexture();
+
+protected:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
-	bool UpdateBuffers(ID3D11DeviceContext*);
 	void RenderBuffers(ID3D11DeviceContext*);
 
 	bool LoadTexture(ID3D11Device*, WCHAR*);
 	void ReleaseTexture();
 
+	bool LoadModel(char*);
+	bool LoadModelObj(char*);
+	void ReleaseModel();
+
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	D3DXMATRIX m_baseViewMatrix;
 	Texture* m_Texture;
-	int m_screenWidth, m_screenHeight;
-	int m_bitmapWidth, m_bitmapHeight;
-	int m_previousPosX, m_previousPosY;
-
-	int m_posX, m_posY;
+	VertexType* m_Model;
 };
 
 #endif
