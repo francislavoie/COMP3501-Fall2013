@@ -12,12 +12,14 @@
 #include <d3dx10math.h>
 
 #include <fstream>
+#include <string>
 using namespace std;
 
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "textureclass.h"
+#include "arraylist.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +62,7 @@ private:
 	void ReleaseTexture();
 
 	bool LoadModel(char*);
+	bool LoadModelObj(char*);
 	void ReleaseModel();
 
 private:

@@ -207,6 +207,9 @@
     <ClInclude Include="positionclass.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="arraylist.h">
+      <Filter>Header Files\Main\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs.hlsl">

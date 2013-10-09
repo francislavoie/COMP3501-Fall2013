@@ -56,6 +56,7 @@ private:
 	ModelClass* m_Model2;
 
 	ModelClass* m_Bullet;
+	ModelClass* m_Turret;
 
 	BitmapClass* m_Bitmap;
 	MouseCursor* m_Cursor;
@@ -67,6 +68,10 @@ private:
 	FrustumClass* m_Frustum;
 
 	D3DXVECTOR3 bulletVelocity, bulletPosition;
+	D3DXQUATERNION bulletRotation;
+
+	D3DXVECTOR3 turretVelocity, turretPosition;
+	D3DXQUATERNION turretRotation;
 };
 
 #endif

@@ -10,6 +10,7 @@ GraphicsClass::GraphicsClass() {
 	m_Model = 0;
 	m_Model2 = 0;
 	m_Bullet = 0;
+	m_Turret = 0;
 
 	m_LightShader = 0;
 	m_TextureShader = 0;
@@ -103,7 +104,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Bullet) return false;
 
 	// Initialize the model object.
-	result = m_Bullet->Initialize(m_D3D->GetDevice(), "data/cube.txt", L"data/Am8.dds");
+	result = m_Bullet->Initialize(m_D3D->GetDevice(), "data/tank.obj", L"data/bulletrust.dds");
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the model object.
+	m_Turret = new ModelClass;
+	if(!m_Turret) return false;
+
+	// Initialize the model object.
+	result = m_Turret->Initialize(m_D3D->GetDevice(), "data/turret.obj", L"data/bulletrust.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -229,6 +241,13 @@ void GraphicsClass::Shutdown() {
 	}
 
 	// Release the bullet object.
+	if(m_Turret) {
+		m_Turret->Shutdown();
+		delete m_Turret;
+		m_Turret = 0;
+	}
+
+	// Release the bullet object.
 	if(m_Bullet) {
 		m_Bullet->Shutdown();
 		delete m_Bullet;
@@ -308,12 +327,21 @@ bool GraphicsClass::Frame(int fps, int cpu, float time, InputClass* input) {
 	if(input->IsKeyPressed(DIK_LCONTROL))
 		m_Camera->Move(-0.002f * time);
 
+	D3DXMATRIX viewMatrix;
+	m_Camera->GetViewMatrix(viewMatrix);
+
 	// Bullet controls
 	if(input->IsKeyPressed(DIK_SPACE)) {
-		bulletVelocity = m_Camera->GetAxisZ() * 0.1f;
-		bulletPosition = m_Camera->GetPosition() + 10*bulletVelocity - 0.6f * m_Camera->GetAxisY();
+		bulletVelocity = m_Camera->GetAxisZ() * 0.05f;
+		bulletPosition = m_Camera->GetPosition() + 50*bulletVelocity - 0.5f * m_Camera->GetAxisY();
+		bulletRotation = m_Camera->GetRotation();
+
+		turretVelocity = m_Camera->GetAxisZ() * 0.05f;
+		turretPosition = m_Camera->GetPosition() + 50*bulletVelocity - 0.02f * m_Camera->GetAxisY();
+		turretRotation = m_Camera->GetRotation();
 	} else {
 		bulletPosition += bulletVelocity * time;
+		turretPosition += turretVelocity * time;
 	}
 
 	return true;
@@ -447,14 +475,24 @@ bool GraphicsClass::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			BULLET DRAWING
 	////////////////////////////////////////////////////////////////////////////
-	D3DXMATRIX translationMatrix, scalingMatrix;
+	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix;
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &bulletRotation);
 	D3DXMatrixTranslation(&translationMatrix, bulletPosition.x, bulletPosition.y, bulletPosition.z);
-	D3DXMatrixScaling(&scalingMatrix, 0.15f, 0.15f, 0.15f);
-	worldMatrix = scalingMatrix * translationMatrix;
+	worldMatrix = rotationMatrix * translationMatrix;
 	
 	m_Bullet->Render(m_D3D->GetDeviceContext());
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if(!result) return false;
+
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &turretRotation);
+	D3DXMatrixTranslation(&translationMatrix, turretPosition.x, turretPosition.y, turretPosition.z);
+	worldMatrix = rotationMatrix * translationMatrix;
+
+	m_Turret->Render(m_D3D->GetDeviceContext());
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_Turret->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 

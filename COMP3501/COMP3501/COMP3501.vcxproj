@@ -113,6 +113,7 @@
     <ClInclude Include="frustumclass.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="d3dclass.h" />
+    <ClInclude Include="arraylist.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="modelclass.h" />
