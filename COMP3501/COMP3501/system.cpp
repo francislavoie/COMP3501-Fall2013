@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "system.h"
 
-System::System() {
+SystemClass::SystemClass() {
 	m_Input = 0;
 	m_Graphics = 0;
 	m_Fps = 0;
@@ -12,13 +12,13 @@ System::System() {
 	m_Position = 0;
 }
 
-System::System(const System& other) { }
+SystemClass::SystemClass(const SystemClass& other) { }
 
 
-System::~System() { }
+SystemClass::~SystemClass() { }
 
 
-bool System::Initialize() {
+bool SystemClass::Initialize() {
 	int screenWidth, screenHeight;
 	bool result;
 	
@@ -80,7 +80,7 @@ bool System::Initialize() {
 	return true;
 }
 
-void System::Shutdown() {
+void SystemClass::Shutdown() {
 
 	// Release the position object.
 	if(m_Position) {
@@ -127,7 +127,7 @@ void System::Shutdown() {
 	return;
 }
 
-void System::Run() {
+void SystemClass::Run() {
 	MSG msg;
 	bool done, result;
 
@@ -164,7 +164,7 @@ void System::Run() {
 }
 
 
-bool System::Frame() {
+bool SystemClass::Frame() {
 	bool result;
 
 	// Update the system stats.
@@ -187,11 +187,11 @@ bool System::Frame() {
 	return true;
 }
 
-LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
-void System::InitializeWindows(int& screenWidth, int& screenHeight) {
+void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight) {
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
 	int posX, posY;
@@ -269,7 +269,7 @@ void System::InitializeWindows(int& screenWidth, int& screenHeight) {
 	return;
 }
 
-void System::ShutdownWindows() {
+void SystemClass::ShutdownWindows() {
 	// Show the mouse cursor.
 	ShowCursor(true);
 
