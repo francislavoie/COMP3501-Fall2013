@@ -154,6 +154,7 @@ void Input::ProcessInput() {
 	// Update the location of the mouse cursor based on the change of the mouse location during the frame.
 	m_mouseX += m_deltaX = int(m_mouseState.lX * m_mouseFactor);
 	m_mouseY += m_deltaY = int(m_mouseState.lY * m_mouseFactor);
+	m_mouseZ += m_deltaZ = m_mouseState.lZ;
 
 	// Ensure the mouse location doesn't exceed the screen width or height.
 	if(m_mouseX < 0) m_mouseX = 0;
@@ -171,6 +172,12 @@ bool Input::IsKeyPressed(int key) {
 	return false;
 }
 
+bool Input::IsMousePressed(int button) {
+	if(m_mouseState.rgbButtons[button] & 0x80) return true;
+
+	return false;
+}
+
 
 void Input::GetMouseLocation(int& mouseX, int& mouseY) {
 	mouseX = m_mouseX;
@@ -182,5 +189,11 @@ void Input::GetMouseLocation(int& mouseX, int& mouseY) {
 void Input::GetMouseDelta(int& deltaX, int& deltaY) {
 	deltaX = m_deltaX;
 	deltaY = m_deltaY;
+	return;
+}
+
+
+void Input::GetWheelDelta(int& deltaZ) {
+	deltaZ = m_deltaZ;
 	return;
 }

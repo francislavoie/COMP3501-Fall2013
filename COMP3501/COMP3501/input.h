@@ -10,6 +10,10 @@
 ///////////////////////////////
 #define DIRECTINPUT_VERSION 0x0800
 
+#define MOUSE_LEFT 0
+#define MOUSE_RIGHT 1
+#define MOUSE_MIDDLE 2
+
 
 /////////////
 // LINKING //
@@ -37,9 +41,11 @@ public:
 	void Shutdown();
 	bool Frame();
 
+	bool IsMousePressed(int);
 	bool IsKeyPressed(int);
 	void GetMouseLocation(int&, int&);
 	void GetMouseDelta(int&, int&);
+	void GetWheelDelta(int&);
 
 private:
 	bool ReadKeyboard();
@@ -55,8 +61,8 @@ private:
 	DIMOUSESTATE m_mouseState;
 
 	int m_screenWidth, m_screenHeight;
-	int m_mouseX, m_mouseY;
-	int m_deltaX, m_deltaY;
+	int m_mouseX, m_mouseY, m_mouseZ;
+	int m_deltaX, m_deltaY, m_deltaZ;
 
 	float m_mouseFactor;
 };

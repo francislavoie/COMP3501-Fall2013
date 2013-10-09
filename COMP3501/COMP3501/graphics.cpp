@@ -312,7 +312,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Camera->GetViewMatrix(viewMatrix);
 
 	// Bullet controls
-	if(input->IsKeyPressed(DIK_SPACE)) {
+	if(input->IsKeyPressed(DIK_SPACE) || input->IsMousePressed(MOUSE_LEFT)) {
 		bulletVelocity = m_Camera->GetAxisZ() * 0.05f;
 		bulletPosition = m_Camera->GetPosition() + 50*bulletVelocity - 0.5f * m_Camera->GetAxisY();
 		bulletRotation = m_Camera->GetRotation();
