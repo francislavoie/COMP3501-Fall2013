@@ -15,22 +15,14 @@
 // Class name: MouseCursor
 ////////////////////////////////////////////////////////////////////////////////
 class MouseCursor : public Bitmap {
-private:
-	struct VertexType {
-		D3DXVECTOR3 position;
-	    D3DXVECTOR2 texture;
-	};
-
 public:
 	MouseCursor();
-	MouseCursor(const MouseCursor&);
-	~MouseCursor();
 
 	bool Render(ID3D11DeviceContext*);
-	void SetPosition(int, int);
+	void SetPosition(D3DXVECTOR2);
 
 private:
-	int m_posX, m_posY;
+	D3DXVECTOR2 m_pos;
 };
 
 #endif

@@ -42,7 +42,7 @@ public:
 	Graphics(const Graphics&);
 	~Graphics();
 
-	bool Initialize(int, int, HWND);
+	bool Initialize(D3DXVECTOR2, HWND);
 	void Shutdown();
 
 	bool Frame(int, int, float, Input*);

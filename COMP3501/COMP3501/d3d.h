@@ -29,7 +29,7 @@ public:
 	D3D(const D3D&);
 	~D3D();
 
-	bool Initialize(int, int, bool, HWND, bool, float, float);
+	bool Initialize(D3DXVECTOR2, bool, HWND, bool, float, float);
 	void Shutdown();
 	
 	void BeginScene(float, float, float, float);

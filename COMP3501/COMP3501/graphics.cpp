@@ -28,7 +28,8 @@ Graphics::Graphics(const Graphics& other) { }
 Graphics::~Graphics() { }
 
 
-bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
+bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
+{
 	bool result;
 	D3DXMATRIX baseViewMatrix;
 		
@@ -37,7 +38,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_D3D) return false;
 
 	// Initialize the Direct3D object.
-	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = m_D3D->Initialize(screen, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize Direct3D", L"Error", MB_OK);
 		return false;
@@ -56,7 +57,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Text) return false;
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 3);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
 		return false;
@@ -136,7 +137,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Bitmap) return false;
 
 	// Initialize the bitmap object.
-	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/crosshairs.dds", baseViewMatrix, 50, 50);
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screen, L"data/crosshairs.dds", baseViewMatrix, D3DXVECTOR2(50, 50));
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
@@ -147,7 +148,7 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	if(!m_Cursor) return false;
 
 	// Initialize the bitmap object.
-	result = m_Cursor->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"data/cursor.dds", baseViewMatrix, 25, 25);
+	result = m_Cursor->Initialize(m_D3D->GetDevice(), screen, L"data/cursor.dds", baseViewMatrix, D3DXVECTOR2(25, 25));
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
@@ -270,11 +271,11 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	int mouseX, mouseY, deltaX, deltaY;
 
 	// Set the frames per second.
-	result = m_Text->SetFps(fps, m_D3D->GetDeviceContext());
+	result = m_Text->SetFps(fps, 0, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	// Set the cpu usage.
-	result = m_Text->SetCpu(cpu, m_D3D->GetDeviceContext());
+	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	// Set the location of the mouse.
@@ -284,7 +285,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 
-	m_Cursor->SetPosition(mouseX, mouseY);
+	m_Cursor->SetPosition(D3DXVECTOR2(float(mouseX), float(mouseY)));
 
 	// Mouse controls
 	m_Camera->Yaw(deltaX * 0.005f);
@@ -450,7 +451,7 @@ bool Graphics::Render(float time) {
 	}
 
 	// Set the number of models that was actually rendered this frame.
-	result = m_Text->SetRenderCount(renderCount, m_D3D->GetDeviceContext());
+	result = m_Text->SetRenderCount(renderCount, 2, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	////////////////////////////////////////////////////////////////////////////
@@ -537,7 +538,7 @@ bool Graphics::Render(float time) {
 	m_D3D->TurnOnAlphaBlending();
 
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenterX(), m_Bitmap->GetCenterY());
+	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenter());
 	if(!result) return false;
 
 	// Render the bitmap with the texture shader.
