@@ -294,17 +294,18 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	int scroll;
 	input->GetWheelDelta(scroll);
-	m_Camera->Scoll(scroll);
-	if (input->IsMousePressed(MOUSE_RIGHT))
-		m_Camera->Rotate(deltaX);
+	m_Camera->Scroll(float(scroll));
+	if (input->IsMousePressed(MOUSE_RIGHT)) {
+		m_Camera->Rotate(float(deltaX));
+	}
 
 	if(input->IsKeyPressed(DIK_W)){
-		tankPosition += D3DXVECTOR3(0,0,0.1);
-		turretPosition += D3DXVECTOR3(0,0,0.1);
+		tankPosition += D3DXVECTOR3(0,0,0.1f);
+		turretPosition += D3DXVECTOR3(0,0,0.1f);
 	}
 	if(input->IsKeyPressed(DIK_S)){
-		tankPosition += D3DXVECTOR3(0,0,-0.1);
-		turretPosition += D3DXVECTOR3(0,0,-0.1);
+		tankPosition += D3DXVECTOR3(0,0,-0.1f);
+		turretPosition += D3DXVECTOR3(0,0,-0.1f);
 	}
 	m_Camera->setLookAtPosition(tankPosition);
 
@@ -496,7 +497,7 @@ bool Graphics::Render(float time) {
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
 	D3DXMatrixTranslation(&translationMatrix, turretPosition.x, turretPosition.y, turretPosition.z);
-	D3DXMatrixMultiply(&worldMatrix, &translationMatrix, &worldMatrix);
+	worldMatrix = translationMatrix * worldMatrix;
 		
 	m_Turret->Render(m_D3D->GetDeviceContext());
 	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
@@ -506,7 +507,7 @@ bool Graphics::Render(float time) {
 
 	m_D3D->GetWorldMatrix(worldMatrix);
 	////////////////////////////////////////////////////////////////////////////
-	//			BULLET DRAWING
+	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 
 

@@ -10,7 +10,7 @@
 //////////////
 #include <d3dx10math.h>
 
-const float angle = D3DX_PI*3/8;
+const float angle = float(D3DX_PI*3/8);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: CameraClass
@@ -40,7 +40,7 @@ public:
 	void Move(float distance ) { ApplyTranslation(distance, MOVE); }
 	void Strafe(float distance ) { ApplyTranslation(distance, STRAFE); }
 	void Up(float distance) { ApplyTranslation(distance, UPWARDS); }
-	void Scoll(float);
+	void Scroll(float);
 	void Rotate(float);
 	void setLookAtPosition(D3DXVECTOR3);
 

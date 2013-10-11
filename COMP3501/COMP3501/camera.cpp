@@ -6,7 +6,7 @@
 
 Camera::Camera() {
 	raiseDistance = 2.5f;
-	theta = D3DX_PI* 3/2;
+	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	CalculatePosition();
@@ -19,7 +19,7 @@ Camera::Camera() {
 
 Camera::Camera(D3DXVECTOR3 pos) {
 	raiseDistance = 2.5f;
-	theta = D3DX_PI* 3/2;
+	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	CalculatePosition();
@@ -67,26 +67,26 @@ void Camera::Update() {
 	
 	D3DXVECTOR3 v3Up, v3Right, v3LookAt = m_lookatPosition - m_position;
 
-    D3DXVec3Normalize( &v3LookAt, &v3LookAt );
-    D3DXVec3Cross( &v3Right, &D3DXVECTOR3(0,1,0), &v3LookAt );
-    D3DXVec3Normalize( &v3Right, &v3Right );
-    D3DXVec3Cross( &v3Up, &v3LookAt, &v3Right );
-    D3DXVec3Normalize( &v3Up, &v3Up );
+	D3DXVec3Normalize( &v3LookAt, &v3LookAt );
+	D3DXVec3Cross( &v3Right, &D3DXVECTOR3(0,1,0), &v3LookAt );
+	D3DXVec3Normalize( &v3Right, &v3Right );
+	D3DXVec3Cross( &v3Up, &v3LookAt, &v3Right );
+	D3DXVec3Normalize( &v3Up, &v3Up );
 
 	D3DXMATRIX mRotation;
-    D3DXMatrixIdentity( &mRotation );
+	D3DXMatrixIdentity( &mRotation );
 
-    mRotation(0,0) = v3Right.x;    
-    mRotation(0,1) = v3Up.x;
-    mRotation(0,2) = v3LookAt.x;
+	mRotation(0,0) = v3Right.x;    
+	mRotation(0,1) = v3Up.x;
+	mRotation(0,2) = v3LookAt.x;
 
-    mRotation(1,0) = v3Right.y;
-    mRotation(1,1) = v3Up.y;
-    mRotation(1,2) = v3LookAt.y;
+	mRotation(1,0) = v3Right.y;
+	mRotation(1,1) = v3Up.y;
+	mRotation(1,2) = v3LookAt.y;
 
-    mRotation(2,0) = v3Right.z;
-    mRotation(2,1) = v3Up.z;
-    mRotation(2,2) = v3LookAt.z;
+	mRotation(2,0) = v3Right.z;
+	mRotation(2,1) = v3Up.z;
+	mRotation(2,2) = v3LookAt.z;
 
 	D3DXQuaternionRotationMatrix( &m_quatOrientation, &mRotation );
 
@@ -282,7 +282,7 @@ void Camera::CalculatePosition()
 	//m_position = D3DXVECTOR3(m_position.x,raiseDistance,m_position.z) + m_lookatPosition;
 }
 
-void Camera::Scoll(float scroll)
+void Camera::Scroll(float scroll)
 {
 	raiseDistance -= scroll*0.001f;
 	if (raiseDistance < 0.75f)
@@ -290,7 +290,7 @@ void Camera::Scoll(float scroll)
 	else if (raiseDistance > 25.0f)
 		raiseDistance = 25.0f;
 	else
-		m_lookatPosition += D3DXVECTOR3(0,scroll*0.0002f,0);
+		m_lookatPosition += D3DXVECTOR3(0, scroll*0.0002f, 0);
 	upToDate = false;
 }
 
@@ -302,5 +302,5 @@ void Camera::Rotate(float rot)
 
 void Camera::setLookAtPosition(D3DXVECTOR3 laPosition)
 {
-	m_lookatPosition = laPosition + D3DXVECTOR3(0,raiseDistance - 2.5 *0.2f,0);
+	m_lookatPosition = laPosition + D3DXVECTOR3(0, raiseDistance - 2.5f * 0.2f, 0);
 }
