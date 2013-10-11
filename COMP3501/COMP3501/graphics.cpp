@@ -9,7 +9,7 @@ Graphics::Graphics() {
 
 	m_Model = 0;
 	m_Model2 = 0;
-	m_Bullet = 0;
+	m_Tank = 0;
 	m_Turret = 0;
 
 	m_ShaderManager = 0;
@@ -19,6 +19,9 @@ Graphics::Graphics() {
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
+
+	tankPosition = D3DXVECTOR3(0,0,0);
+	turretPosition = D3DXVECTOR3(0,0.53f,0);
 }
 
 
@@ -46,10 +49,11 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	// Create the camera object.
 	m_Camera = new Camera;
 	if(!m_Camera) return false;
+	//m_Camera->setPosition(0,0,0);
 
-	// Initialize a base view matrix with the camera for 2D user interface rendering.
-	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
-	m_Camera->GetViewMatrix(baseViewMatrix);
+	// Initialize a base view matrix for 2D user interface rendering.	
+	D3DXMatrixIdentity(&baseViewMatrix);
+	D3DXMatrixTranslation(&baseViewMatrix, 0,0,1);
 
 	// Create the text object.
 	m_Text = new Text;
@@ -99,15 +103,16 @@ bool Graphics::Initialize(int screenWidth, int screenHeight, HWND hwnd) {
 	}
 
 	// Create the model object.
-	m_Bullet = new Model;
-	if(!m_Bullet) return false;
+	m_Tank = new Model;
+	if(!m_Tank) return false;
 
 	// Initialize the model object.
-	result = m_Bullet->Initialize(m_D3D->GetDevice(), "data/tank.obj", L"data/bulletrust.dds");
+	result = m_Tank->Initialize(m_D3D->GetDevice(), "data/tank.obj", L"data/bulletrust.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
+
 
 	// Create the model object.
 	m_Turret = new Model;
@@ -221,18 +226,18 @@ void Graphics::Shutdown() {
 		m_Light = 0;
 	}
 
-	// Release the bullet object.
+	// Release the turret object.
 	if(m_Turret) {
 		m_Turret->Shutdown();
 		delete m_Turret;
 		m_Turret = 0;
 	}
 
-	// Release the bullet object.
-	if(m_Bullet) {
-		m_Bullet->Shutdown();
-		delete m_Bullet;
-		m_Bullet = 0;
+	// Release the Tank object.
+	if(m_Tank) {
+		m_Tank->Shutdown();
+		delete m_Tank;
+		m_Tank = 0;
 	}
 
 	// Release the model object.
@@ -286,6 +291,23 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	m_Cursor->SetPosition(mouseX, mouseY);
 
+	int scroll;
+	input->GetWheelDelta(scroll);
+	m_Camera->Scoll(scroll);
+	if (input->IsMousePressed(MOUSE_RIGHT))
+		m_Camera->Rotate(deltaX);
+
+	if(input->IsKeyPressed(DIK_W)){
+		tankPosition += D3DXVECTOR3(0,0,0.1);
+		turretPosition += D3DXVECTOR3(0,0,0.1);
+	}
+	if(input->IsKeyPressed(DIK_S)){
+		tankPosition += D3DXVECTOR3(0,0,-0.1);
+		turretPosition += D3DXVECTOR3(0,0,-0.1);
+	}
+	m_Camera->setLookAtPosition(tankPosition);
+
+	/*
 	// Mouse controls
 	m_Camera->Yaw(deltaX * 0.005f);
 	m_Camera->Pitch(deltaY * 0.005f);
@@ -323,7 +345,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	} else {
 		bulletPosition += bulletVelocity * time;
 		turretPosition += turretVelocity * time;
-	}
+	}*/
 
 	return true;
 }
@@ -411,10 +433,10 @@ bool Graphics::Render(float time) {
 				m_ModelList->Hide(index);
 			}
 	
-			// Check if asteroid collides with bullet
-			if(m_ModelList->GetDistance(index, bulletPosition) < radius + 0.15f) {
+			// Check if asteroid collides with tank
+			/*if(m_ModelList->GetDistance(index, tankPosition) < radius + 0.15f) {
 				m_ModelList->Hide(index);
-			}
+			}*/
 	
 			// If it can be seen then render it, if not skip this model and check the next sphere.
 			if(renderModel) {
@@ -454,23 +476,27 @@ bool Graphics::Render(float time) {
 	if(!result) return false;
 
 	////////////////////////////////////////////////////////////////////////////
-	//			BULLET DRAWING
+	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix;
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &bulletRotation);
-	D3DXMatrixTranslation(&translationMatrix, bulletPosition.x, bulletPosition.y, bulletPosition.z);
-	worldMatrix = rotationMatrix * translationMatrix;
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &tankRotation);
 	
-	m_Bullet->Render(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-		m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+	m_D3D->GetWorldMatrix(worldMatrix);
+	D3DXMatrixTranslation(&translationMatrix, tankPosition.x, tankPosition.y, tankPosition.z);
+	D3DXMatrixMultiply(&worldMatrix, &translationMatrix, &worldMatrix);
+	
+	m_Tank->Render(m_D3D->GetDeviceContext());
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_Tank->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
 	D3DXMatrixRotationQuaternion(&rotationMatrix, &turretRotation);
+	
+	m_D3D->GetWorldMatrix(worldMatrix);
 	D3DXMatrixTranslation(&translationMatrix, turretPosition.x, turretPosition.y, turretPosition.z);
-	worldMatrix = rotationMatrix * translationMatrix;
-
+	D3DXMatrixMultiply(&worldMatrix, &translationMatrix, &worldMatrix);
+		
 	m_Turret->Render(m_D3D->GetDeviceContext());
 	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Turret->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 

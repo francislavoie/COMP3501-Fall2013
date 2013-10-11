@@ -10,6 +10,7 @@
 //////////////
 #include <d3dx10math.h>
 
+const float angle = D3DX_PI*3/8;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: CameraClass
@@ -39,6 +40,9 @@ public:
 	void Move(float distance ) { ApplyTranslation(distance, MOVE); }
 	void Strafe(float distance ) { ApplyTranslation(distance, STRAFE); }
 	void Up(float distance) { ApplyTranslation(distance, UPWARDS); }
+	void Scoll(float);
+	void Rotate(float);
+	void setLookAtPosition(D3DXVECTOR3);
 
 	const D3DXVECTOR3 GetAxisZ() const;
 	const D3DXVECTOR3 GetAxisY() const;
@@ -48,6 +52,10 @@ private:
 	D3DXVECTOR3 m_position;
 	D3DXQUATERNION	m_quatOrientation;
 	D3DXMATRIX m_viewMatrix;
+	D3DXVECTOR3 m_lookatPosition;
+	float theta;
+	float raiseDistance;
+
 	bool upToDate;
 
 	enum eDir { MOVE, STRAFE, UPWARDS };
@@ -58,6 +66,7 @@ private:
 	static bool RotateYAxis(D3DXQUATERNION*, float);
 	static bool RotateXAxis(D3DXQUATERNION*, float);
 	static D3DXVECTOR3* TransformVector(D3DXQUATERNION*, D3DXVECTOR3*);
+	void CalculatePosition();
 
 	void ApplyTranslation(float, eDir); 
 	void ApplyRotate(float, eOrient);

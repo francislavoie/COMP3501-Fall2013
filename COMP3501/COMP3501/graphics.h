@@ -55,7 +55,7 @@ private:
 	Model* m_Model;
 	Model* m_Model2;
 
-	Model* m_Bullet;
+	Model* m_Tank;
 	Model* m_Turret;
 
 	Bitmap* m_Bitmap;
@@ -68,8 +68,8 @@ private:
 	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
-	D3DXVECTOR3 bulletVelocity, bulletPosition;
-	D3DXQUATERNION bulletRotation;
+	D3DXVECTOR3 tankVelocity, tankPosition;
+	D3DXQUATERNION tankRotation;
 
 	D3DXVECTOR3 turretVelocity, turretPosition;
 	D3DXQUATERNION turretRotation;

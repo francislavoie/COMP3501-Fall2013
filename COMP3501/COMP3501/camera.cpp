@@ -5,20 +5,28 @@
 
 
 Camera::Camera() {
-	m_position = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	raiseDistance = 2.5f;
+	theta = D3DX_PI* 3/2;
+	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	D3DXQuaternionIdentity(&m_quatOrientation);
-	D3DXMatrixIdentity(&m_viewMatrix);
-
-	upToDate = true;
-}
-
-Camera::Camera(D3DXVECTOR3 pos) {
-	m_position = pos;
+	CalculatePosition();
 
 	D3DXQuaternionIdentity(&m_quatOrientation);
 	D3DXMatrixIdentity(&m_viewMatrix);
 	
+	upToDate = false;
+}
+
+Camera::Camera(D3DXVECTOR3 pos) {
+	raiseDistance = 2.5f;
+	theta = D3DX_PI* 3/2;
+	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	CalculatePosition();
+
+	D3DXQuaternionIdentity(&m_quatOrientation);
+	D3DXMatrixIdentity(&m_viewMatrix);
+	theta = 0.0f;
 	upToDate = false;
 }
 
@@ -30,14 +38,14 @@ Camera::~Camera() { }
 
 
 void Camera::SetPosition(float x, float y, float z) {
-	m_position = D3DXVECTOR3(x, y, z);
+	//m_position = D3DXVECTOR3(x, y, z);
 	upToDate = false;
 	return;
 }
 
 
 void Camera::SetPosition(D3DXVECTOR3 v) {
-	m_position = v;
+	//m_position = v;
 	upToDate = false;
 	return;
 }
@@ -53,7 +61,34 @@ void Camera::SetOrientation(D3DXQUATERNION quatOrient) {
 void Camera::Update() {
 	D3DXMATRIX matTranslation;
 
-	D3DXMatrixTranslation(&matTranslation, -m_position.x, -m_position.y , -m_position.z);
+	CalculatePosition();
+		
+	/*D3DXMatrixTranslation(&matTranslation, -m_position.x, -m_position.y , -m_position.z);
+	
+	D3DXVECTOR3 v3Up, v3Right, v3LookAt = m_lookatPosition - m_position;
+
+    D3DXVec3Normalize( &v3LookAt, &v3LookAt );
+    D3DXVec3Cross( &v3Right, &D3DXVECTOR3(0,1,0), &v3LookAt );
+    D3DXVec3Normalize( &v3Right, &v3Right );
+    D3DXVec3Cross( &v3Up, &v3LookAt, &v3Right );
+    D3DXVec3Normalize( &v3Up, &v3Up );
+
+	D3DXMATRIX mRotation;
+    D3DXMatrixIdentity( &mRotation );
+
+    mRotation(0,0) = v3Right.x;    
+    mRotation(0,1) = v3Up.x;
+    mRotation(0,2) = v3LookAt.x;
+
+    mRotation(1,0) = v3Right.y;
+    mRotation(1,1) = v3Up.y;
+    mRotation(1,2) = v3LookAt.y;
+
+    mRotation(2,0) = v3Right.z;
+    mRotation(2,1) = v3Up.z;
+    mRotation(2,2) = v3LookAt.z;
+
+	D3DXQuaternionRotationMatrix( &m_quatOrientation, &mRotation );
 
 	// Calculate rotation by taking the conjugate of the quaternion
 	D3DXMATRIX matRotation;
@@ -68,7 +103,7 @@ void Camera::Update() {
 	);
 
 	// Apply rotation & translation matrix at view matrix
-	D3DXMatrixMultiply(&m_viewMatrix, &matTranslation, &matRotation);
+	D3DXMatrixMultiply(&m_viewMatrix, &matTranslation, &matRotation);*/
 
 	upToDate = true;
 }
@@ -76,7 +111,9 @@ void Camera::Update() {
 
 void Camera::GetViewMatrix(D3DXMATRIX& viewMatrix) {
 	if(!upToDate) Update();
-	viewMatrix = m_viewMatrix;
+	
+	D3DXMatrixLookAtLH(&viewMatrix,&m_position,&m_lookatPosition,&D3DXVECTOR3(0,1,0));
+	//viewMatrix = m_viewMatrix;
 	return;
 }
 
@@ -233,4 +270,37 @@ D3DXVECTOR3* Camera::TransformVector(D3DXQUATERNION *pOrientation, D3DXVECTOR3 *
 	memcpy(pAxis, &vNewAxis, sizeof(vNewAxis)); // Copy axis.
 	
 	return pAxis;
+}
+
+void Camera::CalculatePosition()
+{
+	float radius = tan(angle)*raiseDistance;
+	float x = cos(theta)*radius;
+	float y = raiseDistance;
+	float z = sin(theta)*radius;
+	m_position = D3DXVECTOR3(x,y,z) + m_lookatPosition;
+	//m_position = D3DXVECTOR3(m_position.x,raiseDistance,m_position.z) + m_lookatPosition;
+}
+
+void Camera::Scoll(float scroll)
+{
+	raiseDistance -= scroll*0.001f;
+	if (raiseDistance < 0.75f)
+		raiseDistance = 0.75f;
+	else if (raiseDistance > 25.0f)
+		raiseDistance = 25.0f;
+	else
+		m_lookatPosition += D3DXVECTOR3(0,scroll*0.0002f,0);
+	upToDate = false;
+}
+
+void Camera::Rotate(float rot)
+{
+	theta += rot*0.01f;
+	upToDate = false;
+}
+
+void Camera::setLookAtPosition(D3DXVECTOR3 laPosition)
+{
+	m_lookatPosition = laPosition + D3DXVECTOR3(0,raiseDistance - 2.5 *0.2f,0);
 }
