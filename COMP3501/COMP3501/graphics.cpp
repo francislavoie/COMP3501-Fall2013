@@ -21,7 +21,7 @@ Graphics::Graphics() {
 	m_Frustum = 0;
 
 	tankPosition = D3DXVECTOR3(0,0,0);
-	turretPosition = D3DXVECTOR3(0,0.53f,0);
+	turretPosition = D3DXVECTOR3(0,0.48f,0);
 }
 
 
