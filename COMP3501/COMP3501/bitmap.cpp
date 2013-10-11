@@ -17,23 +17,20 @@ Bitmap::Bitmap(const Bitmap& other) { }
 Bitmap::~Bitmap() { }
 
 
-bool Bitmap::Initialize(ID3D11Device* device, int screenWidth, int screenHeight, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, int bitmapWidth, int bitmapHeight) {
+bool Bitmap::Initialize(ID3D11Device* device, D3DXVECTOR2 screen, WCHAR* textureFilename, D3DXMATRIX baseViewMatrix, D3DXVECTOR2 size) {
 	bool result;
 
 	// Store the screen size.
-	m_screenWidth = screenWidth;
-	m_screenHeight = screenHeight;
+	m_screen = screen;
 
 	// Store the base view matrix.
 	m_baseViewMatrix = baseViewMatrix;
 
 	// Store the size in pixels that this bitmap should be rendered at.
-	m_bitmapWidth = bitmapWidth;
-	m_bitmapHeight = bitmapHeight;
+	m_size = size;
 
 	// Initialize the previous rendering position to negative one.
-	m_previousPosX = -1;
-	m_previousPosY = -1;
+	m_prevPos = D3DXVECTOR2(0.0f, 0.0f);
 
 	// Initialize the vertex and index buffers.
 	result = InitializeBuffers(device);
@@ -58,12 +55,11 @@ void Bitmap::Shutdown() {
 }
 
 
-bool Bitmap::Render(ID3D11DeviceContext* deviceContext, int positionX, int positionY) {
+bool Bitmap::Render(ID3D11DeviceContext* deviceContext, D3DXVECTOR2 size) {
 	bool result;
 
-
 	// Re-build the dynamic vertex buffer for rendering to possibly a different location on the screen.
-	result = UpdateBuffers(deviceContext, positionX, positionY);
+	result = UpdateBuffers(deviceContext, size);
 	if(!result) return false;
 
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
@@ -122,7 +118,7 @@ bool Bitmap::InitializeBuffers(ID3D11Device* device) {
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
-	// Give the subresource structure a pointer to the vertex data.
+	// Give the sub resource structure a pointer to the vertex data.
 	vertexData.pSysMem = vertices;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
@@ -139,7 +135,7 @@ bool Bitmap::InitializeBuffers(ID3D11Device* device) {
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.StructureByteStride = 0;
 
-	// Give the subresource structure a pointer to the index data.
+	// Give the sub resource structure a pointer to the index data.
 	indexData.pSysMem = indices;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
@@ -176,7 +172,7 @@ void Bitmap::ShutdownBuffers() {
 }
 
 
-bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, int positionY) {
+bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, D3DXVECTOR2 position) {
 	float left, right, top, bottom;
 	VertexType* vertices;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -185,23 +181,22 @@ bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, in
 	
 	// If the position we are rendering this bitmap to has not changed then don't update the vertex buffer since it
 	// currently has the correct parameters.
-	if((positionX == m_previousPosX) && (positionY == m_previousPosY)) return true;
+	if((position == m_prevPos)) return true;
 	
 	// If it has changed then update the position it is being rendered to.
-	m_previousPosX = positionX;
-	m_previousPosY = positionY;
+	m_prevPos = position;
 
 	// Calculate the screen coordinates of the left side of the bitmap.
-	left = (float)((m_screenWidth / 2) * -1) + (float)positionX;
+	left = (float)((m_screen.x / 2) * -1) + (float)position.x;
 
 	// Calculate the screen coordinates of the right side of the bitmap.
-	right = left + (float)m_bitmapWidth;
+	right = left + (float)m_size.x;
 
 	// Calculate the screen coordinates of the top of the bitmap.
-	top = (float)(m_screenHeight / 2) - (float)positionY;
+	top = (float)(m_screen.y / 2) - (float)position.y;
 
 	// Calculate the screen coordinates of the bottom of the bitmap.
-	bottom = top - (float)m_bitmapHeight;
+	bottom = top - (float)m_size.y;
 
 	// Create the vertex array.
 	vertices = new VertexType[m_vertexCount];
@@ -209,24 +204,24 @@ bool Bitmap::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, in
 
 	// Load the vertex array with data.
 	// First triangle.
-	vertices[0].position = D3DXVECTOR3(left, top, 0.0f);  // Top left.
-	vertices[0].texture = D3DXVECTOR2(0.0f, 0.0f);
+	vertices[0].pos = D3DXVECTOR3(left, top, 0.0f);  // Top left.
+	vertices[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 
-	vertices[1].position = D3DXVECTOR3(right, bottom, 0.0f);  // Bottom right.
-	vertices[1].texture = D3DXVECTOR2(1.0f, 1.0f);
+	vertices[1].pos = D3DXVECTOR3(right, bottom, 0.0f);  // Bottom right.
+	vertices[1].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	vertices[2].position = D3DXVECTOR3(left, bottom, 0.0f);  // Bottom left.
-	vertices[2].texture = D3DXVECTOR2(0.0f, 1.0f);
+	vertices[2].pos = D3DXVECTOR3(left, bottom, 0.0f);  // Bottom left.
+	vertices[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 
 	// Second triangle.
-	vertices[3].position = D3DXVECTOR3(left, top, 0.0f);  // Top left.
-	vertices[3].texture = D3DXVECTOR2(0.0f, 0.0f);
+	vertices[3].pos = D3DXVECTOR3(left, top, 0.0f);  // Top left.
+	vertices[3].tex = D3DXVECTOR2(0.0f, 0.0f);
 
-	vertices[4].position = D3DXVECTOR3(right, top, 0.0f);  // Top right.
-	vertices[4].texture = D3DXVECTOR2(1.0f, 0.0f);
+	vertices[4].pos = D3DXVECTOR3(right, top, 0.0f);  // Top right.
+	vertices[4].tex = D3DXVECTOR2(1.0f, 0.0f);
 
-	vertices[5].position = D3DXVECTOR3(right, bottom, 0.0f);  // Bottom right.
-	vertices[5].texture = D3DXVECTOR2(1.0f, 1.0f);
+	vertices[5].pos = D3DXVECTOR3(right, bottom, 0.0f);  // Bottom right.
+	vertices[5].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// Lock the vertex buffer so it can be written to.
 	result = deviceContext->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -303,11 +298,6 @@ D3DXMATRIX Bitmap::GetViewMatrix() {
 }
 
 
-int Bitmap::GetCenterX() {
-	return m_screenWidth / 2 - m_bitmapWidth / 2;
-}
-
-
-int Bitmap::GetCenterY() {
-	return m_screenHeight / 2 - m_bitmapHeight / 2;
+D3DXVECTOR2 Bitmap::GetCenter() {
+	return m_screen / 2 - m_size / 2;
 }

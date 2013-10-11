@@ -46,7 +46,7 @@ bool SystemClass::Initialize() {
 	if(!m_Graphics) return false;
 
 	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	result = m_Graphics->Initialize(D3DXVECTOR2(screenWidth, screenHeight), m_hwnd);
 	if(!result) return false;
 
 	// Create the fps object.

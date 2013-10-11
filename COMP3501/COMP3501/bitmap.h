@@ -22,10 +22,10 @@
 // Class name: BitmapClass
 ////////////////////////////////////////////////////////////////////////////////
 class Bitmap {
-private:
+protected:
 	struct VertexType {
-		D3DXVECTOR3 position;
-	    D3DXVECTOR2 texture;
+		D3DXVECTOR3 pos;
+	    D3DXVECTOR2 tex;
 	};
 
 public:
@@ -33,21 +33,20 @@ public:
 	Bitmap(const Bitmap&);
 	~Bitmap();
 
-	bool Initialize(ID3D11Device*, int, int, WCHAR*, D3DXMATRIX, int, int);
+	bool Initialize(ID3D11Device*, D3DXVECTOR2, WCHAR*, D3DXMATRIX, D3DXVECTOR2);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, int);
+	bool Render(ID3D11DeviceContext*, D3DXVECTOR2);
 
 	int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 	D3DXMATRIX GetViewMatrix();
 
-	int GetCenterX();
-	int GetCenterY();
+	D3DXVECTOR2 GetCenter();
 
 protected:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
-	bool UpdateBuffers(ID3D11DeviceContext*, int, int);
+	bool UpdateBuffers(ID3D11DeviceContext*, D3DXVECTOR2);
 	void RenderBuffers(ID3D11DeviceContext*);
 
 	bool LoadTexture(ID3D11Device*, WCHAR*);
@@ -58,9 +57,7 @@ protected:
 	int m_vertexCount, m_indexCount;
 	D3DXMATRIX m_baseViewMatrix;
 	Texture* m_Texture;
-	int m_screenWidth, m_screenHeight;
-	int m_bitmapWidth, m_bitmapHeight;
-	int m_previousPosX, m_previousPosY;
+	D3DXVECTOR2 m_prevPos, m_screen, m_size;
 };
 
 #endif
