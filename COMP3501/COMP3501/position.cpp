@@ -5,13 +5,11 @@
 
 
 Position::Position() {
-	m_frameTime = 0.0f;
-	m_rotationX = 0.0f;
-	m_rotationY = 0.0f;
-	m_leftTurnSpeed  = 0.0f;
-	m_rightTurnSpeed = 0.0f;
-	m_upTurnSpeed  = 0.0f;
-	m_downTurnSpeed = 0.0f;
+	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_rot = D3DXQUATERNION(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_time = 0.0f;
 }
 
 
@@ -21,118 +19,38 @@ Position::Position(const Position& other) { }
 Position::~Position() { }
 
 
-void Position::SetFrameTime(float time) {
-	m_frameTime = time;
-	return;
-}
+D3DXVECTOR3 Position::GetRotVel() { return m_rotvel; }
+D3DXVECTOR3 Position::GetPosVel() { return m_posvel; }
+D3DXVECTOR3 Position::GetPosition() { return m_pos; }
+D3DXQUATERNION Position::GetRotation() { return m_rot; }
 
 
-void Position::GetRotation(float& x, float& y) {
-	x = m_rotationX;
-	y = m_rotationY;
-	return;
-}
+void Position::SetTime(float t) { m_time = t; }
+
+void Position::SetYaw(float angle) { m_rotvel.x = angle; }
+void Position::SetPitch(float angle) { m_rotvel.y = angle; }
+void Position::SetRoll(float angle) { m_rotvel.z = angle; }
+
+void Position::SetStrafe(float vel) { m_posvel.x = vel; }
 
 
-void Position::TurnLeft(bool keydown) {
-	// If the key is pressed increase the speed at which the camera turns left.  If not slow down the turn speed.
-	if(keydown) {
-		m_leftTurnSpeed += m_frameTime * 0.01f;
-		if(m_leftTurnSpeed > (m_frameTime * 0.15f)) {
-			m_leftTurnSpeed = m_frameTime * 0.15f;
-		}
-	} else {
-		m_leftTurnSpeed -= m_frameTime* 0.005f;
-		if(m_leftTurnSpeed < 0.0f) {
-			m_leftTurnSpeed = 0.0f;
-		}
-	}
+void Position::Update() {
+	// TODO: Add decay speed
+	// D3DXVECTOR3 decay;
+	// D3DXVec3Normalize(&decay, &m_posvel);
+	// m_posvel -= m_decayRate * decay;
+	
+	// Apply positional velocity
+	m_pos += m_posvel * m_time;
 
-		// Update the rotation using the turning speed.
-	if(m_rotationX < 90.0f || m_rotationX > 270.0f)
-		m_rotationY -= m_leftTurnSpeed;
-	else 
-		m_rotationY += m_leftTurnSpeed;
-
-	if(m_rotationY < 0.0f) {
-		m_rotationY += 360.0f;
-	}
-
-	return;
-}
-
-
-void Position::TurnRight(bool keydown) {
-	// If the key is pressed increase the speed at which the camera turns right.  If not slow down the turn speed.
-	if(keydown) {
-		m_rightTurnSpeed += m_frameTime * 0.01f;
-		if(m_rightTurnSpeed > (m_frameTime * 0.15f)) {
-			m_rightTurnSpeed = m_frameTime * 0.15f;
-		}
-	} else {
-		m_rightTurnSpeed -= m_frameTime* 0.005f;
-		if(m_rightTurnSpeed < 0.0f) {
-			m_rightTurnSpeed = 0.0f;
-		}
-	}
-
-	// Update the rotation using the turning speed.
-	if(m_rotationX < 90.0f || m_rotationX > 270.0f)
-		m_rotationY += m_rightTurnSpeed;
-	else 
-		m_rotationY -= m_rightTurnSpeed;
-
-	if(m_rotationY > 360.0f) {
-		m_rotationY -= 360.0f;
-	}
-
-	return;
-}
-
-
-void Position::TurnUp(bool keydown) {
-	// If the key is pressed increase the speed at which the camera turns up.  If not slow down the turn speed.
-	if(keydown) {
-		m_upTurnSpeed += m_frameTime * 0.01f;
-		if(m_upTurnSpeed > (m_frameTime * 0.15f)) {
-			m_upTurnSpeed = m_frameTime * 0.15f;
-		}
-	} else {
-		m_upTurnSpeed -= m_frameTime* 0.005f;
-		if(m_upTurnSpeed < 0.0f) {
-			m_upTurnSpeed = 0.0f;
-		}
-	}
-
-	// Update the rotation using the turning speed.
-	m_rotationX -= m_upTurnSpeed;
-	if(m_rotationX < 0.0f) {
-		m_rotationX += 360.0f;
-	}
-
-	return;
-}
-
-
-void Position::TurnDown(bool keydown) {
-	// If the key is pressed increase the speed at which the camera turns down.  If not slow down the turn speed.
-	if(keydown) {
-		m_downTurnSpeed += m_frameTime * 0.01f;
-		if(m_downTurnSpeed > (m_frameTime * 0.15f)) {
-			m_downTurnSpeed = m_frameTime * 0.15f;
-		}
-	} else {
-		m_downTurnSpeed -= m_frameTime* 0.005f;
-		if(m_downTurnSpeed < 0.0f) {
-			m_downTurnSpeed = 0.0f;
-		}
-	}
-
-	// Update the rotation using the turning speed.
-	m_rotationX += m_downTurnSpeed;
-	if(m_rotationX > 360.0f) {
-		m_rotationX -= 360.0f;
-	}
-
-	return;
+	// Apply rotational velocity
+	D3DXQUATERNION rot;
+	D3DXQuaternionRotationYawPitchRoll(
+		&rot, 
+		m_rotvel.x * m_time, 
+		m_rotvel.y * m_time, 
+		m_rotvel.z * m_time
+	);
+	m_rot *= rot;
+	D3DXQuaternionNormalize(&m_rot, &m_rot);
 }

@@ -9,6 +9,7 @@
 // INCLUDES //
 //////////////
 #include <math.h>
+#include <d3dx10math.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,19 +21,26 @@ public:
 	Position(const Position&);
 	~Position();
 
-	void SetFrameTime(float);
-	void GetRotation(float&, float&);
+	D3DXVECTOR3 GetRotVel();
+	D3DXVECTOR3 GetPosVel();
 
-	void TurnLeft(bool);
-	void TurnRight(bool);
-	void TurnUp(bool);
-	void TurnDown(bool);
+	D3DXVECTOR3 GetPosition();
+	D3DXQUATERNION GetRotation();
+
+	void SetTime(float);
+
+	void SetYaw(float);
+	void SetPitch(float);
+	void SetRoll(float);
+
+	void SetStrafe(float);
+
+	void Update();
 
 private:
-	float m_frameTime;
-	float m_rotationX, m_rotationY;
-	float m_leftTurnSpeed, m_rightTurnSpeed;
-	float m_upTurnSpeed, m_downTurnSpeed;
+	float m_time;
+	D3DXVECTOR3 m_pos, m_rotvel, m_posvel;
+	D3DXQUATERNION m_rot;
 };
 
 #endif
