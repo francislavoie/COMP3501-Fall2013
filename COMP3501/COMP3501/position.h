@@ -34,6 +34,8 @@ public:
 	void SetRoll(float);
 
 	void SetStrafe(float);
+	void SetClimb(float);
+	void SetForward(float);
 
 	void Update();
 
@@ -41,6 +43,8 @@ private:
 	float m_time;
 	D3DXVECTOR3 m_pos, m_rotvel, m_posvel;
 	D3DXQUATERNION m_rot;
+
+	D3DXVECTOR3 m_up, m_front, m_right;
 };
 
 #endif
