@@ -309,6 +309,8 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	}
 	m_Camera->setLookAtPosition(tankPosition);
 
+	D3DXQuaternionRotationAxis(&turretRotation,&D3DXVECTOR3(0,-1,0), m_Camera->getTheta() + D3DX_PI/2);
+
 	/*
 	// Mouse controls
 	m_Camera->Yaw(deltaX * 0.005f);
@@ -497,7 +499,7 @@ bool Graphics::Render(float time) {
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
 	D3DXMatrixTranslation(&translationMatrix, turretPosition.x, turretPosition.y, turretPosition.z);
-	worldMatrix = translationMatrix * worldMatrix;
+	worldMatrix =  (rotationMatrix * translationMatrix) * worldMatrix;
 		
 	m_Turret->Render(m_D3D->GetDeviceContext());
 	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 

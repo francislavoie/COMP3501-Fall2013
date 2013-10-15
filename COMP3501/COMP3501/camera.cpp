@@ -302,5 +302,6 @@ void Camera::Rotate(float rot)
 
 void Camera::setLookAtPosition(D3DXVECTOR3 laPosition)
 {
-	m_lookatPosition = laPosition + D3DXVECTOR3(0, raiseDistance - 2.5f * 0.2f, 0);
+	m_lookatPosition = laPosition + D3DXVECTOR3(0, (raiseDistance + 2.5f) * 0.2f, 0);
+
 }

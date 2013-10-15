@@ -30,6 +30,7 @@ public:
 
 	D3DXVECTOR3 GetPosition() const { return m_position; }
 	D3DXQUATERNION GetRotation() const { return m_quatOrientation; }
+	float getTheta() const {return theta;}
 
 	void GetViewMatrix(D3DXMATRIX&);
 
