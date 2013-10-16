@@ -45,7 +45,7 @@ void Position::Update() {
 	// D3DXVECTOR3 decay;
 	// D3DXVec3Normalize(&decay, &m_posvel);
 	// m_posvel -= m_decayRate * decay;
-	
+
 	// Apply positional velocity
 	m_pos += (m_right * m_posvel.x) * m_time;
 	m_pos += (m_up * m_posvel.y) * m_time;
@@ -63,15 +63,21 @@ void Position::Update() {
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
 
 	// Calculate up, front, left
-	D3DXQUATERNION conj, temp;
-	D3DXQuaternionConjugate(&conj, &m_rot);
+	m_up = D3DXVECTOR3(
+		2 * (m_rot.x * m_rot.y - m_rot.w * m_rot.z), 
+		1 - 2 * (m_rot.x * m_rot.x + m_rot.z * m_rot.z),
+		2 * (m_rot.y * m_rot.z + m_rot.w * m_rot.x)
+	);
 
-	temp = m_rot * D3DXQUATERNION(0.0f, 1.0f, 0.0f, 0.0f) * conj;
-	m_up = D3DXVECTOR3(temp.x, temp.y, temp.z);
-
-	temp = m_rot * D3DXQUATERNION(0.0f, 0.0f, 1.0f, 0.0f) * conj;
-	m_front = D3DXVECTOR3(temp.x, temp.y, temp.z);
-
-	temp = m_rot * D3DXQUATERNION(1.0f, 0.0f, 0.0f, 0.0f) * conj;
-	m_right = D3DXVECTOR3(temp.x, temp.y, temp.z);
+	m_front = D3DXVECTOR3(
+		2 * (m_rot.x * m_rot.z + m_rot.w * m_rot.y), 
+		2 * (m_rot.y * m_rot.z - m_rot.w * m_rot.x),
+		1 - 2 * (m_rot.x * m_rot.x + m_rot.y * m_rot.y)
+	);
+	
+	m_right = D3DXVECTOR3(
+		1 - 2 * (m_rot.y * m_rot.y + m_rot.z * m_rot.z),
+		2 * (m_rot.x * m_rot.y + m_rot.w * m_rot.z),
+		2 * (m_rot.x * m_rot.z - m_rot.w * m_rot.y)
+	);;
 }

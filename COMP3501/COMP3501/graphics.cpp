@@ -325,7 +325,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_tankPosition->SetYaw(0.0f);
 	}
 
-	//m_tankPosition->SetYaw(float(deltaX) * 0.0008f);
+	//m_tankPosition->SetYaw(-float(m_Camera->getTheta() + D3DX_PI/2));
 
 	m_tankPosition->Update();
 	turretPosition = m_tankPosition->GetPosition() + D3DXVECTOR3(0.0f, 0.48f, 0.0f);
