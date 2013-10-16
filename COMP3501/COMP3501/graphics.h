@@ -21,6 +21,7 @@
 #include "frustum.h"
 #include "shadermanager.h"
 #include "input.h"
+#include "position.h"
 
 
 /////////////
@@ -68,8 +69,7 @@ private:
 	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
-	D3DXVECTOR3 tankVelocity, tankPosition;
-	D3DXQUATERNION tankRotation;
+	Position* m_tankPosition;
 
 	D3DXVECTOR3 turretVelocity, turretPosition;
 	D3DXQUATERNION turretRotation;

@@ -7,12 +7,12 @@
 Position::Position() {
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXQUATERNION(0.0f, 0.0f, 0.0f, 0.0f);
+	m_rot = D3DXQUATERNION(1.0f, 0.0f, 0.0f, 90.0f);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_time = 0.0f;
 
 	m_up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	m_front = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	m_front = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 	m_right = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
 }
 
@@ -55,9 +55,9 @@ void Position::Update() {
 	D3DXQUATERNION rot;
 	D3DXQuaternionRotationYawPitchRoll(
 		&rot, 
-		m_rotvel.x * m_time, 
-		m_rotvel.y * m_time, 
-		m_rotvel.z * m_time
+		m_rotvel.x, 
+		m_rotvel.y, 
+		m_rotvel.z
 	);
 	m_rot *= rot;
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
@@ -69,7 +69,7 @@ void Position::Update() {
 	temp = m_rot * D3DXQUATERNION(0.0f, 1.0f, 0.0f, 0.0f) * conj;
 	m_up = D3DXVECTOR3(temp.x, temp.y, temp.z);
 
-	temp = m_rot * D3DXQUATERNION(0.0f, 0.0f, -1.0f, 0.0f) * conj;
+	temp = m_rot * D3DXQUATERNION(0.0f, 0.0f, 1.0f, 0.0f) * conj;
 	m_front = D3DXVECTOR3(temp.x, temp.y, temp.z);
 
 	temp = m_rot * D3DXQUATERNION(1.0f, 0.0f, 0.0f, 0.0f) * conj;
