@@ -69,10 +69,7 @@ private:
 	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
-	Position* m_tankPosition;
-
-	D3DXVECTOR3 turretVelocity, turretPosition;
-	D3DXQUATERNION turretRotation;
+	Position *m_tankPosition, *m_turretPosition;
 };
 
 #endif

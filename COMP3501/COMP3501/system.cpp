@@ -10,7 +10,6 @@ SystemClass::SystemClass() {
 	m_Fps = 0;
 	m_Cpu = 0;
 	m_Timer = 0;
-	m_Position = 0;
 }
 
 SystemClass::SystemClass(const SystemClass& other) { }
@@ -74,20 +73,10 @@ bool SystemClass::Initialize() {
 		return false;
 	}
 
-	// Create the position object.
-	m_Position = new Position;
-	if(!m_Position) return false;
-
 	return true;
 }
 
 void SystemClass::Shutdown() {
-
-	// Release the position object.
-	if(m_Position) {
-		delete m_Position;
-		m_Position = 0;
-	}
 
 	// Release the timer object.
 	if(m_Timer) {
@@ -95,7 +84,7 @@ void SystemClass::Shutdown() {
 		m_Timer = 0;
 	}
 
-	// Release the cpu object.
+	// Release the CPU object.
 	if(m_Cpu) {
 		m_Cpu->Shutdown();
 		delete m_Cpu;

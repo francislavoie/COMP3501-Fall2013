@@ -19,8 +19,6 @@ Graphics::Graphics() {
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
-
-	turretPosition = D3DXVECTOR3(0.0f, 0.48f, 0.0f);
 }
 
 
@@ -174,8 +172,14 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Frustum) return false;
 
 	// Create tank position
-	m_tankPosition = new Position;
+	m_tankPosition = new Position(true);
 	if(!m_tankPosition) return false;
+
+	// Create turret position
+	m_turretPosition = new Position(false, m_tankPosition);
+	if(!m_turretPosition) return false;
+
+	m_turretPosition->SetOffset(D3DXVECTOR3(0.0f, 0.48f, 0.0f));
 
 	return true;
 }
@@ -222,6 +226,18 @@ void Graphics::Shutdown() {
 		m_ShaderManager->Shutdown();
 		delete m_ShaderManager;
 		m_ShaderManager = 0;
+	}
+
+	// Release the position object.
+	if(m_tankPosition) {
+		delete m_tankPosition;
+		m_tankPosition = 0;
+	}
+
+	// Release the position object.
+	if(m_turretPosition) {
+		delete m_turretPosition;
+		m_turretPosition = 0;
 	}
 
 	// Release the light object.
@@ -302,19 +318,19 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Camera->Rotate(-float(deltaX));
 
 	if(input->IsKeyPressed(DIK_W)){
-		m_tankPosition->SetForward(0.05f);
+		m_tankPosition->SetForwardVel(0.05f);
 	} else if(input->IsKeyPressed(DIK_S)){
-		m_tankPosition->SetForward(-0.05f);
+		m_tankPosition->SetForwardVel(-0.05f);
 	} else {
-		m_tankPosition->SetForward(0.0f);
+		m_tankPosition->SetForwardVel(0.0f);
 	}
 
 	if(input->IsKeyPressed(DIK_A)) {
-		m_tankPosition->SetStrafe(-0.05f);
+		m_tankPosition->SetStrafeVel(-0.05f);
 	} else if(input->IsKeyPressed(DIK_D)) {
-		m_tankPosition->SetStrafe(0.05f);
+		m_tankPosition->SetStrafeVel(0.05f);
 	} else {
-		m_tankPosition->SetStrafe(0.0f);
+		m_tankPosition->SetStrafeVel(0.0f);
 	}
 
 	if(input->IsKeyPressed(DIK_Q)) {
@@ -326,13 +342,12 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	}
 
 	//m_tankPosition->SetYaw(-float(m_Camera->getTheta() + D3DX_PI/2));
+	m_turretPosition->SetYaw(-float(m_Camera->getTheta() + D3DX_PI/2));
 
 	m_tankPosition->Update();
-	turretPosition = m_tankPosition->GetPosition() + D3DXVECTOR3(0.0f, 0.48f, 0.0f);
+	m_turretPosition->Update();
 
 	m_Camera->setLookAtPosition(m_tankPosition->GetPosition());
-
-	D3DXQuaternionRotationAxis(&turretRotation, &D3DXVECTOR3(0.0f, -1.0f, 0.0f), float(m_Camera->getTheta() + D3DX_PI/2));
 
 	/*
 	// Mouse controls
@@ -518,10 +533,10 @@ bool Graphics::Render(float time) {
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &turretRotation);
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_turretPosition->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&translationMatrix, turretPosition.x, turretPosition.y, turretPosition.z);
+	D3DXMatrixTranslation(&translationMatrix, m_turretPosition->GetPosition().x, m_turretPosition->GetPosition().y, m_turretPosition->GetPosition().z);
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 		
 	m_Turret->Render(m_D3D->GetDeviceContext());

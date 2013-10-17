@@ -4,7 +4,7 @@
 #include "position.h"
 
 
-Position::Position() {
+Position::Position(bool rotvel_on, Position* follow) {
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXQUATERNION(1.0f, 0.0f, 0.0f, 90.0f);
@@ -14,6 +14,12 @@ Position::Position() {
 	m_up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	m_front = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 	m_right = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
+
+	m_offset = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	m_follow = follow;
+
+	m_rotvel_on = rotvel_on;
 }
 
 
@@ -29,15 +35,17 @@ D3DXVECTOR3 Position::GetPosition() { return m_pos; }
 D3DXQUATERNION Position::GetRotation() { return m_rot; }
 
 
+void Position::SetOffset(D3DXVECTOR3 offset) { m_offset = offset; }
+
 void Position::SetTime(float t) { m_time = t; }
 
 void Position::SetYaw(float angle) { m_rotvel.x = angle; }
 void Position::SetPitch(float angle) { m_rotvel.y = angle; }
 void Position::SetRoll(float angle) { m_rotvel.z = angle; }
 
-void Position::SetStrafe(float vel) { m_posvel.x = vel; }
-void Position::SetClimb(float vel) { m_posvel.y = vel; }
-void Position::SetForward(float vel) { m_posvel.z = vel; }
+void Position::SetStrafeVel(float vel) { m_posvel.x = vel; }
+void Position::SetClimbVel(float vel) { m_posvel.y = vel; }
+void Position::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 
 void Position::Update() {
@@ -47,9 +55,13 @@ void Position::Update() {
 	// m_posvel -= m_decayRate * decay;
 
 	// Apply positional velocity
-	m_pos += (m_right * m_posvel.x) * m_time;
-	m_pos += (m_up * m_posvel.y) * m_time;
-	m_pos += (m_front * m_posvel.z) * m_time;
+	if(!m_follow) {
+		m_pos += (m_right * m_posvel.x) * m_time;
+		m_pos += (m_up * m_posvel.y) * m_time;
+		m_pos += (m_front * m_posvel.z) * m_time;
+	} else {
+		m_pos = m_follow->GetPosition() + m_offset;
+	}
 
 	// Apply rotational velocity
 	D3DXQUATERNION rot;
@@ -59,7 +71,10 @@ void Position::Update() {
 		m_rotvel.y, 
 		m_rotvel.z
 	);
-	m_rot *= rot;
+
+	if(m_rotvel_on) m_rot *= rot;
+	else m_rot = rot;
+
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
 
 	// Calculate up, front, left

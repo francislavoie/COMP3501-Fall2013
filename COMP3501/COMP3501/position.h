@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 class Position {
 public:
-	Position();
+	Position(bool, Position* = 0);
 	Position(const Position&);
 	~Position();
 
@@ -27,24 +27,31 @@ public:
 	D3DXVECTOR3 GetPosition();
 	D3DXQUATERNION GetRotation();
 
+	void SetOffset(D3DXVECTOR3);
+
 	void SetTime(float);
 
 	void SetYaw(float);
 	void SetPitch(float);
 	void SetRoll(float);
 
-	void SetStrafe(float);
-	void SetClimb(float);
-	void SetForward(float);
+	void SetStrafeVel(float);
+	void SetClimbVel(float);
+	void SetForwardVel(float);
 
 	void Update();
 
 private:
 	float m_time;
-	D3DXVECTOR3 m_pos, m_rotvel, m_posvel;
-	D3DXQUATERNION m_rot;
 
-	D3DXVECTOR3 m_up, m_front, m_right;
+	bool m_rotvel_on;
+
+	Position *m_follow;
+
+	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset,
+				m_up, m_front, m_right;
+
+	D3DXQUATERNION m_rot;
 };
 
 #endif

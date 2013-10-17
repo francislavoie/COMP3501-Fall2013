@@ -25,7 +25,6 @@
 #include "fps.h"
 #include "cpu.h"
 #include "timer.h"
-#include "position.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +58,6 @@ private:
 	Fps* m_Fps;
 	Cpu* m_Cpu;
 	Timer* m_Timer;
-
-	Position* m_Position;
 };
 
 
