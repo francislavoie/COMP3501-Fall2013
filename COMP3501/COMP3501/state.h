@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Filename: positionclass.h
+// Filename: stateclass.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _POSITIONCLASS_H_
-#define _POSITIONCLASS_H_
+#ifndef _STATECLASS_H_
+#define _STATECLASS_H_
 
 
 //////////////
@@ -13,13 +13,13 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class name: PositionClass
+// Class name: StateClass
 ////////////////////////////////////////////////////////////////////////////////
-class Position {
+class State {
 public:
-	Position(bool, Position* = 0);
-	Position(const Position&);
-	~Position();
+	State(bool, State* = 0);
+	State(const State&);
+	~State();
 
 	D3DXVECTOR3 GetRotVel();
 	D3DXVECTOR3 GetPosVel();
@@ -46,7 +46,7 @@ private:
 
 	bool m_rotvel_on;
 
-	Position *m_follow;
+	State *m_follow;
 
 	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset,
 				m_up, m_front, m_right;

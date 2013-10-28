@@ -10,7 +10,6 @@ Graphics::Graphics() {
 	m_Model = 0;
 	m_Model2 = 0;
 	m_Tank = 0;
-	m_Turret = 0;
 
 	m_ShaderManager = 0;
 	m_Light = 0;
@@ -101,27 +100,16 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	}
 
 	// Create the model object.
-	m_Tank = new Model;
+	m_Tank = new Tank;
 	if(!m_Tank) return false;
 
 	// Initialize the model object.
-	result = m_Tank->Initialize(m_D3D->GetDevice(), "data/tank.obj", L"data/bulletrust.dds");
+	result = m_Tank->Initialize(m_D3D, hwnd);
 	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the tank object.", L"Error", MB_OK);
 		return false;
 	}
 
-
-	// Create the model object.
-	m_Turret = new Model;
-	if(!m_Turret) return false;
-
-	// Initialize the model object.
-	result = m_Turret->Initialize(m_D3D->GetDevice(), "data/turret.obj", L"data/bulletrust.dds");
-	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
 
 	// Create the light object.
 	m_Light = new Light;
@@ -171,16 +159,6 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	m_Frustum = new Frustum;
 	if(!m_Frustum) return false;
 
-	// Create tank position
-	m_tankPosition = new Position(true);
-	if(!m_tankPosition) return false;
-
-	// Create turret position
-	m_turretPosition = new Position(false, m_tankPosition);
-	if(!m_turretPosition) return false;
-
-	m_turretPosition->SetOffset(D3DXVECTOR3(0.0f, 0.48f, 0.0f));
-
 	return true;
 }
 
@@ -228,32 +206,12 @@ void Graphics::Shutdown() {
 		m_ShaderManager = 0;
 	}
 
-	// Release the position object.
-	if(m_tankPosition) {
-		delete m_tankPosition;
-		m_tankPosition = 0;
-	}
-
-	// Release the position object.
-	if(m_turretPosition) {
-		delete m_turretPosition;
-		m_turretPosition = 0;
-	}
-
 	// Release the light object.
 	if(m_Light) {
 		delete m_Light;
 		m_Light = 0;
 	}
 
-	// Release the turret object.
-	if(m_Turret) {
-		m_Turret->Shutdown();
-		delete m_Turret;
-		m_Turret = 0;
-	}
-
-	// Release the Tank object.
 	if(m_Tank) {
 		m_Tank->Shutdown();
 		delete m_Tank;
@@ -309,45 +267,19 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 
-	m_Cursor->SetPosition(D3DXVECTOR2(float(mouseX), float(mouseY)));
-	m_tankPosition->SetTime(time);
-
+	
 	int scroll;
 	input->GetWheelDelta(scroll);
 	m_Camera->Scroll(float(scroll));
 	m_Camera->Rotate(-float(deltaX));
 
-	if(input->IsKeyPressed(DIK_W)){
-		m_tankPosition->SetForwardVel(0.05f);
-	} else if(input->IsKeyPressed(DIK_S)){
-		m_tankPosition->SetForwardVel(-0.05f);
-	} else {
-		m_tankPosition->SetForwardVel(0.0f);
-	}
+	m_Cursor->SetPosition(D3DXVECTOR2(float(mouseX), float(mouseY)));
 
-	if(input->IsKeyPressed(DIK_A)) {
-		m_tankPosition->SetStrafeVel(-0.05f);
-	} else if(input->IsKeyPressed(DIK_D)) {
-		m_tankPosition->SetStrafeVel(0.05f);
-	} else {
-		m_tankPosition->SetStrafeVel(0.0f);
-	}
+	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-	if(input->IsKeyPressed(DIK_Q)) {
-		m_tankPosition->SetYaw(-0.05f);
-	} else if(input->IsKeyPressed(DIK_E)) {
-		m_tankPosition->SetYaw(0.05f);
-	} else {
-		m_tankPosition->SetYaw(0.0f);
-	}
+	m_Tank->Update(input, time, rotation);	
 
-	//m_tankPosition->SetYaw(-float(m_Camera->getTheta() + D3DX_PI/2));
-	m_turretPosition->SetYaw(-float(m_Camera->getTheta() + D3DX_PI/2));
-
-	m_tankPosition->Update();
-	m_turretPosition->Update();
-
-	m_Camera->setLookAtPosition(m_tankPosition->GetPosition());
+	m_Camera->setLookAtPosition(m_Tank->getTankState()->GetPosition());
 
 	/*
 	// Mouse controls
@@ -521,27 +453,27 @@ bool Graphics::Render(float time) {
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix;
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_tankPosition->GetRotation());
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_Tank->getTankState()->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&translationMatrix, m_tankPosition->GetPosition().x, m_tankPosition->GetPosition().y, m_tankPosition->GetPosition().z);
+	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTankState()->GetPosition().x, m_Tank->getTankState()->GetPosition().y, m_Tank->getTankState()->GetPosition().z);
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 	
-	m_Tank->Render(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-		m_Tank->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+	m_Tank->RenderTank(m_D3D->GetDeviceContext());
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetTankIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_Tank->GetTankTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_turretPosition->GetRotation());
+	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_Tank->getTurretState()->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&translationMatrix, m_turretPosition->GetPosition().x, m_turretPosition->GetPosition().y, m_turretPosition->GetPosition().z);
+	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTurretState()->GetPosition().x, m_Tank->getTurretState()->GetPosition().y, m_Tank->getTurretState()->GetPosition().z);
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
-		
-	m_Turret->Render(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Turret->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-		m_Turret->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+
+	m_Tank->RenderTurret(m_D3D->GetDeviceContext());
+	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetTurretIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_Tank->GetTurretTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 

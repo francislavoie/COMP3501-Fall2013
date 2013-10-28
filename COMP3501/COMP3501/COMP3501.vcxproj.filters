@@ -136,9 +136,6 @@
     <ClCompile Include="modellist.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="position.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="texture.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
@@ -149,6 +146,12 @@
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="bumpmodel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Tank.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="state.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
@@ -166,9 +169,6 @@
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="modellist.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="position.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="graphics.h">
@@ -226,6 +226,12 @@
       <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="bumpmodel.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="tank.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="state.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>

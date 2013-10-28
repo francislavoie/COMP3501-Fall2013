@@ -21,7 +21,8 @@
 #include "frustum.h"
 #include "shadermanager.h"
 #include "input.h"
-#include "position.h"
+#include "state.h"
+#include "tank.h"
 
 
 /////////////
@@ -56,9 +57,6 @@ private:
 	Model* m_Model;
 	Model* m_Model2;
 
-	Model* m_Tank;
-	Model* m_Turret;
-
 	Bitmap* m_Bitmap;
 	MouseCursor* m_Cursor;
 
@@ -69,7 +67,7 @@ private:
 	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
-	Position *m_tankPosition, *m_turretPosition;
+	Tank* m_Tank;
 };
 
 #endif

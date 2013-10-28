@@ -63,7 +63,7 @@ void Camera::Update() {
 
 	CalculatePosition();
 		
-	/*D3DXMatrixTranslation(&matTranslation, -m_position.x, -m_position.y , -m_position.z);
+	D3DXMatrixTranslation(&matTranslation, -m_position.x, -m_position.y , -m_position.z);
 	
 	D3DXVECTOR3 v3Up, v3Right, v3LookAt = m_lookatPosition - m_position;
 
@@ -103,7 +103,7 @@ void Camera::Update() {
 	);
 
 	// Apply rotation & translation matrix at view matrix
-	D3DXMatrixMultiply(&m_viewMatrix, &matTranslation, &matRotation);*/
+	D3DXMatrixMultiply(&m_viewMatrix, &matTranslation, &matRotation);
 
 	upToDate = true;
 }
@@ -279,7 +279,6 @@ void Camera::CalculatePosition()
 	float y = raiseDistance;
 	float z = sin(theta)*radius;
 	m_position = D3DXVECTOR3(x,y,z) + m_lookatPosition;
-	//m_position = D3DXVECTOR3(m_position.x,raiseDistance,m_position.z) + m_lookatPosition;
 }
 
 void Camera::Scroll(float scroll)

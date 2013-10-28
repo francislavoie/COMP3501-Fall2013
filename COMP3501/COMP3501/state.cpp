@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: positionclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
-#include "position.h"
+#include "state.h"
 
 
-Position::Position(bool rotvel_on, Position* follow) {
+State::State(bool rotvel_on, State* follow) {
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXQUATERNION(1.0f, 0.0f, 0.0f, 90.0f);
@@ -23,32 +23,32 @@ Position::Position(bool rotvel_on, Position* follow) {
 }
 
 
-Position::Position(const Position& other) { }
+State::State(const State& other) { }
 
 
-Position::~Position() { }
+State::~State() { }
 
 
-D3DXVECTOR3 Position::GetRotVel() { return m_rotvel; }
-D3DXVECTOR3 Position::GetPosVel() { return m_posvel; }
-D3DXVECTOR3 Position::GetPosition() { return m_pos; }
-D3DXQUATERNION Position::GetRotation() { return m_rot; }
+D3DXVECTOR3 State::GetRotVel() { return m_rotvel; }
+D3DXVECTOR3 State::GetPosVel() { return m_posvel; }
+D3DXVECTOR3 State::GetPosition() { return m_pos; }
+D3DXQUATERNION State::GetRotation() { return m_rot; }
 
 
-void Position::SetOffset(D3DXVECTOR3 offset) { m_offset = offset; }
+void State::SetOffset(D3DXVECTOR3 offset) { m_offset = offset; }
 
-void Position::SetTime(float t) { m_time = t; }
+void State::SetTime(float t) { m_time = t; }
 
-void Position::SetYaw(float angle) { m_rotvel.x = angle; }
-void Position::SetPitch(float angle) { m_rotvel.y = angle; }
-void Position::SetRoll(float angle) { m_rotvel.z = angle; }
+void State::SetYaw(float angle) { m_rotvel.x = angle; }
+void State::SetPitch(float angle) { m_rotvel.y = angle; }
+void State::SetRoll(float angle) { m_rotvel.z = angle; }
 
-void Position::SetStrafeVel(float vel) { m_posvel.x = vel; }
-void Position::SetClimbVel(float vel) { m_posvel.y = vel; }
-void Position::SetForwardVel(float vel) { m_posvel.z = vel; }
+void State::SetStrafeVel(float vel) { m_posvel.x = vel; }
+void State::SetClimbVel(float vel) { m_posvel.y = vel; }
+void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 
-void Position::Update() {
+void State::Update() {
 	// TODO: Add decay speed
 	// D3DXVECTOR3 decay;
 	// D3DXVec3Normalize(&decay, &m_posvel);
