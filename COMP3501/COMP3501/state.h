@@ -38,11 +38,18 @@ public:
 	void SetStrafeVel(float);
 	void SetClimbVel(float);
 	void SetForwardVel(float);
+	void SetDecayRate(float rate) {decayRate = rate;}
+	void applyForce(D3DXVECTOR3);
+	void setMaxSpeed(float speed) {maxSpeed = speed;}
+	D3DXVECTOR3* getForward() {return &m_front;}
 
 	void Update();
 
 private:
 	float m_time;
+	float decayRate; //% decay rate
+	float maxSpeed;
+	D3DXVECTOR3 acceleration;
 
 	bool m_rotvel_on;
 

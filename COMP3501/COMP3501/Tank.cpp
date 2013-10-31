@@ -30,7 +30,6 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 		return false;
 	}
 
-
 	// Create the model object.
 	turret = new Model;
 	if(!turret) return false;
@@ -45,6 +44,8 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	// Create tank state
 	m_tankState = new State(true);
 	if(!m_tankState) return false;
+	m_tankState->SetDecayRate(0.00002f);
+	m_tankState->setMaxSpeed(0.05f);
 
 	// Create turret state
 	m_turretState = new State(false, m_tankState);
@@ -94,24 +95,30 @@ void Tank::Update(Input* input,float time, float rotation){
 	input->GetWheelDelta(scroll);
 
 	if(input->IsKeyPressed(DIK_W)){
-		m_tankState->SetForwardVel(0.05f);
+		D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
+		D3DXVec3Normalize(&normalForward, m_tankState->getForward());
+		m_tankState->applyForce(normalForward * -0.00001f);//D3DXVECTOR3(0,0,-0.00001f));
+		//m_tankState->SetForwardVel(0.05f);
 	} else if(input->IsKeyPressed(DIK_S)){
-		m_tankState->SetForwardVel(-0.05f);
+		D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
+		D3DXVec3Normalize(&normalForward, m_tankState->getForward());
+		m_tankState->applyForce(normalForward * 0.00001f);
+		//m_tankState->SetForwardVel(-0.05f);
 	} else {
-		m_tankState->SetForwardVel(0.0f);
+		//m_tankState->SetForwardVel(0.0f);
 	}
 
-	if(input->IsKeyPressed(DIK_A)) {
+	/*if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetStrafeVel(-0.05f);
 	} else if(input->IsKeyPressed(DIK_D)) {
 		m_tankState->SetStrafeVel(0.05f);
 	} else {
 		m_tankState->SetStrafeVel(0.0f);
-	}
+	}*/
 
-	if(input->IsKeyPressed(DIK_Q)) {
+	if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetYaw(-0.05f);
-	} else if(input->IsKeyPressed(DIK_E)) {
+	} else if(input->IsKeyPressed(DIK_D)) {
 		m_tankState->SetYaw(0.05f);
 	} else {
 		m_tankState->SetYaw(0.0f);
