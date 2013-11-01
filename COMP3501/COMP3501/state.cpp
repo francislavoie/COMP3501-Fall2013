@@ -52,7 +52,7 @@ void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 void State::applyForce(D3DXVECTOR3 force)
 {
-	//if (D3DXVec3Length(&m_posvel) < maxSpeed)
+	if (D3DXVec3Length(&m_posvel) < maxSpeed)
 		acceleration += force;
 }
 
