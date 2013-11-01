@@ -42,6 +42,7 @@ public:
 	void applyForce(D3DXVECTOR3);
 	void setMaxSpeed(float speed) {maxSpeed = speed;}
 	D3DXVECTOR3* getForward() {return &m_front;}
+	float getAcceleration() {return D3DXVec3Length(&acceleration);}
 
 	void Update();
 

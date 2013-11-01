@@ -52,22 +52,18 @@ void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 void State::applyForce(D3DXVECTOR3 force)
 {
-	if (D3DXVec3Length(&m_posvel) < maxSpeed)
+	//if (D3DXVec3Length(&m_posvel) < maxSpeed)
 		acceleration += force;
 }
 
 void State::Update() {
 	// TODO: Add decay speed
-	// D3DXVECTOR3 decay;
-	// D3DXVec3Normalize(&decay, &m_posvel);
-	// m_posvel -= m_decayRate * decay;
-	if (D3DXVec3Length(&acceleration)>0){
-		D3DXVECTOR3 normalAcc = D3DXVECTOR3(0,0,0);
-		D3DXVec3Normalize(&normalAcc, &acceleration);
-		acceleration -= normalAcc * decayRate;
-	}
+	D3DXVECTOR3 decay;
+	D3DXVec3Normalize(&decay, &m_posvel);
+	m_posvel -= decayRate * decay;
 	
 	m_posvel += acceleration * m_time;
+	acceleration = D3DXVECTOR3(0,0,0);
 
 	// Apply positional velocity
 	if(!m_follow) {
@@ -86,6 +82,7 @@ void State::Update() {
 		m_rotvel.y, 
 		m_rotvel.z
 	);
+
 
 	if(m_rotvel_on) m_rot *= rot;
 	else m_rot = rot;
