@@ -9,8 +9,7 @@
 // INCLUDES //
 //////////////
 #include <d3dx10math.h>
-
-const float angle = float(D3DX_PI*3/8);
+#include "state.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: CameraClass
@@ -43,7 +42,8 @@ public:
 	void Up(float distance) { ApplyTranslation(distance, UPWARDS); }
 	void Scroll(float);
 	void Rotate(float);
-	void setLookAtPosition(D3DXVECTOR3);
+
+	void setFollow(State *, float minHeight = 0.5f, float maxHeight = 2.5f);
 
 	const D3DXVECTOR3 GetAxisZ() const;
 	const D3DXVECTOR3 GetAxisY() const;
@@ -56,6 +56,9 @@ private:
 	D3DXVECTOR3 m_lookatPosition;
 	float theta;
 	float raiseDistance;
+	float minHeight, maxHeight;
+	float angle;
+	State *follow;
 
 	bool upToDate;
 

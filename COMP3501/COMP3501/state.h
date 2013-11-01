@@ -24,8 +24,8 @@ public:
 	D3DXVECTOR3 GetRotVel();
 	D3DXVECTOR3 GetPosVel();
 
-	D3DXVECTOR3 GetPosition();
-	D3DXQUATERNION GetRotation();
+	D3DXVECTOR3* GetPosition();
+	D3DXQUATERNION* GetRotation();
 
 	void SetOffset(D3DXVECTOR3);
 

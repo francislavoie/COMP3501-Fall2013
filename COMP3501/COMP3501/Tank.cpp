@@ -44,7 +44,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	// Create tank state
 	m_tankState = new State(true);
 	if(!m_tankState) return false;
-	m_tankState->SetDecayRate(0.0001f);
+	m_tankState->SetDecayRate(0.00015f);
 	m_tankState->setMaxSpeed(0.05f);
 
 	// Create turret state
@@ -88,7 +88,7 @@ void Tank::Shutdown() {
 	return;
 }
 
-void Tank::Update(Input* input,float time, float rotation){
+void Tank::Update(Input* input,float time, float rotation, bool firstPerson){
 	m_tankState->SetTime(time);
 
 	int scroll;
@@ -115,7 +115,7 @@ void Tank::Update(Input* input,float time, float rotation){
 	} else {
 		m_tankState->SetStrafeVel(0.0f);
 	}*/
-
+	
 	if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetYaw(-0.05f);
 	} else if(input->IsKeyPressed(DIK_D)) {

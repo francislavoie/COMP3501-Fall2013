@@ -34,8 +34,8 @@ State::~State() { }
 
 D3DXVECTOR3 State::GetRotVel() { return m_rotvel; }
 D3DXVECTOR3 State::GetPosVel() { return m_posvel; }
-D3DXVECTOR3 State::GetPosition() { return m_pos; }
-D3DXQUATERNION State::GetRotation() { return m_rot; }
+D3DXVECTOR3 *State::GetPosition() { return &m_pos; }
+D3DXQUATERNION *State::GetRotation() { return &m_rot; }
 
 
 void State::SetOffset(D3DXVECTOR3 offset) { m_offset = offset; }
@@ -71,7 +71,7 @@ void State::Update() {
 		m_pos += (m_up * m_posvel.y) * m_time;
 		m_pos += (m_front * m_posvel.z) * m_time;
 	} else {
-		m_pos = m_follow->GetPosition() + m_offset;
+		m_pos = *m_follow->GetPosition() + m_offset;
 	}
 
 	// Apply rotational velocity

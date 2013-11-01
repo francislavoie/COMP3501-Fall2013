@@ -5,28 +5,36 @@
 
 
 Camera::Camera() {
-	raiseDistance = 2.5f;
+	raiseDistance = 1.5f;
 	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
+	
+	follow = 0;
 	CalculatePosition();
 
 	D3DXQuaternionIdentity(&m_quatOrientation);
 	D3DXMatrixIdentity(&m_viewMatrix);
 	
+	minHeight = 0.5f;
+	maxHeight = 2.5f;
+	angle = float(D3DX_PI*3/8);
 	upToDate = false;
 }
 
 Camera::Camera(D3DXVECTOR3 pos) {
-	raiseDistance = 2.5f;
+	raiseDistance = 1.5f;
 	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
+	
+	follow = 0;
 	CalculatePosition();
 
 	D3DXQuaternionIdentity(&m_quatOrientation);
 	D3DXMatrixIdentity(&m_viewMatrix);
 	theta = 0.0f;
+	minHeight = 0.5f;
+	maxHeight = 2.5f;
+	angle = float(D3DX_PI*3/8);
 	upToDate = false;
 }
 
@@ -278,18 +286,22 @@ void Camera::CalculatePosition()
 	float x = cos(theta)*radius;
 	float y = raiseDistance;
 	float z = sin(theta)*radius;
-	m_position = D3DXVECTOR3(x,y,z) + m_lookatPosition;
+	if (follow != 0)
+	{
+		m_position = D3DXVECTOR3(x,y,z) + *follow->GetPosition();
+		m_lookatPosition = *follow->GetPosition() + *follow->getForward() * 100;
+	}
 }
 
 void Camera::Scroll(float scroll)
 {
 	raiseDistance -= scroll*0.001f;
-	if (raiseDistance < 0.75f)
-		raiseDistance = 0.75f;
-	else if (raiseDistance > 25.0f)
-		raiseDistance = 25.0f;
+	if (raiseDistance < minHeight)
+		raiseDistance = minHeight;
+	else if (raiseDistance > maxHeight)
+		raiseDistance = maxHeight;
 	else
-		m_lookatPosition += D3DXVECTOR3(0, scroll*0.0002f, 0);
+		//m_lookatPosition += D3DXVECTOR3(0, scroll*0.0002f, 0);
 	upToDate = false;
 }
 
@@ -299,8 +311,11 @@ void Camera::Rotate(float rot)
 	upToDate = false;
 }
 
-void Camera::setLookAtPosition(D3DXVECTOR3 laPosition)
+void Camera::setFollow(State* followState, float _minHeight, float _maxHeight)
 {
-	m_lookatPosition = laPosition + D3DXVECTOR3(0, (raiseDistance + 2.5f) * 0.2f, 0);
-
+	minHeight = _minHeight;
+	maxHeight = _maxHeight;
+	if(minHeight == maxHeight) angle = float(D3DX_PI);
+	else angle = float(D3DX_PI*3/8);
+	follow = followState;
 }

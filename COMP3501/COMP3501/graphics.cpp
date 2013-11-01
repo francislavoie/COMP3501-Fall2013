@@ -18,6 +18,7 @@ Graphics::Graphics() {
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
+	firstPerson = false;
 }
 
 
@@ -110,6 +111,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+	m_Camera->setFollow(m_Tank->getTurretState());
 
 	// Create the light object.
 	m_Light = new Light;
@@ -277,9 +279,19 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-	m_Tank->Update(input, time, rotation);	
+	m_Tank->Update(input, time, rotation, firstPerson);	
 
-	m_Camera->setLookAtPosition(m_Tank->getTankState()->GetPosition());
+	if (input->IsKeyPressed(DIK_SPACE))
+		if (firstPerson)
+		{
+			m_Camera->setFollow(m_Tank->getTurretState());
+			firstPerson = false;
+		}
+		else
+		{
+			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
+			firstPerson = true;
+		}
 
 	/*
 	// Mouse controls
@@ -453,10 +465,10 @@ bool Graphics::Render(float time) {
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix;
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_Tank->getTankState()->GetRotation());
+	D3DXMatrixRotationQuaternion(&rotationMatrix, m_Tank->getTankState()->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTankState()->GetPosition().x, m_Tank->getTankState()->GetPosition().y, m_Tank->getTankState()->GetPosition().z);
+	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTankState()->GetPosition()->x, m_Tank->getTankState()->GetPosition()->y, m_Tank->getTankState()->GetPosition()->z);
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 	
 	m_Tank->RenderTank(m_D3D->GetDeviceContext());
@@ -465,10 +477,10 @@ bool Graphics::Render(float time) {
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
-	D3DXMatrixRotationQuaternion(&rotationMatrix, &m_Tank->getTurretState()->GetRotation());
+	D3DXMatrixRotationQuaternion(&rotationMatrix, m_Tank->getTurretState()->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
-	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTurretState()->GetPosition().x, m_Tank->getTurretState()->GetPosition().y, m_Tank->getTurretState()->GetPosition().z);
+	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTurretState()->GetPosition()->x, m_Tank->getTurretState()->GetPosition()->y, m_Tank->getTurretState()->GetPosition()->z);
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 
 	m_Tank->RenderTurret(m_D3D->GetDeviceContext());
