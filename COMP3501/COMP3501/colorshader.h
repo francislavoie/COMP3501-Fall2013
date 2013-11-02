@@ -18,7 +18,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ColorShaderClass
 ////////////////////////////////////////////////////////////////////////////////
-class ColorShaderClass {
+class ColorShader {
 private:
 
 	struct MatrixBufferType {
@@ -28,9 +28,9 @@ private:
 	};
 
 public:
-	ColorShaderClass();
-	ColorShaderClass(const ColorShaderClass&);
-	~ColorShaderClass();
+	ColorShader();
+	ColorShader(const ColorShader&);
+	~ColorShader();
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX);

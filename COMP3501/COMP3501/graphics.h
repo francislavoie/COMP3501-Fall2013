@@ -23,12 +23,13 @@
 #include "input.h"
 #include "state.h"
 #include "tank.h"
+#include "terrain.h"
 
 
 /////////////
 // GLOBALS //
 /////////////
-const bool FULL_SCREEN_WINDOWED = false;
+const bool FULL_SCREEN_WINDOWED = true;
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -70,6 +71,8 @@ private:
 	Frustum* m_Frustum;
 
 	Tank* m_Tank;
+
+	Terrain* m_Terrain;
 };
 
 #endif

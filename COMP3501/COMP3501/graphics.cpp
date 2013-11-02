@@ -161,6 +161,17 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	m_Frustum = new Frustum;
 	if(!m_Frustum) return false;
 
+	// Create the terrain object.
+	m_Terrain = new Terrain;
+	if(!m_Terrain) return false;
+
+	// Initialize the terrain object.
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/heightmap01.bmp");
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -208,12 +219,20 @@ void Graphics::Shutdown() {
 		m_ShaderManager = 0;
 	}
 
+	// Release the terrain object.
+	if(m_Terrain) {
+		m_Terrain->Shutdown();
+		delete m_Terrain;
+		m_Terrain = 0;
+	}
+
 	// Release the light object.
 	if(m_Light) {
 		delete m_Light;
 		m_Light = 0;
 	}
 
+	// Release the tank object.
 	if(m_Tank) {
 		m_Tank->Shutdown();
 		delete m_Tank;
@@ -391,6 +410,14 @@ bool Graphics::Render(float time) {
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
+
+
+	// Render the terrain buffers.
+	m_Terrain->Render(m_D3D->GetDeviceContext());
+
+	// Render the model using the color shader.
+	result = m_ShaderManager->RenderColorShader(m_D3D->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	if(!result) return false;
 
 	// Construct the frustum.
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);

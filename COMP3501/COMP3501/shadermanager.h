@@ -10,10 +10,10 @@
 ///////////////////////
 #include "d3d.h"
 
-
 #include "textureshader.h"
 #include "lightshader.h"
 #include "bumpmapshader.h"
+#include "colorshader.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,11 +32,13 @@ public:
 	bool RenderTextureShader(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, ID3D11ShaderResourceView*);
 	bool RenderLightShader(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, ID3D11ShaderResourceView*, D3DXVECTOR3, D3DXVECTOR4, D3DXVECTOR4, D3DXVECTOR3, D3DXVECTOR4, float);
 	bool RenderBumpMapShader(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, D3DXVECTOR3, D3DXVECTOR4);
+	bool RenderColorShader(ID3D11DeviceContext*, int, D3DXMATRIX, D3DXMATRIX, D3DXMATRIX);
 
 private:
 	TextureShader* m_TextureShader;
 	LightShader* m_LightShader;
 	BumpMapShader* m_BumpMapShader;
+	ColorShader* m_ColorShader;
 };
 
 #endif

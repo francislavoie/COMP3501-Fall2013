@@ -74,6 +74,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{31ee3ab3-8a84-45bb-8590-8fec8f60e259}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Terrain">
+      <UniqueIdentifier>{34884fb8-87ef-483f-bea5-bb776dc1c5ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -153,6 +156,12 @@
     </ClCompile>
     <ClCompile Include="state.cpp">
       <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshader.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +243,12 @@
     <ClInclude Include="state.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshader.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs.hlsl">
@@ -288,6 +303,9 @@
     </Image>
     <Image Include="data\cursor.dds">
       <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="data\heightmap01.bmp">
+      <Filter>Resource Files\Terrain</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

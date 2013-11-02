@@ -8,6 +8,7 @@ ShaderManager::ShaderManager() {
 	m_TextureShader = 0;
 	m_LightShader = 0;
 	m_BumpMapShader = 0;
+	m_ColorShader = 0;
 }
 
 
@@ -53,11 +54,29 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 		return false;
 	}
 
+	// Create the color shader object.
+	m_ColorShader = new ColorShader;
+	if(!m_ColorShader) return false;
+
+	// Initialize the color shader object.
+	result = m_ColorShader->Initialize(device, hwnd);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
 
 void ShaderManager::Shutdown() {
+	// Release the color shader object.
+	if(m_ColorShader) {
+		m_ColorShader->Shutdown();
+		delete m_ColorShader;
+		m_ColorShader = 0;
+	}
+
 	// Release the bump map shader object.
 	if(m_BumpMapShader) {
 		m_BumpMapShader->Shutdown();
@@ -115,6 +134,17 @@ bool ShaderManager::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int 
 
 	// Render the model using the bump map shader.
 	result = m_BumpMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, colorTexture, normalTexture, lightDirection, diffuse);
+	if(!result) return false;
+
+	return true;
+}
+
+
+bool ShaderManager::RenderColorShader(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix) {
+	bool result;
+
+	// Render the model using the bump map shader.
+	result = m_ColorShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix);
 	if(!result) return false;
 
 	return true;
