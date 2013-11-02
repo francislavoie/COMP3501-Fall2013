@@ -58,7 +58,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Text) return false;
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 3);
+	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 4);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
 		return false;
@@ -281,9 +281,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	// Set the location of the mouse.
-	//result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
-	//if(!result) return false;
+	result = m_Text->SetVector3(m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
 
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);

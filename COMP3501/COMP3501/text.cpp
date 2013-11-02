@@ -52,7 +52,7 @@ bool Text::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
 	m_sentences = new SentenceType[m_count];
 
 	for(int i = 0; i < m_count; i++) {
-		result = InitializeSentence(&m_sentences[i], 32, device);
+		result = InitializeSentence(&m_sentences[i], 64, device);
 		if(!result) return false;
 	}
 
@@ -287,7 +287,7 @@ bool Text::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceType* sent
 
 bool Text::SetMousePosition(int mouseX, int mouseY, ID3D11DeviceContext* deviceContext) {
 	char tempString[16];
-	char mouseString[16];
+	char mouseString[64];
 	bool result;
 
 	// Convert the mouseX integer to string format.
@@ -318,7 +318,7 @@ bool Text::SetMousePosition(int mouseX, int mouseY, ID3D11DeviceContext* deviceC
 
 bool Text::SetFps(int fps, int index, ID3D11DeviceContext* deviceContext) {
 	char tempString[16];
-	char fpsString[16];
+	char fpsString[64];
 	D3DXVECTOR4 color;
 	bool result;
 	
@@ -342,7 +342,7 @@ bool Text::SetFps(int fps, int index, ID3D11DeviceContext* deviceContext) {
 	if(fps < 30) color = D3DXVECTOR4(1.0f, 0.0f, 0.0f, 1.0f);
 
 	// Update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(&m_sentences[index], fpsString, D3DXVECTOR2(20, 20), color, deviceContext);
+	result = UpdateSentence(&m_sentences[index], fpsString, D3DXVECTOR2(20.0f, float((index+1) * 20)), color, deviceContext);
 	if(!result) return false;
 
 	return true;
@@ -351,7 +351,7 @@ bool Text::SetFps(int fps, int index, ID3D11DeviceContext* deviceContext) {
 
 bool Text::SetCpu(int cpu, int index, ID3D11DeviceContext* deviceContext) {
 	char tempString[16];
-	char cpuString[16];
+	char cpuString[64];
 	bool result;
 
 	// Convert the cpu integer to string format.
@@ -363,7 +363,7 @@ bool Text::SetCpu(int cpu, int index, ID3D11DeviceContext* deviceContext) {
 	strcat_s(cpuString, "%");
 
 	// Update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(&m_sentences[index], cpuString, D3DXVECTOR2(20, 40), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), deviceContext);
+	result = UpdateSentence(&m_sentences[index], cpuString, D3DXVECTOR2(20.0f, float((index+1) * 20)), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), deviceContext);
 	if(!result) return false;
 
 	return true;
@@ -372,7 +372,7 @@ bool Text::SetCpu(int cpu, int index, ID3D11DeviceContext* deviceContext) {
 
 bool Text::SetRenderCount(int count, int index, ID3D11DeviceContext* deviceContext) {
 	char tempString[16];
-	char countString[20];
+	char countString[64];
 	bool result;
 
 	// Convert the cpu integer to string format.
@@ -383,7 +383,7 @@ bool Text::SetRenderCount(int count, int index, ID3D11DeviceContext* deviceConte
 	strcat_s(countString, tempString);
 
 	// Update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(&m_sentences[index], countString, D3DXVECTOR2(20, 60), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), deviceContext);
+	result = UpdateSentence(&m_sentences[index], countString, D3DXVECTOR2(20.0f, float((index+1) * 20)), D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f), deviceContext);
 	if(!result) return false;
 
 	return true;
@@ -392,4 +392,49 @@ bool Text::SetRenderCount(int count, int index, ID3D11DeviceContext* deviceConte
 
 int Text::GetSentenceCount() {
 	return m_count;
+}
+
+bool Text::SetVector3(D3DXVECTOR3* vector, int index, ID3D11DeviceContext* deviceContext) {
+	char tempString[20];
+	char string[64];
+	int wholeNum, decimalNum;
+	bool result; 
+
+	strcpy_s(string, "Vector3: (");
+
+	// Convert the x to string format.
+	wholeNum = int(vector->x);
+	decimalNum = (int) (abs(vector->x - wholeNum) * 10000);
+	_itoa_s(wholeNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ".");
+	_itoa_s(decimalNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ", ");
+
+	// Convert the y to string format.
+	wholeNum = int(vector->y);
+	decimalNum = (int) (abs(vector->y - wholeNum) * 10000);
+	_itoa_s(wholeNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ".");
+	_itoa_s(decimalNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ", ");
+
+	// Convert the z to string format.
+	wholeNum = int(vector->z);
+	decimalNum = (int) (abs(vector->z - wholeNum) * 10000);
+	_itoa_s(wholeNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ".");
+	_itoa_s(decimalNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ")");
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(&m_sentences[index], string, D3DXVECTOR2(20.0f, float((index+1) * 20)), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), deviceContext);
+	if(!result) return false;
+
+	return true;
 }
