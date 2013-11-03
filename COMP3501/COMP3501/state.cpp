@@ -10,8 +10,7 @@ State::State(bool rotvel_on, State* follow) {
 	m_rot = D3DXQUATERNION(1.0f, 0.0f, 0.0f, 90.0f);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	decayRate = 0.0f;
-	maxSpeed = 0.0f;
+	friction = 0.0f;
 	m_time = 0.0f;
 
 	m_up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -52,13 +51,12 @@ void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 void State::applyForce(D3DXVECTOR3 force)
 {
-	if (D3DXVec3Length(&m_posvel) < maxSpeed)
-		acceleration += force;
+	acceleration += force;
 }
 
 void State::Update() {
 	// TODO: Add decay speed
-	acceleration -= m_posvel * decayRate;
+	acceleration -= m_posvel * friction;
 	
 	D3DXVECTOR3 prevVelocity = m_posvel;
 	m_posvel += acceleration * m_time;
