@@ -253,7 +253,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		line3 = *m_tankState->getUp();
 
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->getUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
-	angle /= 50;
+	angle /= 15;
 
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross, &line3, m_tankState->getUp());
