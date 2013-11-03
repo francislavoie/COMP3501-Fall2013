@@ -26,15 +26,15 @@ using namespace std;
 #include "quadtree.h"
 
 struct VectorSortP {
-    bool operator()(const D3DXVECTOR3 a, const D3DXVECTOR3 b) const {
+	bool operator()(const D3DXVECTOR3 a, const D3DXVECTOR3 b) const {
 		return a.y < b.y;
-    }
+	}
 };
 
-const D3DXVECTOR3 FRONTRIGHT = D3DXVECTOR3(0.55614, 0, 1.35747);
-const D3DXVECTOR3 FRONTLEFT = D3DXVECTOR3(-0.55106, 0, 1.35747);
-const D3DXVECTOR3 REARLEFT= D3DXVECTOR3(-0.55826, 0, -0.53326);
-const D3DXVECTOR3 REARRIGHT = D3DXVECTOR3(0.56334, 0, -0.53326);
+const D3DXVECTOR3 FRONTRIGHT = D3DXVECTOR3(0.55614f, 0.0f, 1.35747f);
+const D3DXVECTOR3 FRONTLEFT = D3DXVECTOR3(-0.55106f, 0.0f, 1.35747f);
+const D3DXVECTOR3 REARLEFT= D3DXVECTOR3(-0.55826f, 0.0f, -0.53326f);
+const D3DXVECTOR3 REARRIGHT = D3DXVECTOR3(0.56334f, 0.0f, -0.53326f);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ModelClass

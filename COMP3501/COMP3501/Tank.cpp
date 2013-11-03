@@ -248,7 +248,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	*/
 	D3DXVECTOR3 line3;
 	if (count != 0)
-		line3 = (normal1+normal2+normal3+normal4)/count;
+		line3 = (normal1+normal2+normal3+normal4)/float(count);
 	else
 		line3 = *m_tankState->getUp();
 
