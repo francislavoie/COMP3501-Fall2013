@@ -55,7 +55,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	m_turretState = new State(false, m_tankState);
 	if(!m_turretState) return false;
 
-	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.48f, 0.0f));
+	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.45f, 0.0f));
 
 	return true;
 }
