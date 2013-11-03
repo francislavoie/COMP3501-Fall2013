@@ -7,7 +7,7 @@
 State::State(bool rotvel_on, State* follow) {
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_rot = D3DXQUATERNION(1.0f, 0.0f, 0.0f, 90.0f);
+	D3DXQuaternionIdentity(&m_rot);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	friction = 0.0f;
