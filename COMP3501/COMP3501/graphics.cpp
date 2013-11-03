@@ -315,8 +315,6 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson());	
-
 	if (input->IsKeyPressed(DIK_SPACE)){
 		if (m_Camera->isFirstPerson()) 
 			m_Camera->setFollow(m_Tank->getTurretState());
@@ -337,6 +335,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 2.0f, position.z));
 	}
 	
+	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson());	
 
 	/*
 	// Mouse controls
