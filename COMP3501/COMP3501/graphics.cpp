@@ -310,6 +310,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	input->GetWheelDelta(scroll);
 	m_Camera->Scroll(float(scroll));
 	m_Camera->Rotate(-float(deltaX));
+	m_Camera->lookUpDown(-float(deltaY));
 
 	m_Cursor->SetPosition(D3DXVECTOR2(float(mouseX), float(mouseY)));
 

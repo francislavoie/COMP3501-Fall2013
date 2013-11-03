@@ -50,6 +50,7 @@ public:
 	const D3DXVECTOR3 GetAxisX() const;
 	bool isFirstPerson() {return firstPerson;}
 	void toggleFirstPerson() {firstPerson = !firstPerson;}
+	void lookUpDown(float);
 
 private:
 	bool firstPerson;
@@ -61,6 +62,7 @@ private:
 	float raiseDistance;
 	float minHeight, maxHeight;
 	float angle;
+	D3DXVECTOR3 pitch;
 	State *follow;
 
 	bool upToDate;

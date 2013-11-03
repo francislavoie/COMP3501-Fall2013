@@ -8,6 +8,7 @@ Camera::Camera() {
 	raiseDistance = 1.5f;
 	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pitch = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	
 	follow = 0;
 	CalculatePosition();
@@ -26,6 +27,7 @@ Camera::Camera(D3DXVECTOR3 pos) {
 	raiseDistance = 1.5f;
 	theta = float(D3DX_PI* 3/2);
 	m_lookatPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pitch = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	
 	follow = 0;
 	CalculatePosition();
@@ -291,7 +293,7 @@ void Camera::CalculatePosition()
 	if (follow != 0)
 	{
 		m_position = D3DXVECTOR3(x,y,z) + *follow->GetPosition();
-		m_lookatPosition = *follow->GetPosition() + *follow->getForward() * 100;
+		m_lookatPosition = *follow->GetPosition() + *follow->getForward() * 100 + pitch;
 	}
 }
 
@@ -310,6 +312,15 @@ void Camera::Scroll(float scroll)
 void Camera::Rotate(float rot)
 {
 	theta += rot*0.01f;
+	upToDate = false;
+}
+
+void Camera::lookUpDown(float rot)
+{
+	if (rot > 0 && pitch.y < 100) 
+		pitch += D3DXVECTOR3(0,rot*0.1f,0);
+	if (rot < 0 && pitch.y > -100) 
+		pitch += D3DXVECTOR3(0,rot*0.1f,0);
 	upToDate = false;
 }
 
