@@ -101,7 +101,7 @@
     <ClCompile Include="state.cpp" />
     <ClCompile Include="shadermanager.cpp" />
     <ClCompile Include="system.cpp" />
-    <ClCompile Include="Tank.cpp" />
+    <ClCompile Include="tank.cpp" />
     <ClCompile Include="terrain.cpp" />
     <ClCompile Include="terrainshader.cpp" />
     <ClCompile Include="text.cpp" />
