@@ -217,12 +217,12 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		count--;
 	}
 		
-	vector<D3DXVECTOR3> heights;
+	//vector<D3DXVECTOR3> heights;
 	//heights.push_back(*getTankState()->GetPosition());
-	heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTRIGHT + D3DXVECTOR3(0,0.005f,0));
-	heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTLEFT);
-	heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARLEFT);
-	heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARRIGHT);
+	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTRIGHT + D3DXVECTOR3(0,0.005f,0));
+	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTLEFT);
+	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARLEFT);
+	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARRIGHT);
 	/*heights.push_back(frontRight);
 	heights.push_back(frontLeft);
 	heights.push_back(rearLeft);
@@ -253,6 +253,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		line3 = *m_tankState->getUp();
 
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->getUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
+	angle /= 50;
 
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross, &line3, m_tankState->getUp());
