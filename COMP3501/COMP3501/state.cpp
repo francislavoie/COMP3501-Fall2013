@@ -58,21 +58,21 @@ void State::applyForce(D3DXVECTOR3 force)
 
 void State::Update() {
 	// TODO: Add decay speed
-	D3DXVECTOR3 decay;
-	D3DXVec3Normalize(&decay, &m_posvel);
-	m_posvel -= decayRate * decay;
+	acceleration -= m_posvel * decayRate;
 	
+	D3DXVECTOR3 prevVelocity = m_posvel;
 	m_posvel += acceleration * m_time;
-	acceleration = D3DXVECTOR3(0,0,0);
 
 	// Apply positional velocity
 	if(!m_follow) {
-		m_pos += (m_right * m_posvel.x) * m_time;
-		m_pos += (m_up * m_posvel.y) * m_time;
-		m_pos += (m_front * m_posvel.z) * m_time;
+		m_pos += (m_right * prevVelocity.x) * m_time + (1/2) * (m_right * acceleration.x) * pow(m_time, 2);
+		m_pos += (m_up * prevVelocity.y) * m_time + (1/2) * (m_right * acceleration.y) * pow(m_time, 2);
+		m_pos += (m_front * prevVelocity.z) * m_time + (1/2) * (m_right * acceleration.z) * pow(m_time, 2);
 	} else {
 		m_pos = *m_follow->GetPosition() + m_offset;
 	}
+
+	acceleration = D3DXVECTOR3(0,0,0);
 
 	// Apply rotational velocity
 	D3DXQUATERNION rot;
