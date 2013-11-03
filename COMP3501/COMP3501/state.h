@@ -42,6 +42,7 @@ public:
 	void applyForce(D3DXVECTOR3);
 	D3DXVECTOR3* getForward() {return &m_front;}
 	float getAcceleration() {return D3DXVec3Length(&acceleration);}
+	void SetPosition(D3DXVECTOR3 pos) {m_pos = pos;}
 
 	void Update();
 

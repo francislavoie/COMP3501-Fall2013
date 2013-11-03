@@ -318,25 +318,25 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson());	
 
 	if (input->IsKeyPressed(DIK_SPACE)){
-		if (m_Camera->isFirstPerson()) {
+		if (m_Camera->isFirstPerson()) 
 			m_Camera->setFollow(m_Tank->getTurretState());
-		} else {
+		else
 			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
-		}
 		m_Camera->toggleFirstPerson();
 
 	}
-	/*
+	
 	// Get the current position of the camera.
-	D3DXVECTOR3 position = m_Camera->GetPosition();
+	float height;
+	D3DXVECTOR3 position = *m_Tank->getTankState()->GetPosition();
 
 	// Get the height of the triangle that is directly underneath the given camera position.
 	result =  m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
 	if(result) {
 		// If there was a triangle under the camera then position the camera just above it by two units.
-		m_Camera->SetPosition(position.x, height + 2.0f, position.z);
+		m_Tank->getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 2.0f, position.z));
 	}
-	*/
+	
 
 	/*
 	// Mouse controls
