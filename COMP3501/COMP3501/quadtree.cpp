@@ -438,7 +438,7 @@ void QuadTree::RenderNode(NodeType* node, Frustum* frustum, ID3D11DeviceContext*
 	indexCount = node->triangleCount * 3;
 
 	// Call the terrain shader to render the polygons in this node.
-	shader->RenderTerrainShader(deviceContext, indexCount);
+	shader->RenderTerrain(deviceContext, indexCount);
 
 	// Increase the count of the number of polygons that have been rendered during this frame.
 	m_drawCount += node->triangleCount;

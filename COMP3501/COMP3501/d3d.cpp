@@ -13,6 +13,7 @@ D3D::D3D() {
 	m_depthDisabledStencilState = 0;
 	m_depthStencilView = 0;
 	m_rasterState = 0;
+	m_rasterStateNoCulling = 0;
 	m_alphaEnableBlendingState = 0;
 	m_alphaDisableBlendingState = 0;
 }
@@ -249,7 +250,7 @@ bool D3D::Initialize(D3DXVECTOR2 screen, bool vsync, HWND hwnd, bool fullscreen,
 	result = m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
 	if(FAILED(result)) return false;
 
-	// Initailze the depth stencil view.
+	// Initialize the depth stencil view.
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
 	// Set up the depth stencil view description.
@@ -282,6 +283,22 @@ bool D3D::Initialize(D3DXVECTOR2 screen, bool vsync, HWND hwnd, bool fullscreen,
 
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
+
+	// Setup a raster description which turns off back face culling.
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	// Create the no culling rasterizer state.
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterStateNoCulling);
+	if(FAILED(result)) return false;
 
 	// Setup the viewport for rendering.
 	viewport.Width = screen.x;
@@ -353,6 +370,11 @@ void D3D::Shutdown() {
 	if(m_alphaDisableBlendingState) {
 		m_alphaDisableBlendingState->Release();
 		m_alphaDisableBlendingState = 0;
+	}
+
+	if(m_rasterStateNoCulling) {
+		m_rasterStateNoCulling->Release();
+		m_rasterStateNoCulling = 0;
 	}
 
 	if(m_rasterState) {
@@ -500,5 +522,16 @@ void D3D::TurnOffAlphaBlending() {
 	// Turn off the alpha blending.
 	m_deviceContext->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
 
+	return;
+}
+
+void D3D::TurnOnCulling() {
+	m_deviceContext->RSSetState(m_rasterState);
+	return;
+}
+
+
+void D3D::TurnOffCulling() {
+	m_deviceContext->RSSetState(m_rasterStateNoCulling);
 	return;
 }

@@ -98,6 +98,8 @@
     <ClCompile Include="modellist.cpp" />
     <ClCompile Include="mousecursor.cpp" />
     <ClCompile Include="quadtree.cpp" />
+    <ClCompile Include="skydome.cpp" />
+    <ClCompile Include="skydomeshader.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="shadermanager.cpp" />
     <ClCompile Include="system.cpp" />
@@ -131,6 +133,8 @@
     <ClInclude Include="modellist.h" />
     <ClInclude Include="mousecursor.h" />
     <ClInclude Include="quadtree.h" />
+    <ClInclude Include="skydome.h" />
+    <ClInclude Include="skydomeshader.h" />
     <ClInclude Include="state.h" />
     <ClInclude Include="shadermanager.h" />
     <ClInclude Include="system.h" />
@@ -207,6 +211,14 @@
       <FileType>Document</FileType>
     </None>
     <None Include="terrain.vs.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="skydome.ps.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="skydome.vs.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

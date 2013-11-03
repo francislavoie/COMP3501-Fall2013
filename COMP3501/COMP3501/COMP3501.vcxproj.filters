@@ -77,6 +77,18 @@
     <Filter Include="Resource Files\Terrain">
       <UniqueIdentifier>{34884fb8-87ef-483f-bea5-bb776dc1c5ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Model\Environment">
+      <UniqueIdentifier>{4c3b55f5-af0a-433a-8dc2-3a472716075e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model\Environment">
+      <UniqueIdentifier>{911aadbf-3951-47c7-937d-fa49a1dcf1d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Pixel">
+      <UniqueIdentifier>{65f63ef8-f05b-439e-a287-eca9e361b453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders\Vertex">
+      <UniqueIdentifier>{113fdeb9-d6a7-4a2a-9f33-acf31d6fdcd6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -154,20 +166,26 @@
     <ClCompile Include="state.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="terrain.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="colorshader.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="quadtree.cpp">
-      <Filter>Source Files\Model</Filter>
     </ClCompile>
     <ClCompile Include="terrainshader.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="tank.cpp">
       <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="terrain.cpp">
+      <Filter>Source Files\Model\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="quadtree.cpp">
+      <Filter>Source Files\Model\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="skydome.cpp">
+      <Filter>Source Files\Model\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="skydomeshader.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -249,55 +267,67 @@
     <ClInclude Include="state.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="terrain.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
     <ClInclude Include="colorshader.h">
       <Filter>Header Files\Graphics\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="quadtree.h">
-      <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="terrainshader.h">
       <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="terrain.h">
+      <Filter>Header Files\Model\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="quadtree.h">
+      <Filter>Header Files\Model\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="skydome.h">
+      <Filter>Header Files\Model\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="skydomeshader.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="light.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="light.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="texture.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="texture.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+    <None Include="bumpmap.ps.hlsl">
+      <Filter>Resource Files\Shaders\Pixel</Filter>
     </None>
     <None Include="color.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="color.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\Shaders\Pixel</Filter>
     </None>
     <None Include="font.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\Shaders\Pixel</Filter>
     </None>
-    <None Include="font.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+    <None Include="light.ps.hlsl">
+      <Filter>Resource Files\Shaders\Pixel</Filter>
     </None>
-    <None Include="bumpmap.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="bumpmap.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+    <None Include="skydome.ps.hlsl">
+      <Filter>Resource Files\Shaders\Pixel</Filter>
     </None>
     <None Include="terrain.ps.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\Shaders\Pixel</Filter>
+    </None>
+    <None Include="texture.ps.hlsl">
+      <Filter>Resource Files\Shaders\Pixel</Filter>
+    </None>
+    <None Include="bumpmap.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="color.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="font.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="light.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="skydome.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
     </None>
     <None Include="terrain.vs.hlsl">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\Shaders\Vertex</Filter>
+    </None>
+    <None Include="texture.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

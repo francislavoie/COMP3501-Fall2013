@@ -10,6 +10,7 @@ ShaderManager::ShaderManager() {
 	m_BumpMapShader = 0;
 	m_ColorShader = 0;
 	m_TerrainShader = 0;
+	m_SkyDomeShader = 0;
 }
 
 
@@ -77,11 +78,29 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 		return false;
 	}
 
+	// Create the sky dome shader object.
+	m_SkyDomeShader = new SkyDomeShader;
+	if(!m_SkyDomeShader) return false;
+
+	// Initialize the sky dome shader object.
+	result = m_SkyDomeShader->Initialize(device, hwnd);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
 
 void ShaderManager::Shutdown() {
+	// Release the sky dome shader object.
+	if(m_SkyDomeShader) {
+		m_SkyDomeShader->Shutdown();
+		delete m_SkyDomeShader;
+		m_SkyDomeShader = 0;
+	}
+	
 	// Release the terrain shader object.
 	if(m_TerrainShader) {
 		m_TerrainShader->Shutdown();
@@ -121,7 +140,7 @@ void ShaderManager::Shutdown() {
 }
 
 
-bool ShaderManager::RenderTextureShader(ID3D11DeviceContext* device, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
+bool ShaderManager::RenderTexture(ID3D11DeviceContext* device, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
 											 ID3D11ShaderResourceView* texture) {
 	bool result;
 	
@@ -133,7 +152,7 @@ bool ShaderManager::RenderTextureShader(ID3D11DeviceContext* device, int indexCo
 }
 
 
-bool ShaderManager::RenderLightShader(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
+bool ShaderManager::RenderLight(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
 										   ID3D11ShaderResourceView* texture, D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambient, D3DXVECTOR4 diffuse, 
 										   D3DXVECTOR3 cameraPosition, D3DXVECTOR4 specular, float specularPower) {
 	bool result;
@@ -146,7 +165,7 @@ bool ShaderManager::RenderLightShader(ID3D11DeviceContext* deviceContext, int in
 }
 
 
-bool ShaderManager::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
+bool ShaderManager::RenderBumpMap(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
 											 ID3D11ShaderResourceView* colorTexture, ID3D11ShaderResourceView* normalTexture, D3DXVECTOR3 lightDirection, 
 											 D3DXVECTOR4 diffuse) {
 	bool result;
@@ -159,7 +178,7 @@ bool ShaderManager::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int 
 }
 
 
-bool ShaderManager::RenderColorShader(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix) {
+bool ShaderManager::RenderColor(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix) {
 	bool result;
 
 	// Render the model using the color shader.
@@ -170,7 +189,7 @@ bool ShaderManager::RenderColorShader(ID3D11DeviceContext* deviceContext, int in
 }
 
 
-void ShaderManager::RenderTerrainShader(ID3D11DeviceContext* deviceContext, int indexCount) {
+void ShaderManager::RenderTerrain(ID3D11DeviceContext* deviceContext, int indexCount) {
 	// Render the model using the terrain shader.
 	m_TerrainShader->Render(deviceContext, indexCount);
 
@@ -181,4 +200,15 @@ bool ShaderManager::SetTerrainParameters(ID3D11DeviceContext* deviceContext, D3D
 										 D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection, 
 										 ID3D11ShaderResourceView* texture) {
 	return m_TerrainShader->SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, ambientColor, diffuseColor, lightDirection, texture);
+}
+
+bool ShaderManager::RenderSkyDome(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, 
+								  D3DXMATRIX projectionMatrix, D3DXVECTOR4 apexColor, D3DXVECTOR4 centerColor) {
+	bool result;
+
+	// Render the model using the sky dome shader.
+	result = m_SkyDomeShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, apexColor, centerColor);
+	if(!result) return false;
+
+	return true;
 }

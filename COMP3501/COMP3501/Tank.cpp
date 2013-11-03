@@ -54,6 +54,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	m_turretState = new State(false, m_tankState);
 	if(!m_turretState) return false;
 
+	m_tankState->SetPosition(D3DXVECTOR3(3.0f, 0.0f, 3.0f));
 	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.45f, 0.0f));
 
 	return true;
@@ -120,11 +121,11 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	}*/
 	
 	if(input->IsKeyPressed(DIK_A)) {
-		m_tankState->SetYaw(-0.05f);
+		m_tankState->SetYaw(-0.005f * time);
 	} else if(input->IsKeyPressed(DIK_D)) {
-		m_tankState->SetYaw(0.05f);
+		m_tankState->SetYaw(0.005f * time);
 	} else {
-		m_tankState->SetYaw(0.0f);
+		m_tankState->SetYaw(0.0f * time);
 	}
 
 	m_turretState->SetYaw(rotation);
@@ -164,38 +165,38 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
 	if(result) {
 		// If there was a triangle under the camera then position the camera just above it by two units.
-		getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 2.0f, position.z));
+		getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 0.4f, position.z));
 	}
 
 	int count = 5;
-	D3DXVECTOR3 normal1,normal2,normal3,normal4, normal5;
+	D3DXVECTOR3 normal1, normal2, normal3, normal4, normal5;
 	result =  m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal1);
 	if(!result) {
-		normal1 = D3DXVECTOR3(0,0,0);
+		normal1 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal2);
+	result = m_QuadTree->GetHeightAtPosition2(m_frontLeft.x, m_frontLeft.z, height, normal2);
 	if(!result) {
-		normal2 = D3DXVECTOR3(0,0,0); 
+		normal2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal3);
+	result = m_QuadTree->GetHeightAtPosition2(m_rearRight.x, m_rearRight.z, height, normal3);
 	if(!result) {
-		normal3 = D3DXVECTOR3(0,0,0);
+		normal3 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal4);
+	result = m_QuadTree->GetHeightAtPosition2(m_rearLeft.x, m_rearLeft.z, height, normal4);
 	if(!result) {
-		normal4 = D3DXVECTOR3(0,0,0);
+		normal4 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
 	result = m_QuadTree->GetHeightAtPosition2(m_center.x, m_center.z, height, normal5);
-	if(result) {
-		normal5 = D3DXVECTOR3(0,0,0);
+	if(!result) {
+		normal5 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 		
@@ -229,13 +230,13 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	D3DXVec3Cross(&line3, &line1, &line2);
 	*/
 	D3DXVECTOR3 line3;
-	if (count != 0)
-		line3 = (normal1+normal2+normal3+normal4)/float(count);
+	if (count > 0)
+		line3 = (normal1+normal2+normal3+normal4+normal5)/float(count);
 	else
 		line3 = *m_tankState->getUp();
 
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->getUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
-	angle /= 15;
+	angle /= 0.5f * time;
 
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross, &line3, m_tankState->getUp());

@@ -318,9 +318,9 @@ void Camera::Rotate(float rot)
 void Camera::lookUpDown(float rot)
 {
 	if (rot > 0 && pitch.y < 100) 
-		pitch += D3DXVECTOR3(0,rot*0.1f,0);
+		pitch += D3DXVECTOR3(0,rot*0.35f,0);
 	if (rot < 0 && pitch.y > -100) 
-		pitch += D3DXVECTOR3(0,rot*0.1f,0);
+		pitch += D3DXVECTOR3(0,rot*0.35f,0);
 	upToDate = false;
 }
 

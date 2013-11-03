@@ -19,7 +19,7 @@ Graphics::Graphics() {
 	m_ModelList = 0;
 	m_Frustum = 0;
 	m_QuadTree = 0;
-
+	m_SkyDome = 0;
 }
 
 
@@ -184,11 +184,29 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+	// Create the sky dome object.
+	m_SkyDome = new SkyDome;
+	if(!m_SkyDome) return false; 
+
+	// Initialize the sky dome object.
+	result = m_SkyDome->Initialize(m_D3D->GetDevice());
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the sky dome object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
 
 void Graphics::Shutdown() {
+
+	// Release the sky dome object.
+	if(m_SkyDome) {
+		m_SkyDome->Shutdown();
+		delete m_SkyDome;
+		m_SkyDome = 0;
+	}
 
 	// Release the quad tree object.
 	if(m_QuadTree) {
@@ -377,7 +395,7 @@ bool Graphics::Render(float time) {
 	int modelCount, renderCount, index, modelType;
 	float radius;
 	D3DXVECTOR4 color;
-	D3DXVECTOR3 position;
+	D3DXVECTOR3 position, cameraPosition;
 	D3DXQUATERNION rotation;
 
 	// Clear the buffers to begin the scene.
@@ -388,6 +406,34 @@ bool Graphics::Render(float time) {
 	m_D3D->GetWorldMatrix(worldMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
+
+	////////////////////////////////////////////////////////////////////////////
+	//			Sky Dome DRAWING
+	////////////////////////////////////////////////////////////////////////////
+	// Get the position of the camera.
+	cameraPosition = m_Camera->GetPosition();
+	// Translate the sky dome to be centered around the camera position.
+	D3DXMatrixTranslation(&worldMatrix, cameraPosition.x, cameraPosition.y, cameraPosition.z);
+	// Turn off back face culling.
+	m_D3D->TurnOffCulling();
+	// Turn off the Z buffer.
+	m_D3D->TurnZBufferOff();
+
+	// Render the sky dome using the sky dome shader.
+	m_SkyDome->Render(m_D3D->GetDeviceContext());
+	m_ShaderManager->RenderSkyDome(m_D3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+		m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
+
+	// Turn back face culling back on.
+	m_D3D->TurnOnCulling();
+	// Turn the Z buffer back on.
+	m_D3D->TurnZBufferOn();
+	// Reset the world matrix.
+	m_D3D->GetWorldMatrix(worldMatrix);
+	////////////////////////////////////////////////////////////////////////////
+	//			Sky Dome DRAWING
+	////////////////////////////////////////////////////////////////////////////
+
 
 	// Construct the frustum.
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
@@ -445,12 +491,12 @@ bool Graphics::Render(float time) {
 				// Draw model based on type
 				if(modelType == 0) {
 					m_Model->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 						m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
 						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 				} else {
 					m_Model2->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
+					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
 						m_Model2->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
 						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 				}
@@ -477,7 +523,7 @@ bool Graphics::Render(float time) {
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 	
 	m_Tank->RenderTank(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetTankIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTankIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Tank->GetTankTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -489,7 +535,7 @@ bool Graphics::Render(float time) {
 	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 
 	m_Tank->RenderTurret(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Tank->GetTurretIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTurretIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
 		m_Tank->GetTurretTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -511,7 +557,7 @@ bool Graphics::Render(float time) {
 	if(!result) return false;
 
 	// Render the bitmap with the texture shader.
-	result = m_ShaderManager->RenderTextureShader(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
+	result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
 	if(!result) return false;
 
 	// Render the text strings.
@@ -521,7 +567,7 @@ bool Graphics::Render(float time) {
 	result = m_Cursor->Render(m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_ShaderManager->RenderTextureShader(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, m_Cursor->GetViewMatrix(), orthoMatrix, m_Cursor->GetTexture());
+	result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Cursor->GetIndexCount(), worldMatrix, m_Cursor->GetViewMatrix(), orthoMatrix, m_Cursor->GetTexture());
 	if(!result) return false;
 
 	// Turn off alpha blending after rendering the text.
