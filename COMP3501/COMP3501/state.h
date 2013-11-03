@@ -38,21 +38,20 @@ public:
 	void SetStrafeVel(float);
 	void SetClimbVel(float);
 	void SetForwardVel(float);
-	void SetFriction(float rate) {friction = rate;}
+	void SetFriction(float rate) { m_friction = rate; }
 	void applyForce(D3DXVECTOR3);
-	D3DXVECTOR3* getForward() {return &m_front;}
-	D3DXVECTOR3* getUp() {return &m_up;}
-	float getAcceleration() {return D3DXVec3Length(&acceleration);}
-	void SetPosition(D3DXVECTOR3 pos) {m_pos = pos;}
+	D3DXVECTOR3* getForward() { return &m_front; }
+	D3DXVECTOR3* getUp() { return &m_up; }
+	float getAcceleration() { return D3DXVec3Length(&m_acceleration); }
+	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetOrientation(D3DXQUATERNION *);
-	//void multiplyOrientation(D3DXQUATERNION
 
 	void Update();
 
 private:
 	float m_time;
-	float friction;
-	D3DXVECTOR3 acceleration;
+	float m_friction;
+	D3DXVECTOR3 m_acceleration;
 
 	bool m_rotvel_on;
 
