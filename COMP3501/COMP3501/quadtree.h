@@ -50,6 +50,7 @@ public:
 	int GetDrawCount();
 
 	bool GetHeightAtPosition(float, float, float&);
+	bool GetHeightAtPosition2(float, float, float&, D3DXVECTOR3&);
 
 private:
 	void CalculateMeshDimensions(int, float&, float&, float&);
@@ -60,7 +61,9 @@ private:
 	void RenderNode(NodeType*, Frustum*, ID3D11DeviceContext*, ShaderManager*);
 
 	void FindNode(NodeType*, float, float, float&);
+	void FindNode2(NodeType*, float, float, float&, D3DXVECTOR3&);
 	bool CheckHeightOfTriangle(float, float, float&, float[3], float[3], float[3]);
+	bool CheckHeightOfTriangle2(float, float, float&, float[3], float[3], float[3],D3DXVECTOR3&);
 
 private:
 	int m_triangleCount, m_drawCount;

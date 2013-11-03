@@ -41,8 +41,11 @@ public:
 	void SetFriction(float rate) {friction = rate;}
 	void applyForce(D3DXVECTOR3);
 	D3DXVECTOR3* getForward() {return &m_front;}
+	D3DXVECTOR3* getUp() {return &m_up;}
 	float getAcceleration() {return D3DXVec3Length(&acceleration);}
 	void SetPosition(D3DXVECTOR3 pos) {m_pos = pos;}
+	void SetOrientation(D3DXQUATERNION *);
+	//void multiplyOrientation(D3DXQUATERNION
 
 	void Update();
 

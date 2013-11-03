@@ -324,18 +324,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	}
 	
-	// Get the current position of the camera.
-	float height;
-	D3DXVECTOR3 position = *m_Tank->getTankState()->GetPosition();
-
-	// Get the height of the triangle that is directly underneath the given camera position.
-	result =  m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
-	if(result) {
-		// If there was a triangle under the camera then position the camera just above it by two units.
-		m_Tank->getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 2.0f, position.z));
-	}
-	
-	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson());	
+	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);	
 
 	/*
 	// Mouse controls

@@ -48,6 +48,7 @@ void State::SetRoll(float angle) { m_rotvel.z = angle; }
 void State::SetStrafeVel(float vel) { m_posvel.x = vel; }
 void State::SetClimbVel(float vel) { m_posvel.y = vel; }
 void State::SetForwardVel(float vel) { m_posvel.z = vel; }
+void State::SetOrientation(D3DXQUATERNION *orien) {m_rot *= *orien;}
 
 void State::applyForce(D3DXVECTOR3 force)
 {
