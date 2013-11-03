@@ -400,6 +400,8 @@ bool Text::SetVector3(D3DXVECTOR3* vector, int index, ID3D11DeviceContext* devic
 	int wholeNum, decimalNum;
 	bool result; 
 
+	if(_isnan(vector->x) || _isnan(vector->y) || _isnan(vector->z)) return true;
+
 	strcpy_s(string, "Vector3: (");
 
 	// Convert the x to string format.
@@ -424,7 +426,7 @@ bool Text::SetVector3(D3DXVECTOR3* vector, int index, ID3D11DeviceContext* devic
 
 	// Convert the z to string format.
 	wholeNum = int(vector->z);
-	decimalNum = (int) (abs(vector->z - wholeNum) * 10000);
+	decimalNum = int(abs(vector->z - wholeNum) * 10000);
 	_itoa_s(wholeNum, tempString, 10);
 	strcat_s(string, tempString);
 	strcat_s(string, ".");

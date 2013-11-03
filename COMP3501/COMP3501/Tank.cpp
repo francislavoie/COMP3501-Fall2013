@@ -7,10 +7,10 @@
 Tank::Tank() {
 	baseTank = 0;
 	turret = 0;
-	frontRight = FRONTRIGHT;
-	frontLeft = FRONTLEFT;
-	rearLeft = REARLEFT;
-	rearRight = REARRIGHT;
+	m_frontRight = FRONTRIGHT;
+	m_frontLeft = FRONTLEFT;
+	m_rearLeft = REARLEFT;
+	m_rearRight = REARRIGHT;
 }
 
 
@@ -49,7 +49,6 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	m_tankState = new State(true);
 	if(!m_tankState) return false;
 	m_tankState->SetFriction(0.005f);
-	m_tankState->SetPosition(D3DXVECTOR3(3.0f,0.0f,3.0f));
 
 	// Create turret state
 	m_turretState = new State(false, m_tankState);
@@ -99,14 +98,14 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	input->GetWheelDelta(scroll);
 
 	if(input->IsKeyPressed(DIK_W)){
-		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
+		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->applyForce(D3DXVECTOR3(0,0,0.0001f));
+		m_tankState->applyForce(D3DXVECTOR3(0.0f, 0.0f, 0.0001f));
 		//m_tankState->SetForwardVel(0.05f);
 	} else if(input->IsKeyPressed(DIK_S)){
-		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
+		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->applyForce(D3DXVECTOR3(0,0,-0.0001f));
+		m_tankState->applyForce(D3DXVECTOR3(0.0f, 0.0f, -0.0001f));
 		//m_tankState->SetForwardVel(-0.05f);
 	} else {
 		//m_tankState->SetForwardVel(0.0f);
@@ -137,87 +136,64 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	D3DXVECTOR3 output;
 	float garbage;	
 
-	temp	= D3DXQUATERNION(FRONTRIGHT.x,FRONTRIGHT.y,FRONTRIGHT.z,0);
-	temp = quat * temp * inverse;
+	temp = quat * D3DXQUATERNION(FRONTRIGHT.x, FRONTRIGHT.y, FRONTRIGHT.z, 0.0f) * inverse;
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
-	frontRight = *m_tankState->GetPosition() + output;
+	m_frontRight = *m_tankState->GetPosition() + output;
 
-	temp = D3DXQUATERNION(FRONTLEFT.x,FRONTLEFT.y,FRONTLEFT.z,0);
-	temp = quat * temp * inverse;
+	temp = quat * D3DXQUATERNION(FRONTLEFT.x, FRONTLEFT.y, FRONTLEFT.z, 0.0f) * inverse;
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
-	frontLeft = *m_tankState->GetPosition() + output;
+	m_frontLeft = *m_tankState->GetPosition() + output;
 
-	temp = D3DXQUATERNION(REARLEFT.x,REARLEFT.y,REARLEFT.z,0);
-	temp = quat * temp * inverse;
+	temp = quat * D3DXQUATERNION(REARLEFT.x, REARLEFT.y, REARLEFT.z, 0.0f) * inverse;
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
-	rearLeft = *m_tankState->GetPosition() + output;
+	m_rearLeft = *m_tankState->GetPosition() + output;
 
-	temp = D3DXQUATERNION(REARRIGHT.x,REARRIGHT.y,REARRIGHT.z,0);
-	temp = quat * temp * inverse;
+	temp = quat * D3DXQUATERNION(REARRIGHT.x, REARRIGHT.y, REARRIGHT.z, 0.0f) * inverse;
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
-	rearRight = *m_tankState->GetPosition() + output;
+	m_rearRight = *m_tankState->GetPosition() + output;
+
+	temp = quat * D3DXQUATERNION(CENTER.x, CENTER.y, CENTER.z, 0.0f) * inverse;
+	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
+	m_center = *m_tankState->GetPosition() + output;
 
 	bool result;
 	float height;
 	D3DXVECTOR3 position = *getTankState()->GetPosition();
 
 	// Get the height of the triangle that is directly underneath the given camera position.
-	result =  m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
+	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
 	if(result) {
 		// If there was a triangle under the camera then position the camera just above it by two units.
 		getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 2.0f, position.z));
 	}
-	/*
-	result =  m_QuadTree->GetHeightAtPosition(frontRight.x, frontRight.z, height);
-	if(result) {
-		frontRight = D3DXVECTOR3(frontRight.x, height + 2.0f, frontRight.z);
-	}
-	else frontRight = D3DXVECTOR3(frontRight.x, 2.0f, frontRight.z);
-	
-	result =  m_QuadTree->GetHeightAtPosition(frontLeft.x, frontLeft.z, height);
-	if(result) {
-		frontLeft = D3DXVECTOR3(frontLeft.x, height + 2.0f, frontLeft.z);
-	}
-	else frontLeft = D3DXVECTOR3(frontLeft.x, 2.0f, frontLeft.z);
 
-	result =  m_QuadTree->GetHeightAtPosition(rearLeft.x, rearLeft.z, height);
-	if(result) {
-		rearLeft = D3DXVECTOR3(rearLeft.x, height + 2.0f, rearLeft.z);
-	}
-	else rearLeft = D3DXVECTOR3(rearLeft.x, 2.0f, rearLeft.z);
-
-	result =  m_QuadTree->GetHeightAtPosition(rearRight.x, rearRight.z, height);
-	if(result) {
-		rearRight = D3DXVECTOR3(rearRight.x, height + 2.0f, rearRight.z);
-	}
-	else rearRight = D3DXVECTOR3(rearRight.x, 2.0f, rearRight.z);*/
 	int count = 5;
 	D3DXVECTOR3 normal1,normal2,normal3,normal4, normal5;
-	result =  m_QuadTree->GetHeightAtPosition2(frontRight.x, frontRight.z, height, normal1);
+	result =  m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal1);
 	if(!result) {
 		normal1 = D3DXVECTOR3(0,0,0);
 		count--;
 	}
 
-	result =  m_QuadTree->GetHeightAtPosition2(frontRight.x, frontRight.z, height, normal2);
+	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal2);
 	if(!result) {
 		normal2 = D3DXVECTOR3(0,0,0); 
 		count--;
 	}
 
-	result =  m_QuadTree->GetHeightAtPosition2(frontRight.x, frontRight.z, height, normal3);
+	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal3);
 	if(!result) {
 		normal3 = D3DXVECTOR3(0,0,0);
 		count--;
 	}
 
-	result =  m_QuadTree->GetHeightAtPosition2(frontRight.x, frontRight.z, height, normal4);
+	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal4);
 	if(!result) {
 		normal4 = D3DXVECTOR3(0,0,0);
 		count--;
 	}
 
-	result =  m_QuadTree->GetHeightAtPosition2(position.x, position.z, height, normal5);
+	result = m_QuadTree->GetHeightAtPosition2(m_center.x, m_center.z, height, normal5);
 	if(result) {
 		normal5 = D3DXVECTOR3(0,0,0);
 		count--;
@@ -272,8 +248,6 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 	m_tankState->Update();
 	m_turretState->Update();
-
-
 }
 
 
@@ -282,6 +256,7 @@ void Tank::RenderTank(ID3D11DeviceContext* device) {
 
 	return;
 }
+
 
 void Tank::RenderTurret(ID3D11DeviceContext* device) {
 	turret->Render(device);
@@ -293,6 +268,7 @@ void Tank::RenderTurret(ID3D11DeviceContext* device) {
 int Tank::GetTankIndexCount() {
 	return baseTank->GetIndexCount();
 }
+
 
 int Tank::GetTurretIndexCount() {
 	return turret->GetIndexCount();

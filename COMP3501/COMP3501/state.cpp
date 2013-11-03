@@ -9,8 +9,8 @@ State::State(bool rotvel_on, State* follow) {
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXQuaternionIdentity(&m_rot);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	friction = 0.0f;
+	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_friction = 0.0f;
 	m_time = 0.0f;
 
 	m_up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -52,26 +52,26 @@ void State::SetOrientation(D3DXQUATERNION *orien) {m_rot *= *orien;}
 
 void State::applyForce(D3DXVECTOR3 force)
 {
-	acceleration += force;
+	m_acceleration += force;
 }
 
 void State::Update() {
 	// TODO: Add decay speed
-	acceleration -= m_posvel * friction;
+	m_acceleration -= m_posvel * m_friction;
 	
 	D3DXVECTOR3 prevVelocity = m_posvel;
-	m_posvel += acceleration * m_time;
+	m_posvel += m_acceleration * m_time;
 
 	// Apply positional velocity
 	if(!m_follow) {
-		m_pos += (m_right * prevVelocity.x) * m_time + (1/2) * (m_right * acceleration.x) * pow(m_time, 2);
-		m_pos += (m_up * prevVelocity.y) * m_time + (1/2) * (m_right * acceleration.y) * pow(m_time, 2);
-		m_pos += (m_front * prevVelocity.z) * m_time + (1/2) * (m_right * acceleration.z) * pow(m_time, 2);
+		m_pos += (m_right * prevVelocity.x) * m_time + (1/2) * (m_right * m_acceleration.x) * pow(m_time, 2);
+		m_pos += (m_up * prevVelocity.y) * m_time + (1/2) * (m_right * m_acceleration.y) * pow(m_time, 2);
+		m_pos += (m_front * prevVelocity.z) * m_time + (1/2) * (m_right * m_acceleration.z) * pow(m_time, 2);
 	} else {
 		m_pos = *m_follow->GetPosition() + m_offset;
 	}
 
-	acceleration = D3DXVECTOR3(0,0,0);
+	m_acceleration = D3DXVECTOR3(0,0,0);
 
 	// Apply rotational velocity
 	D3DXQUATERNION rot;

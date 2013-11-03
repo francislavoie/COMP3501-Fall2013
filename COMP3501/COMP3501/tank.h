@@ -33,17 +33,14 @@ struct VectorSortP {
 
 const D3DXVECTOR3 FRONTRIGHT = D3DXVECTOR3(0.55614f, 0.0f, 1.35747f);
 const D3DXVECTOR3 FRONTLEFT = D3DXVECTOR3(-0.55106f, 0.0f, 1.35747f);
-const D3DXVECTOR3 REARLEFT= D3DXVECTOR3(-0.55826f, 0.0f, -0.53326f);
+const D3DXVECTOR3 REARLEFT = D3DXVECTOR3(-0.55826f, 0.0f, -0.53326f);
 const D3DXVECTOR3 REARRIGHT = D3DXVECTOR3(0.56334f, 0.0f, -0.53326f);
+const D3DXVECTOR3 CENTER = D3DXVECTOR3(0.0f, 0.0f, 0.94537f);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ModelClass
 ////////////////////////////////////////////////////////////////////////////////
 class Tank {
-
-private:
-	Model *baseTank, *turret;
-	State *m_tankState, *m_turretState;
 
 public:
 	Tank();
@@ -60,10 +57,14 @@ public:
 
 	int GetTankIndexCount();
 	int GetTurretIndexCount();
-	ID3D11ShaderResourceView* GetTankTexture() {return baseTank->GetTexture();}
-	ID3D11ShaderResourceView* GetTurretTexture() {return turret->GetTexture();}
-	
-	D3DXVECTOR3 frontRight, frontLeft, rearRight, rearLeft;
+	ID3D11ShaderResourceView* GetTankTexture() { return baseTank->GetTexture(); }
+	ID3D11ShaderResourceView* GetTurretTexture() { return turret->GetTexture(); }
+
+private:
+	Model *baseTank, *turret;
+	State *m_tankState, *m_turretState;
+
+	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
 
 };
 
