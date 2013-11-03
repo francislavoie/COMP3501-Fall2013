@@ -400,8 +400,7 @@ void QuadTree::RenderNode(NodeType* node, Frustum* frustum, ID3D11DeviceContext*
 	bool result;
 	int count, i, indexCount;
 	unsigned int stride, offset;
-
-
+	
 	// Check to see if the node can be viewed, height doesn't matter in a quad tree.
 	result = frustum->CheckCube(node->positionX, 0.0f, node->positionZ, (node->width / 2.0f));
 
@@ -458,10 +457,7 @@ bool QuadTree::GetHeightAtPosition(float positionX, float positionZ, float& heig
 	meshMaxZ = m_parentNode->positionZ + (m_parentNode->width / 2.0f);
 
 	// Make sure the coordinates are actually over a polygon.
-	if((positionX < meshMinX) || (positionX > meshMaxX) || (positionZ < meshMinZ) || (positionZ > meshMaxZ))
-	{
-		return false;
-	}
+	if((positionX < meshMinX) || (positionX > meshMaxX) || (positionZ < meshMinZ) || (positionZ > meshMaxZ)) return false;
 
 	// Find the node which contains the polygon for this position.
 	FindNode(m_parentNode, positionX, positionZ, height);
@@ -475,8 +471,7 @@ void QuadTree::FindNode(NodeType* node, float x, float z, float& height) {
 	int count, i, index;
 	float vertex1[3], vertex2[3], vertex3[3];
 	bool foundHeight;
-
-
+	
 	// Calculate the dimensions of this node.
 	xMin = node->positionX - (node->width / 2.0f);
 	xMax = node->positionX + (node->width / 2.0f);
@@ -639,10 +634,7 @@ bool QuadTree::CheckHeightOfTriangle(float x, float z, float& height, float v0[3
 	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
 
 	// Check if it is outside.
-	if(determinant > 0.001f)
-	{
-		return false;
-	}
+	if(determinant > 0.001f) return false;
 
 	// Now we have our height.
 	height = Q[1];
