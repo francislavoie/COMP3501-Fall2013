@@ -48,8 +48,11 @@ public:
 	const D3DXVECTOR3 GetAxisZ() const;
 	const D3DXVECTOR3 GetAxisY() const;
 	const D3DXVECTOR3 GetAxisX() const;
+	bool isFirstPerson() {return firstPerson;}
+	void toggleFirstPerson() {firstPerson = !firstPerson;}
 
 private:
+	bool firstPerson;
 	D3DXVECTOR3 m_position;
 	D3DXQUATERNION	m_quatOrientation;
 	D3DXMATRIX m_viewMatrix;

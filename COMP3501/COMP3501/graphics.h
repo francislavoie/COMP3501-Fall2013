@@ -52,7 +52,6 @@ public:
 	bool Render(float);
 
 private:
-	bool firstPerson;
 	int spaceBuffer;
 	D3D* m_D3D;
 	Camera* m_Camera;

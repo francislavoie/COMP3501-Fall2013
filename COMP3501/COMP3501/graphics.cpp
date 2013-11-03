@@ -18,7 +18,6 @@ Graphics::Graphics() {
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
-	firstPerson = false;
 }
 
 
@@ -296,19 +295,15 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-	m_Tank->Update(input, time, rotation, firstPerson);	
+	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson());	
 
-	if (input->IsKeyPressed(DIK_SPACE))
-		if (firstPerson)
-		{
+	if (input->IsKeyPressed(DIK_SPACE)){
+		if (m_Camera->isFirstPerson())
 			m_Camera->setFollow(m_Tank->getTurretState());
-			firstPerson = false;
-		}
 		else
-		{
 			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
-			firstPerson = true;
-		}
+		m_Camera->toggleFirstPerson();
+	}
 
 	/*
 	// Mouse controls

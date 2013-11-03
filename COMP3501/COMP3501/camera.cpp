@@ -19,6 +19,7 @@ Camera::Camera() {
 	maxHeight = 2.5f;
 	angle = float(D3DX_PI*3/8);
 	upToDate = false;
+	firstPerson = false;
 }
 
 Camera::Camera(D3DXVECTOR3 pos) {
@@ -36,6 +37,7 @@ Camera::Camera(D3DXVECTOR3 pos) {
 	maxHeight = 2.5f;
 	angle = float(D3DX_PI*3/8);
 	upToDate = false;
+	firstPerson = false;
 }
 
 
