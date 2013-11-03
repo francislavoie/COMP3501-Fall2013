@@ -18,6 +18,8 @@ Graphics::Graphics() {
 	m_Text = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
+	m_QuadTree = 0;
+
 	firstPerson = false;
 }
 
@@ -118,9 +120,9 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Light) return false;
 
 	// Initialize the light object.
-	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
+	m_Light->SetAmbientColor(0.05f, 0.05f, 0.05f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 0.0f, -1.0f);
+	m_Light->SetDirection(-0.5f, -1.0f, 0.0f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetSpecularPower(32.0f);
 
@@ -166,9 +168,20 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Terrain) return false;
 
 	// Initialize the terrain object.
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/heightmap01.bmp");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/heightmap01.bmp", L"data/dirt01.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the quad tree object.
+	m_QuadTree = new QuadTree;
+	if(!m_QuadTree) return false;
+
+	// Initialize the quad tree object.
+	result = m_QuadTree->Initialize(m_Terrain, m_D3D->GetDevice());
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the quad tree object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -177,6 +190,13 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 
 
 void Graphics::Shutdown() {
+
+	// Release the quad tree object.
+	if(m_QuadTree) {
+		m_QuadTree->Shutdown();
+		delete m_QuadTree;
+		m_QuadTree = 0;
+	}
 
 	// Release the frustum object.
 	if(m_Frustum) {
@@ -298,17 +318,26 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	m_Tank->Update(input, time, rotation, firstPerson);	
 
-	if (input->IsKeyPressed(DIK_SPACE))
-		if (firstPerson)
-		{
+	if (input->IsKeyPressed(DIK_SPACE)) {
+		if (firstPerson) {
 			m_Camera->setFollow(m_Tank->getTurretState());
 			firstPerson = false;
-		}
-		else
-		{
+		} else {
 			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
 			firstPerson = true;
 		}
+	}
+	/*
+	// Get the current position of the camera.
+	D3DXVECTOR3 position = m_Camera->GetPosition();
+
+	// Get the height of the triangle that is directly underneath the given camera position.
+	result =  m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
+	if(result) {
+		// If there was a triangle under the camera then position the camera just above it by two units.
+		m_Camera->SetPosition(position.x, height + 2.0f, position.z);
+	}
+	*/
 
 	/*
 	// Mouse controls
@@ -363,43 +392,6 @@ bool Graphics::Render(float time) {
 	D3DXVECTOR3 position;
 	D3DXQUATERNION rotation;
 
-	////////////////////////////////////////////////////////////////////////////
-	//			ROBOT MATH
-	////////////////////////////////////////////////////////////////////////////
-	D3DXMATRIX scale, rotate, rotateZ, robotPosition, parent;
-	static int direction = 1;
-	static bool state = true;
-	static float bodyrotation = (float)D3DX_PI/2.0f;
-	static float x = 0.0f;
-	static float armrotation = 0.0f;
-	float left = -10.0f, right = 10.0f;
-	int armCount = 8;
-
-	armrotation += (float)D3DX_PI * 0.001f * time;
-
-	if(!state) bodyrotation -= direction * (float)D3DX_PI * 0.001f * time;
-	if(state) x += direction * 0.01f * time;
-
-	D3DXMatrixScaling(&scale, 0.8f, 0.3f, 0.3f);
-	D3DXMatrixRotationY(&rotate, bodyrotation);
-	D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-	D3DXMatrixTranslation(&robotPosition, x, 0.0f, 0.0f);
-
-	if(x > right || x < left) {
-		direction *= -1;
-		x = direction==1 ? left : right;
-		state = false;
-	}
-
-	if(bodyrotation < (float)D3DX_PI/2 || bodyrotation > (float)(3*D3DX_PI)/2) {
-		bodyrotation = direction==1 ? (float)D3DX_PI/2 : (float)(3*D3DX_PI)/2;
-		state = true;
-	}
-	////////////////////////////////////////////////////////////////////////////
-	//			ROBOT MATH
-	////////////////////////////////////////////////////////////////////////////
-
-
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -409,16 +401,16 @@ bool Graphics::Render(float time) {
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
-
-	// Render the terrain buffers.
-	m_Terrain->Render(m_D3D->GetDeviceContext());
-
-	// Render the model using the color shader.
-	result = m_ShaderManager->RenderColorShader(m_D3D->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	if(!result) return false;
-
 	// Construct the frustum.
 	m_Frustum->ConstructFrustum(SCREEN_DEPTH, projectionMatrix, viewMatrix);
+
+	// Set the terrain shader parameters that it will use for rendering.
+	result = m_ShaderManager->SetTerrainParameters(m_D3D->GetDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, m_Light->GetAmbientColor(), 
+		m_Light->GetDiffuseColor(), m_Light->GetDirection(), m_Terrain->GetTexture());
+	if(!result) return false;
+
+	// Render the terrain using the quad tree and terrain shader.
+	m_QuadTree->Render(m_Frustum, m_D3D->GetDeviceContext(), m_ShaderManager);
 
 	// Get the number of models that will be rendered.
 	modelCount = m_ModelList->GetModelCount();
@@ -483,7 +475,7 @@ bool Graphics::Render(float time) {
 	}
 
 	// Set the number of models that was actually rendered this frame.
-	result = m_Text->SetRenderCount(renderCount, 2, m_D3D->GetDeviceContext());
+	result = m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), 2, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	////////////////////////////////////////////////////////////////////////////
@@ -519,53 +511,6 @@ bool Graphics::Render(float time) {
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 
-
-	////////////////////////////////////////////////////////////////////////////
-	//			ROBOT DRAWING
-	////////////////////////////////////////////////////////////////////////////
-	m_Model->Render(m_D3D->GetDeviceContext());
-
-	// Multiply position with rotation of the entire robot
-	worldMatrix = rotate * robotPosition;
-
-	// Render the model using the light shader.
-	result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
-		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-	if(!result) return false;
-
-	parent = worldMatrix;
-	for(int i = 0; i < armCount; i++) {
-		D3DXMATRIX translate, backtranslate, local, rotateZ;
-		D3DXMatrixTranslation(&backtranslate, -0.8f, 0.0f, 0.0f);
-		D3DXMatrixTranslation(&translate, 1.6f, 0.0f, 0.0f);
-		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-		local = scale * translate * rotateZ * backtranslate * parent;
-		parent = translate * rotateZ * parent;
-		result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-		if(!result) return false;
-	}
-
-	parent = worldMatrix;
-	for(int i = 0; i < armCount; i++) {
-		D3DXMATRIX translate, backtranslate, local, rotateZ;
-		D3DXMatrixTranslation(&backtranslate, 0.8f, 0.0f, 0.0f);
-		D3DXMatrixTranslation(&translate, -1.6f, 0.0f, 0.0f);
-		D3DXMatrixRotationZ(&rotateZ, sin(armrotation)/3.0f);
-		local = scale * translate * rotateZ * backtranslate * parent;
-		parent = translate * rotateZ * parent;
-		result = m_ShaderManager->RenderLightShader(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-			m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
-			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-		if(!result) return false;
-	}
-
-	m_D3D->GetWorldMatrix(worldMatrix);
-	////////////////////////////////////////////////////////////////////////////
-	//			ROBOT DRAWING
-	////////////////////////////////////////////////////////////////////////////
 
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();

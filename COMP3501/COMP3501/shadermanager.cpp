@@ -9,6 +9,7 @@ ShaderManager::ShaderManager() {
 	m_LightShader = 0;
 	m_BumpMapShader = 0;
 	m_ColorShader = 0;
+	m_TerrainShader = 0;
 }
 
 
@@ -65,11 +66,29 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 		return false;
 	}
 
+	// Create the terrain shader object.
+	m_TerrainShader = new TerrainShader;
+	if(!m_TerrainShader) return false;
+
+	// Initialize the terrain shader object.
+	result = m_TerrainShader->Initialize(device, hwnd);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
 
 void ShaderManager::Shutdown() {
+	// Release the terrain shader object.
+	if(m_TerrainShader) {
+		m_TerrainShader->Shutdown();
+		delete m_TerrainShader;
+		m_TerrainShader = 0;
+	}
+	
 	// Release the color shader object.
 	if(m_ColorShader) {
 		m_ColorShader->Shutdown();
@@ -143,9 +162,23 @@ bool ShaderManager::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int 
 bool ShaderManager::RenderColorShader(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix) {
 	bool result;
 
-	// Render the model using the bump map shader.
+	// Render the model using the color shader.
 	result = m_ColorShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix);
 	if(!result) return false;
 
 	return true;
+}
+
+
+void ShaderManager::RenderTerrainShader(ID3D11DeviceContext* deviceContext, int indexCount) {
+	// Render the model using the terrain shader.
+	m_TerrainShader->Render(deviceContext, indexCount);
+
+	return;
+}
+
+bool ShaderManager::SetTerrainParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, 
+										 D3DXMATRIX projectionMatrix, D3DXVECTOR4 ambientColor, D3DXVECTOR4 diffuseColor, D3DXVECTOR3 lightDirection, 
+										 ID3D11ShaderResourceView* texture) {
+	return m_TerrainShader->SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, ambientColor, diffuseColor, lightDirection, texture);
 }

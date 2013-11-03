@@ -163,6 +163,12 @@
     <ClCompile Include="colorshader.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="quadtree.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="terrainshader.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mousecursor.h">
@@ -249,6 +255,12 @@
     <ClInclude Include="colorshader.h">
       <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="quadtree.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="terrainshader.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs.hlsl">
@@ -279,6 +291,12 @@
       <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="bumpmap.ps.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="terrain.ps.hlsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="terrain.vs.hlsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>

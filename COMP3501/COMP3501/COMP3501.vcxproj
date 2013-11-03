@@ -97,11 +97,13 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modellist.cpp" />
     <ClCompile Include="mousecursor.cpp" />
+    <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="shadermanager.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="Tank.cpp" />
     <ClCompile Include="terrain.cpp" />
+    <ClCompile Include="terrainshader.cpp" />
     <ClCompile Include="text.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="lightshader.cpp" />
@@ -128,11 +130,13 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="modellist.h" />
     <ClInclude Include="mousecursor.h" />
+    <ClInclude Include="quadtree.h" />
     <ClInclude Include="state.h" />
     <ClInclude Include="shadermanager.h" />
     <ClInclude Include="system.h" />
     <ClInclude Include="tank.h" />
     <ClInclude Include="terrain.h" />
+    <ClInclude Include="terrainshader.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="lightshader.h" />
@@ -195,6 +199,14 @@
       <FileType>Document</FileType>
     </None>
     <None Include="bumpmap.vs.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="terrain.ps.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="terrain.vs.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

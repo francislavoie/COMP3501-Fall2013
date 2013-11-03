@@ -19,6 +19,7 @@
 #include "text.h"
 #include "modellist.h"
 #include "frustum.h"
+#include "quadtree.h"
 #include "shadermanager.h"
 #include "input.h"
 #include "state.h"
@@ -73,6 +74,7 @@ private:
 	Tank* m_Tank;
 
 	Terrain* m_Terrain;
+	QuadTree* m_QuadTree;
 };
 
 #endif
