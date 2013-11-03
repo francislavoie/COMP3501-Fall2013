@@ -44,8 +44,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	// Create tank state
 	m_tankState = new State(true);
 	if(!m_tankState) return false;
-	m_tankState->SetDecayRate(0.01f);
-	m_tankState->setMaxSpeed(0.05f);
+	m_tankState->SetFriction(0.005f);
 
 	// Create turret state
 	m_turretState = new State(false, m_tankState);
@@ -97,12 +96,12 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson){
 	if(input->IsKeyPressed(DIK_W)){
 		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->applyForce(D3DXVECTOR3(0,0,0.0002f));
+		m_tankState->applyForce(D3DXVECTOR3(0,0,0.0001f));
 		//m_tankState->SetForwardVel(0.05f);
 	} else if(input->IsKeyPressed(DIK_S)){
 		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0,0,0);
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->applyForce(D3DXVECTOR3(0,0,-0.0002f));
+		m_tankState->applyForce(D3DXVECTOR3(0,0,-0.0001f));
 		//m_tankState->SetForwardVel(-0.05f);
 	} else {
 		//m_tankState->SetForwardVel(0.0f);
