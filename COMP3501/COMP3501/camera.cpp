@@ -304,7 +304,7 @@ void Camera::Scroll(float scroll)
 		raiseDistance = minHeight;
 	else if (raiseDistance > maxHeight)
 		raiseDistance = maxHeight;
-	else
+	//else
 		//m_lookatPosition += D3DXVECTOR3(0, scroll*0.0002f, 0);
 	upToDate = false;
 }
