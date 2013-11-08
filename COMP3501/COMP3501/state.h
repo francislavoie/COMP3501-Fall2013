@@ -23,6 +23,7 @@ public:
 
 	D3DXVECTOR3 GetRotVel();
 	D3DXVECTOR3 GetPosVel();
+	D3DXVECTOR3 GetOffset();
 
 	D3DXVECTOR3* GetPosition();
 	D3DXQUATERNION* GetRotation();
@@ -57,7 +58,7 @@ private:
 
 	State *m_follow;
 
-	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset,
+	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset, m_offsetRot,
 				m_up, m_front, m_right;
 
 	D3DXQUATERNION m_rot;

@@ -246,6 +246,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	D3DXQUATERNION quaternion;	
 	D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
 	m_tankState->SetOrientation(&quaternion);
+	m_turretState->SetOrientation(&quaternion);
 
 	m_tankState->Update();
 	m_turretState->Update();
