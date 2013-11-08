@@ -82,9 +82,13 @@ void State::Update() {
 		m_rotvel.z
 	);
 
-
 	if(m_rotvel_on) m_rot *= rot;
 	else m_rot = rot;
+
+	if (m_follow)
+	{
+		m_rot *= *m_follow->GetRotation();
+	}
 
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
 
