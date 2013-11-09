@@ -28,7 +28,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	if(!baseTank) return false;
 
 	// Initialize the model object.
-	result = baseTank->Initialize(m_D3D->GetDevice(), "data/tankwithmirror.obj", L"data/bulletrust.dds");
+	result = baseTank->Initialize(m_D3D->GetDevice(), "data/tank.bin", L"data/bulletrust.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -39,7 +39,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	if(!turret) return false;
 
 	// Initialize the model object.
-	result = turret->Initialize(m_D3D->GetDevice(), "data/turret.obj", L"data/bulletrust.dds");
+	result = turret->Initialize(m_D3D->GetDevice(), "data/turret.bin", L"data/bulletrust.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;

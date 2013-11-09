@@ -84,7 +84,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Model) return false;
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.txt", L"data/Am13.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), "data/asteroid1.bin", L"data/Am13.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -95,7 +95,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Model2) return false;
 
 	// Initialize the model object.
-	result = m_Model2->Initialize(m_D3D->GetDevice(), "data/asteroid2.txt", L"data/Am8.dds");
+	result = m_Model2->Initialize(m_D3D->GetDevice(), "data/asteroid2.bin", L"data/Am8.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;

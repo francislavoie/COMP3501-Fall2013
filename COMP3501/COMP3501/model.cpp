@@ -30,6 +30,9 @@ bool Model::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* texture
 	} else if (fn.substr(fn.find_last_of(".") + 1) == "txt") {
 		result = LoadModel(modelFilename);
 		if(!result) return false;
+	} else if (fn.substr(fn.find_last_of(".") + 1) == "bin") {
+		result = LoadModelBin(modelFilename);
+		if(!result) return false;
 	}
 
 	// Initialize the vertex and index buffer that hold the geometry for the triangle.
@@ -366,6 +369,27 @@ bool Model::LoadModelObj(char* filename) {
 	m_vertexCount = vertexTotals->count();
 	m_indexCount = m_vertexCount;
  
+	return true;
+}
+
+
+bool Model::LoadModelBin(char* filename) {
+	FILE* f;
+	fopen_s(&f, filename, "rb");
+	if(f == NULL) return false;
+
+	fseek(f, 0, SEEK_END);
+	long fileSize = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	m_Model = new VertexType[fileSize/sizeof(VertexType)];
+
+	fread(m_Model, sizeof(VertexType), fileSize/sizeof(VertexType), f);
+
+	fclose(f);
+
+	m_vertexCount = fileSize/sizeof(VertexType);
+	m_indexCount = m_vertexCount;
+
 	return true;
 }
 

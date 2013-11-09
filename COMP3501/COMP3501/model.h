@@ -57,8 +57,9 @@ protected:
 
 	bool LoadModel(char*);
 	bool LoadModelObj(char*);
+	bool LoadModelBin(char*);
 	void ReleaseModel();
-
+	
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;

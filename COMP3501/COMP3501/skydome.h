@@ -20,9 +20,9 @@ using namespace std;
 class SkyDome {
 private:
 	struct ModelType {
-		float x, y, z;
-		float tu, tv;
-		float nx, ny, nz;
+		D3DXVECTOR3 pos;
+		D3DXVECTOR2 tex;
+		D3DXVECTOR3 nrm;
 	};
 
 	struct VertexType {
@@ -44,12 +44,13 @@ public:
 
 private:
 	bool LoadSkyDomeModel(char*);
+	bool LoadModelBin(char*);
 	void ReleaseSkyDomeModel();
 
 	bool InitializeBuffers(ID3D11Device*);
 	void ReleaseBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
-
+	
 private:
 	ModelType* m_model;
 	int m_vertexCount, m_indexCount;

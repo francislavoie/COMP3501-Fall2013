@@ -21,7 +21,10 @@ bool SkyDome::Initialize(ID3D11Device* device) {
 	bool result;
 
 	// Load in the sky dome model.
-	result = LoadSkyDomeModel("data/skydome.txt");
+	//result = LoadSkyDomeModel("data/skydome.bin");
+	//if(!result) return false;
+
+	result = LoadModelBin("data/skydome.bin");
 	if(!result) return false;
 
 	// Load the sky dome into a vertex and index buffer for rendering.
@@ -105,13 +108,34 @@ bool SkyDome::LoadSkyDomeModel(char* filename) {
 
 	// Read in the vertex data.
 	for(i=0; i<m_vertexCount; i++) {
-		fin >> m_model[i].x >> m_model[i].y >> m_model[i].z;
-		fin >> m_model[i].tu >> m_model[i].tv;
-		fin >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
+		fin >> m_model[i].pos.x >> m_model[i].pos.y >> m_model[i].pos.z;
+		fin >> m_model[i].tex.x >> m_model[i].tex.y;
+		fin >> m_model[i].nrm.x >> m_model[i].nrm.y >> m_model[i].nrm.z;
 	}
 
 	// Close the model file.
 	fin.close();
+
+	return true;
+}
+
+
+bool SkyDome::LoadModelBin(char* filename) {
+	FILE* f;
+	fopen_s(&f, filename, "rb");
+	if(f == NULL) return false;
+
+	fseek(f, 0, SEEK_END);
+	long fileSize = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	m_model = new ModelType[fileSize/sizeof(ModelType)];
+
+	fread(m_model, sizeof(ModelType), fileSize/sizeof(ModelType), f);
+
+	fclose(f);
+
+	m_vertexCount = fileSize/sizeof(ModelType);
+	m_indexCount = m_vertexCount;
 
 	return true;
 }
@@ -145,7 +169,7 @@ bool SkyDome::InitializeBuffers(ID3D11Device* device) {
 
 	// Load the vertex array and index array with data.
 	for(i=0; i<m_vertexCount; i++) {
-		vertices[i].position = D3DXVECTOR3(m_model[i].x, m_model[i].y, m_model[i].z);
+		vertices[i].position = D3DXVECTOR3(m_model[i].pos.x, m_model[i].pos.y, m_model[i].pos.z);
 		indices[i] = i;
 	}
 
