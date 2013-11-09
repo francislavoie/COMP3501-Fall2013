@@ -60,7 +60,7 @@ private:
 	void RenderNode(NodeType*, Frustum*, ID3D11DeviceContext*, ShaderManager*);
 
 	void FindNode(NodeType*, float, float, float&, D3DXVECTOR3&);
-	bool CheckHeightOfTriangle(float, float, float&, D3DXVECTOR3&, D3DXVECTOR3, D3DXVECTOR3, D3DXVECTOR3);
+	bool CheckHeightOfTriangle(float, float, float&, D3DXVECTOR3&, float[3], float[3], float[3]);
 
 private:
 	int m_triangleCount, m_drawCount;

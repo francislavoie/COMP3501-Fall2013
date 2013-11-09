@@ -315,8 +315,7 @@ int QuadTree::CountTriangles(float positionX, float positionZ, float width) {
 bool QuadTree::IsTriangleContained(int index, float positionX, float positionZ, float width) {
 	float radius;
 	int vertexIndex;
-	float x1, z1, x2, z2, x3, z3;
-	float minimumX, maximumX, minimumZ, maximumZ;
+	D3DXVECTOR3 v1, v2, v3;
 
 
 	// Calculate the radius of this node.
@@ -326,32 +325,21 @@ bool QuadTree::IsTriangleContained(int index, float positionX, float positionZ, 
 	vertexIndex = index * 3;
 
 	// Get the three vertices of this triangle from the vertex list.
-	x1 = m_vertexList[vertexIndex].position.x;
-	z1 = m_vertexList[vertexIndex].position.z;
-	vertexIndex++;
-	
-	x2 = m_vertexList[vertexIndex].position.x;
-	z2 = m_vertexList[vertexIndex].position.z;
-	vertexIndex++;
-
-	x3 = m_vertexList[vertexIndex].position.x;
-	z3 = m_vertexList[vertexIndex].position.z;
+	v1 = m_vertexList[vertexIndex].position;
+	v2 = m_vertexList[++vertexIndex].position;
+	v3 = m_vertexList[++vertexIndex].position;
 
 	// Check to see if the minimum of the x coordinates of the triangle is inside the node.
-	minimumX = min(x1, min(x2, x3));
-	if(minimumX > (positionX + radius)) return false;
+	if(min(v1.x, min(v2.x, v3.x)) > (positionX + radius)) return false;
 
 	// Check to see if the maximum of the x coordinates of the triangle is inside the node.
-	maximumX = max(x1, max(x2, x3));
-	if(maximumX < (positionX - radius)) return false;
+	if(max(v1.x, max(v2.x, v3.x)) < (positionX - radius)) return false;
 
 	// Check to see if the minimum of the z coordinates of the triangle is inside the node.
-	minimumZ = min(z1, min(z2, z3));
-	if(minimumZ > (positionZ + radius)) return false;
+	if(min(v1.z, min(v2.z, v3.z)) > (positionZ + radius)) return false;
 
 	// Check to see if the maximum of the z coordinates of the triangle is inside the node.
-	maximumZ = max(z1, max(z2, z3));
-	if(maximumZ < (positionZ - radius)) return false;
+	if(max(v1.z, max(v2.z, v3.z)) < (positionZ - radius)) return false;
 
 	return true;
 }
@@ -480,11 +468,9 @@ void QuadTree::FindNode(NodeType* node, float x, float z, float& height, D3DXVEC
 	// the height of which one the polygon we are looking for.
 	for(i = 0; i < node->triangleCount; i++) {
 		index = i * 3;
-		vertex1 = D3DXVECTOR3(node->vertexArray[index].x, node->vertexArray[index].y, node->vertexArray[index].z);
-		index++;
-		vertex2 = D3DXVECTOR3(node->vertexArray[index].x, node->vertexArray[index].y, node->vertexArray[index].z);
-		index++;
-		vertex3 = D3DXVECTOR3(node->vertexArray[index].x, node->vertexArray[index].y, node->vertexArray[index].z);
+		vertex1 = node->vertexArray[index];
+		vertex2 = node->vertexArray[++index];
+		vertex3 = node->vertexArray[++index];
 
 		// Check to see if this is the polygon we are looking for.
 		foundHeight = CheckHeightOfTriangle(x, z, height, normal, vertex1, vertex2, vertex3);
@@ -497,58 +483,121 @@ void QuadTree::FindNode(NodeType* node, float x, float z, float& height, D3DXVEC
 }
 
 
-bool QuadTree::CheckHeightOfTriangle(float x, float z, float& height, D3DXVECTOR3& foundNormal, D3DXVECTOR3 v0, D3DXVECTOR3 v1, D3DXVECTOR3 v2) {
-	D3DXVECTOR3 startVector, directionVector, edge1, edge2, normal;
-	D3DXVECTOR3 Q, e1, e2, e3, edgeNormal;
-	float denominator, numerator;
+bool QuadTree::CheckHeightOfTriangle(float x, float z, float& height, D3DXVECTOR3& foundNormal, float v0[3], float v1[3], float v2[3]) {
+	float startVector[3], directionVector[3], edge1[3], edge2[3], normal[3];
+	float Q[3], e1[3], e2[3], e3[3], edgeNormal[3], temp[3];
+	float magnitude, D, denominator, numerator, t, determinant;
 
 	// Starting position of the ray that is being cast.
-	startVector = D3DXVECTOR3(x, 0.0f, z);
+	startVector[0] = x;
+	startVector[1] = 0.0f;
+	startVector[2] = z;
 
 	// The direction the ray is being cast.
-	directionVector = D3DXVECTOR3(0.0f, -1.0f,  0.0f);
+	directionVector[0] =  0.0f;
+	directionVector[1] = -1.0f;
+	directionVector[2] =  0.0f;
 
 	// Calculate the two edges from the three points given.
-	edge1 = v1 - v0;
-	edge2 = v2 - v0;
+	edge1[0] = v1[0] - v0[0];
+	edge1[1] = v1[1] - v0[1];
+	edge1[2] = v1[2] - v0[2];
+
+	edge2[0] = v2[0] - v0[0];
+	edge2[1] = v2[1] - v0[1];
+	edge2[2] = v2[2] - v0[2];
 
 	// Calculate the normal of the triangle from the two edges.
-	D3DXVec3Cross(&normal, &edge1, &edge2);
-	D3DXVec3Normalize(&normal, &normal);
+	normal[0] = (edge1[1] * edge2[2]) - (edge1[2] * edge2[1]);
+	normal[1] = (edge1[2] * edge2[0]) - (edge1[0] * edge2[2]);
+	normal[2] = (edge1[0] * edge2[1]) - (edge1[1] * edge2[0]);
+
+	magnitude = (float)sqrt((normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]));
+	normal[0] = normal[0] / magnitude;
+	normal[1] = normal[1] / magnitude;
+	normal[2] = normal[2] / magnitude;
+
+	// Find the distance from the origin to the plane.
+	D = ((-normal[0] * v0[0]) + (-normal[1] * v0[1]) + (-normal[2] * v0[2]));
 
 	// Get the denominator of the equation.
-	denominator = D3DXVec3Dot(&normal, &directionVector);
+	denominator = ((normal[0] * directionVector[0]) + (normal[1] * directionVector[1]) + (normal[2] * directionVector[2]));
 
 	// Make sure the result doesn't get too close to zero to prevent divide by zero.
 	if(fabs(denominator) < 0.0001f) return false;
 
-	// Find the distance from the origin to the plane. Get the numerator of the equation.
-	numerator = -1.0f * (D3DXVec3Dot(&normal, &startVector) + D3DXVec3Dot(&(-normal), &v0));
+	// Get the numerator of the equation.
+	numerator = -1.0f * (((normal[0] * startVector[0]) + (normal[1] * startVector[1]) + (normal[2] * startVector[2])) + D);
 
-	// Calculate where we intersect the triangle. Find the intersection vector.
-	Q = startVector + (directionVector * (numerator / denominator));
+	// Calculate where we intersect the triangle.
+	t = numerator / denominator;
+
+	// Find the intersection vector.
+	Q[0] = startVector[0] + (directionVector[0] * t);
+	Q[1] = startVector[1] + (directionVector[1] * t);
+	Q[2] = startVector[2] + (directionVector[2] * t);
 
 	// Find the three edges of the triangle.
-	e1 = v1 - v0;
-	e2 = v2 - v1;
-	e3 = v0 - v2;
+	e1[0] = v1[0] - v0[0];
+	e1[1] = v1[1] - v0[1];
+	e1[2] = v1[2] - v0[2];
 
-	// Calculate the normals for the first edge. Check if it's outside the edge.
-	D3DXVec3Cross(&edgeNormal, &e1, &normal);
-	if(D3DXVec3Dot(&edgeNormal, &(Q - v0)) > 0.001f) return false;
+	e2[0] = v2[0] - v1[0];
+	e2[1] = v2[1] - v1[1];
+	e2[2] = v2[2] - v1[2];
 
-	// Calculate the normal for the second edge. Check if it's outside the edge.
-	D3DXVec3Cross(&edgeNormal, &e2, &normal);
-	if(D3DXVec3Dot(&edgeNormal, &(Q - v1)) > 0.001f) return false;
+	e3[0] = v0[0] - v2[0];
+	e3[1] = v0[1] - v2[1];
+	e3[2] = v0[2] - v2[2];
 
-	// Calculate the normal for the third edge. Check if it's outside the edge.
-	D3DXVec3Cross(&edgeNormal, &e3, &normal);
-	if(D3DXVec3Dot(&edgeNormal, &(Q - v2)) > 0.001f) return false;
+	// Calculate the normal for the first edge.
+	edgeNormal[0] = (e1[1] * normal[2]) - (e1[2] * normal[1]);
+	edgeNormal[1] = (e1[2] * normal[0]) - (e1[0] * normal[2]);
+	edgeNormal[2] = (e1[0] * normal[1]) - (e1[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v0[0];
+	temp[1] = Q[1] - v0[1];
+	temp[2] = Q[2] - v0[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if(determinant > 0.001f) return false;
+
+	// Calculate the normal for the second edge.
+	edgeNormal[0] = (e2[1] * normal[2]) - (e2[2] * normal[1]);
+	edgeNormal[1] = (e2[2] * normal[0]) - (e2[0] * normal[2]);
+	edgeNormal[2] = (e2[0] * normal[1]) - (e2[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v1[0];
+	temp[1] = Q[1] - v1[1];
+	temp[2] = Q[2] - v1[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if(determinant > 0.001f) return false;
+
+	// Calculate the normal for the third edge.
+	edgeNormal[0] = (e3[1] * normal[2]) - (e3[2] * normal[1]);
+	edgeNormal[1] = (e3[2] * normal[0]) - (e3[0] * normal[2]);
+	edgeNormal[2] = (e3[0] * normal[1]) - (e3[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v2[0];
+	temp[1] = Q[1] - v2[1];
+	temp[2] = Q[2] - v2[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if(determinant > 0.001f) return false;
 
 	// Now we have our height.
-	height = Q.y;
-	foundNormal = normal;
-
+	height = Q[1];
+	foundNormal = D3DXVECTOR3(normal[0], normal[1], normal[2]);
 	return true;
 }
 
