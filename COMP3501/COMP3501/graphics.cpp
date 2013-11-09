@@ -318,7 +318,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_Text->SetVector3(m_Tank->getTurretState()->GetForward(), 3, m_D3D->GetDeviceContext());
+	result = m_Text->SetVector3("Tank Position", m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
 
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);

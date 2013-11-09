@@ -394,7 +394,7 @@ int Text::GetSentenceCount() {
 	return m_count;
 }
 
-bool Text::SetVector3(D3DXVECTOR3* vector, int index, ID3D11DeviceContext* deviceContext) {
+bool Text::SetVector3(char* label, D3DXVECTOR3* vector, int index, ID3D11DeviceContext* deviceContext) {
 	char tempString[20];
 	char string[64];
 	int wholeNum, decimalNum;
@@ -402,7 +402,8 @@ bool Text::SetVector3(D3DXVECTOR3* vector, int index, ID3D11DeviceContext* devic
 
 	if(_isnan(vector->x) || _isnan(vector->y) || _isnan(vector->z)) return true;
 
-	strcpy_s(string, "Vector3: (");
+	strcpy_s(string, label);
+	strcat_s(string, ": (");
 
 	// Convert the x to string format.
 	wholeNum = int(vector->x);

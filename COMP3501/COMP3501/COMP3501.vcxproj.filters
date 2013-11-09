@@ -329,6 +329,24 @@
     <None Include="texture.vs.hlsl">
       <Filter>Resource Files\Shaders\Vertex</Filter>
     </None>
+    <None Include="data\asteroid1.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="data\asteroid2.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="data\skydome.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="data\sphere.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="data\tank.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="data\turret.bin">
+      <Filter>Resource Files\Models</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\rocky.dds">
@@ -357,20 +375,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="data\cube.txt">
-      <Filter>Resource Files\Models</Filter>
-    </Text>
     <Text Include="data\fontdata.txt">
       <Filter>Resource Files\Fonts</Filter>
-    </Text>
-    <Text Include="data\asteroid1.txt">
-      <Filter>Resource Files\Models</Filter>
-    </Text>
-    <Text Include="data\asteroid2.txt">
-      <Filter>Resource Files\Models</Filter>
-    </Text>
-    <Text Include="data\sphere.txt">
-      <Filter>Resource Files\Models</Filter>
     </Text>
   </ItemGroup>
 </Project>
