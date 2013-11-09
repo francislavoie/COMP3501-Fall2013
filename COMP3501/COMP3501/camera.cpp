@@ -293,7 +293,7 @@ void Camera::CalculatePosition()
 	if (follow != 0)
 	{
 		m_position = D3DXVECTOR3(x,y,z) + *follow->GetPosition();
-		m_lookatPosition = *follow->GetPosition() + *follow->getForward() * 100 + pitch;
+		m_lookatPosition = *follow->GetPosition() + *follow->GetForward() * 100 + pitch;
 	}
 }
 

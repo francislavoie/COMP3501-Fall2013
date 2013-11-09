@@ -40,10 +40,11 @@ public:
 	void SetClimbVel(float);
 	void SetForwardVel(float);
 	void SetFriction(float rate) { m_friction = rate; }
-	void applyForce(D3DXVECTOR3);
-	D3DXVECTOR3* getForward() { return &m_front; }
-	D3DXVECTOR3* getUp() { return &m_up; }
-	float getAcceleration() { return D3DXVec3Length(&m_acceleration); }
+	void ApplyForce(D3DXVECTOR3);
+	D3DXVECTOR3* GetForward() { return &m_front; }
+	D3DXVECTOR3* GetUp() { return &m_up; }
+	D3DXVECTOR3* GetRight() { return &m_right; }
+	float GetAcceleration() { return D3DXVec3Length(&m_acceleration); }
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetOrientation(D3DXQUATERNION *);
 
@@ -58,7 +59,7 @@ private:
 
 	State *m_follow;
 
-	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset, m_offsetRot,
+	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset,
 				m_up, m_front, m_right;
 
 	D3DXQUATERNION m_rot;

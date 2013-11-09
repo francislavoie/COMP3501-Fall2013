@@ -18,7 +18,6 @@ State::State(bool rotvel_on, State* follow) {
 	m_right = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
 
 	m_offset = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_offsetRot = m_offset;
 
 	m_follow = follow;
 
@@ -42,8 +41,7 @@ D3DXQUATERNION *State::GetRotation() { return &m_rot; }
 
 
 void State::SetOffset(D3DXVECTOR3 offset) { 
-	m_offset = offset; 
-	m_offsetRot = m_offset;
+	m_offset = offset;
 }
 
 void State::SetTime(float t) { m_time = t; }
@@ -60,7 +58,7 @@ void State::SetOrientation(D3DXQUATERNION *orien) {
 	m_rot *= *orien;
 }
 
-void State::applyForce(D3DXVECTOR3 force) {
+void State::ApplyForce(D3DXVECTOR3 force) {
 	m_acceleration += force;
 }
 
@@ -77,30 +75,44 @@ void State::Update() {
 		m_pos += (m_up * prevVelocity.y) * m_time + (1/2) * (m_right * m_acceleration.y) * pow(m_time, 2);
 		m_pos += (m_front * prevVelocity.z) * m_time + (1/2) * (m_right * m_acceleration.z) * pow(m_time, 2);
 	} else {
-		D3DXQUATERNION inverse, temp; 
-		D3DXQuaternionInverse(&inverse, m_follow->GetRotation());
-		temp = *m_follow->GetRotation() * D3DXQUATERNION(m_offset.x, m_offset.y, m_offset.z, 0.0f) * inverse;
-		m_offsetRot = D3DXVECTOR3(temp.x, temp.y, temp.z);
-		m_pos = *m_follow->GetPosition() + m_offsetRot;
+		m_pos = *m_follow->GetPosition();
+		m_pos += (*m_follow->GetRight() * m_offset.x);
+		m_pos += (*m_follow->GetUp() * m_offset.y);
+		m_pos += (*m_follow->GetForward() * m_offset.z);
 	}
 
-	m_acceleration = D3DXVECTOR3(0,0,0);
+	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	// Apply rotational velocity
-	D3DXQUATERNION rot;
-	D3DXQuaternionRotationYawPitchRoll(
-		&rot, 
-		m_rotvel.x, 
-		m_rotvel.y, 
-		m_rotvel.z
-	);
 
-	if(m_rotvel_on) m_rot *= rot;
-	else m_rot = rot;
+	if(m_rotvel_on) {
+		// Apply rotational velocity
+		D3DXQUATERNION rot;
+		D3DXQuaternionRotationYawPitchRoll(
+			&rot, 
+			m_rotvel.x, 
+			m_rotvel.y, 
+			m_rotvel.z
+		);
 
-	if (m_follow)
-	{
-		m_rot *= *m_follow->GetRotation();
+		m_rot *= rot;
+	} else {
+		D3DXQUATERNION rot, temp;
+		D3DXQuaternionRotationYawPitchRoll(
+			&rot, 
+			m_rotvel.x, 
+			m_rotvel.y, 
+			m_rotvel.z
+		);
+
+		temp = *m_follow->GetRotation();
+		temp.y = 0;
+		m_rot = temp;
+		D3DXQuaternionNormalize(&m_rot, &m_rot);
+
+		rot.x = 0;
+		rot.z = 0;
+		D3DXQuaternionNormalize(&rot, &rot);
+		m_rot *= rot;
 	}
 
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
