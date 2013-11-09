@@ -159,42 +159,42 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 	bool result;
 	float height;
-	D3DXVECTOR3 position = *getTankState()->GetPosition();
+	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage;
 
-	// Get the height of the triangle that is directly underneath the given camera position.
-	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height);
+	// Get the height of the triangle that is directly underneath the given tank position.
+	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
 	if(result) {
-		// If there was a triangle under the camera then position the camera just above it by two units.
+		// If there was a triangle under the tank then position the tank just above it by one unit.
 		getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 1.0f, position.z));
 	}
 
 	int count = 5;
 	D3DXVECTOR3 normal1, normal2, normal3, normal4, normal5;
-	result = m_QuadTree->GetHeightAtPosition2(m_frontRight.x, m_frontRight.z, height, normal1);
+	result = m_QuadTree->GetHeightAtPosition(m_frontRight.x, m_frontRight.z, height, normal1);
 	if(!result) {
 		normal1 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_frontLeft.x, m_frontLeft.z, height, normal2);
+	result = m_QuadTree->GetHeightAtPosition(m_frontLeft.x, m_frontLeft.z, height, normal2);
 	if(!result) {
 		normal2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_rearRight.x, m_rearRight.z, height, normal3);
+	result = m_QuadTree->GetHeightAtPosition(m_rearRight.x, m_rearRight.z, height, normal3);
 	if(!result) {
 		normal3 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_rearLeft.x, m_rearLeft.z, height, normal4);
+	result = m_QuadTree->GetHeightAtPosition(m_rearLeft.x, m_rearLeft.z, height, normal4);
 	if(!result) {
 		normal4 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
 	}
 
-	result = m_QuadTree->GetHeightAtPosition2(m_center.x, m_center.z, height, normal5);
+	result = m_QuadTree->GetHeightAtPosition(m_center.x, m_center.z, height, normal5);
 	if(!result) {
 		normal5 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		count--;
@@ -255,14 +255,12 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 void Tank::RenderTank(ID3D11DeviceContext* device) {
 	baseTank->Render(device);
-
 	return;
 }
 
 
 void Tank::RenderTurret(ID3D11DeviceContext* device) {
 	turret->Render(device);
-
 	return;
 }
 
