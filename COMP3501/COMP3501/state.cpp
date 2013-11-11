@@ -109,7 +109,7 @@ void State::Update() {
 		m_rot = temp;
 		D3DXQuaternionNormalize(&m_rot, &m_rot);
 
-		m_rot *= rot;
+		m_rot = rot * m_rot;
 	}
 
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
