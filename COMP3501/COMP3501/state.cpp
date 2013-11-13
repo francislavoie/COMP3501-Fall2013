@@ -46,9 +46,9 @@ void State::SetOffset(D3DXVECTOR3 offset) {
 
 void State::SetTime(float t) { m_time = t; }
 
-void State::SetYaw(float angle) { m_rotvel.x = angle; }
-void State::SetPitch(float angle) { m_rotvel.y = angle; }
-void State::SetRoll(float angle) { m_rotvel.z = angle; }
+void State::SetYaw(float angle) { m_rotvel.x += angle; }
+void State::SetPitch(float angle) { m_rotvel.y += angle; }
+void State::SetRoll(float angle) { m_rotvel.z += angle; }
 
 void State::SetStrafeVel(float vel) { m_posvel.x = vel; }
 void State::SetClimbVel(float vel) { m_posvel.y = vel; }
@@ -81,8 +81,29 @@ void State::Update() {
 		m_pos += (*m_follow->GetForward() * m_offset.z);
 	}
 
-	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
+	D3DXQUATERNION rot;
+	D3DXQuaternionRotationYawPitchRoll(
+		&rot, 
+		m_rotvel.x, 
+		m_rotvel.y, 
+		m_rotvel.z
+	);
+
+	if (m_follow)
+	{
+		static D3DXQUATERNION totalRot = rot;
+		totalRot *= rot;
+		D3DXQUATERNION temp;
+		temp = *m_follow->GetRotation();
+		m_rot = totalRot * temp;
+	}
+	else
+	{	
+		m_rot *= rot;
+	}
+
+	/*
 
 	if(m_rotvel_on) {
 		// Apply rotational velocity
@@ -105,12 +126,12 @@ void State::Update() {
 		);
 
 		temp = *m_follow->GetRotation();
-		temp.y = 0;
+		//temp.y = 0;
 		m_rot = temp;
 		D3DXQuaternionNormalize(&m_rot, &m_rot);
 
 		m_rot = rot * m_rot;
-	}
+	}*/
 
 	D3DXQuaternionNormalize(&m_rot, &m_rot);
 
@@ -132,4 +153,7 @@ void State::Update() {
 		2 * (m_rot.x * m_rot.y + m_rot.w * m_rot.z),
 		2 * (m_rot.x * m_rot.z - m_rot.w * m_rot.y)
 	);;
+
+	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }

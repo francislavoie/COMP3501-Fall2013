@@ -319,7 +319,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	if(!result) return false;
 
 	result = m_Text->SetVector3("Tank Position", m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
-
+	
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 		
