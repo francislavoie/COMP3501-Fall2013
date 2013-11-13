@@ -53,6 +53,9 @@ public:
 	void TurnOnCulling();
 	void TurnOffCulling();
 
+	void TurnZBufferWriteOn();
+	void TurnZBufferWriteOff();
+
 private:
 	bool m_vsync_enabled;
 	int m_videoCardMemory;
@@ -64,6 +67,7 @@ private:
 	ID3D11Texture2D* m_depthStencilBuffer;
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilState* m_depthDisabledStencilState;
+	ID3D11DepthStencilState* m_depthReadOnlyStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterStateNoCulling;
 	ID3D11RasterizerState* m_rasterState;

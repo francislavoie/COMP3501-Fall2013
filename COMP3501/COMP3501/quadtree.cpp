@@ -207,7 +207,7 @@ void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, 
 	index = 0;
 
 	// Go through all the triangles in the vertex list.
-	for(i=0; i<m_triangleCount; i++) {
+	for(i = 0; i < m_triangleCount; i++) {
 		// If the triangle is inside this node then add it to the vertex array.
 		result = IsTriangleContained(i, positionX, positionZ, width);
 		if(result == true) {
@@ -296,13 +296,12 @@ void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, 
 int QuadTree::CountTriangles(float positionX, float positionZ, float width) {
 	int count, i;
 	bool result;
-
-
+	
 	// Initialize the count to zero.
 	count = 0;
 
 	// Go through all the triangles in the entire mesh and check which ones should be inside this node.
-	for(i=0; i<m_triangleCount; i++) {
+	for(i = 0; i < m_triangleCount; i++) {
 		// If the triangle is inside the node then increment the count by one.
 		result = IsTriangleContained(i, positionX, positionZ, width);
 		if(result == true) count++;
@@ -316,8 +315,7 @@ bool QuadTree::IsTriangleContained(int index, float positionX, float positionZ, 
 	float radius;
 	int vertexIndex;
 	D3DXVECTOR3 v1, v2, v3;
-
-
+	
 	// Calculate the radius of this node.
 	radius = width / 2.0f;
 
