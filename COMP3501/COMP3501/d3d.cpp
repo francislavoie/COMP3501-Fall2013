@@ -11,6 +11,7 @@ D3D::D3D() {
 	m_depthStencilBuffer = 0;
 	m_depthStencilState = 0;
 	m_depthDisabledStencilState = 0;
+	m_depthReadOnlyStencilState = 0;
 	m_depthStencilView = 0;
 	m_rasterState = 0;
 	m_rasterStateNoCulling = 0;
@@ -39,6 +40,7 @@ bool D3D::Initialize(D3DXVECTOR2 screen, bool vsync, HWND hwnd, bool fullscreen,
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_DESC depthDisabledStencilDesc;
+	D3D11_DEPTH_STENCIL_DESC depthReadOnlyStencilState;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_VIEWPORT viewport;
@@ -250,6 +252,27 @@ bool D3D::Initialize(D3DXVECTOR2 screen, bool vsync, HWND hwnd, bool fullscreen,
 	result = m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
 	if(FAILED(result)) return false;
 
+	// Now create a third depth stencil state which turns off Z buffer writing.  The only difference is 
+	// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
+	depthReadOnlyStencilState.DepthEnable = true;
+	depthReadOnlyStencilState.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthReadOnlyStencilState.DepthFunc = D3D11_COMPARISON_LESS;
+	depthReadOnlyStencilState.StencilEnable = true;
+	depthReadOnlyStencilState.StencilReadMask = 0xFF;
+	depthReadOnlyStencilState.StencilWriteMask = 0xFF;
+	depthReadOnlyStencilState.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthReadOnlyStencilState.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthReadOnlyStencilState.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthReadOnlyStencilState.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthReadOnlyStencilState.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthReadOnlyStencilState.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthReadOnlyStencilState.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthReadOnlyStencilState.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Create the state using the device.
+	result = m_device->CreateDepthStencilState(&depthReadOnlyStencilState, &m_depthReadOnlyStencilState);
+	if(FAILED(result)) return false;
+
 	// Initialize the depth stencil view.
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
@@ -355,6 +378,11 @@ void D3D::Shutdown() {
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if(m_swapChain) {
 		m_swapChain->SetFullscreenState(false, NULL);
+	}
+
+	if(m_depthReadOnlyStencilState) {
+		m_depthReadOnlyStencilState->Release();
+		m_depthReadOnlyStencilState = 0;
 	}
 
 	if(m_depthDisabledStencilState) {
@@ -492,6 +520,16 @@ void D3D::TurnZBufferOn() {
 
 void D3D::TurnZBufferOff() {
 	m_deviceContext->OMSetDepthStencilState(m_depthDisabledStencilState, 1);
+	return;
+}
+
+void D3D::TurnZBufferWriteOn() {
+	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+	return;
+}
+
+void D3D::TurnZBufferWriteOff() {
+	m_deviceContext->OMSetDepthStencilState(m_depthReadOnlyStencilState, 1);
 	return;
 }
 
