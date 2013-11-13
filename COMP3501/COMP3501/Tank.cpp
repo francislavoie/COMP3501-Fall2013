@@ -134,6 +134,9 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	}
 
 	m_turretState->SetYaw(deltaX*0.01f);
+	D3DXVECTOR3 *forward = m_turretState->GetForward();
+	if ((deltaY < 0 && forward->y < 0.75) || (deltaY > 0 && forward->y >-0.75))
+		m_turretState->SetPitch(deltaY*0.01f);
 
 	//m_turretState->SetYaw(rotation);
 

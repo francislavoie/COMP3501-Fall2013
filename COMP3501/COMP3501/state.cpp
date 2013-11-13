@@ -40,6 +40,7 @@ D3DXQUATERNION *State::GetRotation() { return &m_rot; }
 
 
 
+
 void State::SetOffset(D3DXVECTOR3 offset) { 
 	m_offset = offset;
 }
@@ -96,7 +97,7 @@ void State::Update() {
 		totalRot *= rot;
 		D3DXQUATERNION temp;
 		temp = *m_follow->GetRotation();
-		m_rot = totalRot * temp;
+		m_rot = temp * totalRot;// * temp;
 	}
 	else
 	{	

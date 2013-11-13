@@ -292,7 +292,7 @@ void Camera::CalculatePosition()
 	float z = sin(theta)*radius;*/
 	if (follow != 0)
 	{
-		m_position = *follow->GetForward() * -2.5f + *follow->GetPosition() + D3DXVECTOR3(0,0.75f,0);
+		m_position = *follow->GetForward() * -2.5f * raiseDistance + *follow->GetPosition() + D3DXVECTOR3(0,raiseDistance,0);
 		//D3DXVECTOR3 look;
 		//D3DXVec3Normalize(&look, &D3DXVECTOR3(-x,0,-z)); 
 		m_lookatPosition = *follow->GetPosition() + *follow->GetForward() * 50;//m_position + look*50;
