@@ -86,13 +86,20 @@ void State::Update() {
 	D3DXQUATERNION rot;
 	D3DXQuaternionRotationYawPitchRoll(
 		&rot, 
-		m_rotvel.x, 
-		m_rotvel.y, 
+		m_rotvel.x,
+		m_rotvel.y,
 		m_rotvel.z
 	);
 
+
+
 	if (m_follow)
 	{
+		D3DXQUATERNION xrot,yrot,zrot;
+		D3DXQuaternionRotationAxis(&xrot,&m_right,m_rotvel.y);
+		D3DXQuaternionRotationAxis(&yrot,m_follow->GetUp(),m_rotvel.x);
+		rot = yrot * xrot;
+
 		static D3DXQUATERNION totalRot = rot;
 		totalRot *= rot;
 		D3DXQUATERNION temp;

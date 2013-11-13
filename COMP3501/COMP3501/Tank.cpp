@@ -126,10 +126,10 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	
 	if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetYaw(-0.005f * time);
-		m_turretState->SetYaw(0.005f * time);
+		//m_turretState->SetYaw(0.005f * time);
 	} else if(input->IsKeyPressed(DIK_D)) {
 		m_tankState->SetYaw(0.005f * time);
-		m_turretState->SetYaw(-0.005f * time);
+		//m_turretState->SetYaw(-0.005f * time);
 	} else {
 	}
 
