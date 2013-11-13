@@ -93,6 +93,10 @@ void Tank::Shutdown() {
 }
 
 void Tank::Update(Input* input,float time, float rotation, bool firstPerson, QuadTree *m_QuadTree){
+	int mouseX, mouseY, deltaX, deltaY;
+	input->GetMouseLocation(mouseX, mouseY);
+	input->GetMouseDelta(deltaX, deltaY);
+	
 	m_tankState->SetTime(time);
 
 	int scroll;
@@ -122,13 +126,16 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	
 	if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetYaw(-0.005f * time);
+		m_turretState->SetYaw(0.005f * time);
 	} else if(input->IsKeyPressed(DIK_D)) {
 		m_tankState->SetYaw(0.005f * time);
+		m_turretState->SetYaw(-0.005f * time);
 	} else {
-		m_tankState->SetYaw(0.0f * time);
 	}
 
-	m_turretState->SetYaw(rotation);
+	m_turretState->SetYaw(deltaX*0.01f);
+
+	//m_turretState->SetYaw(rotation);
 
 	D3DXQUATERNION quat = *m_tankState->GetRotation();
 	D3DXQUATERNION inverse;
@@ -200,35 +207,6 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		count--;
 	}
 		
-	//vector<D3DXVECTOR3> heights;
-	//heights.push_back(*getTankState()->GetPosition());
-	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTRIGHT + D3DXVECTOR3(0,0.005f,0));
-	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + FRONTLEFT);
-	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARLEFT);
-	//heights.push_back(*getTankState()->GetPosition() - D3DXVECTOR3(0,getTankState()->GetPosition()->y,0) + REARRIGHT);
-	/*heights.push_back(frontRight);
-	heights.push_back(frontLeft);
-	heights.push_back(rearLeft);
-	heights.push_back(rearRight);*/
-	/*
-	std::sort (heights.begin(), heights.end(), VectorSortP());
-
-	D3DXVECTOR3 first = heights.back();
-	heights.pop_back();
-	
-	D3DXVECTOR3 second = heights.back();
-	heights.pop_back();
-
-	D3DXVECTOR3 third = heights.back();
-	heights.pop_back();
-
-	D3DXVECTOR3 line1 = first - second;
-
-	D3DXVECTOR3 line2 = third - second;
-
-	D3DXVECTOR3 line3;
-	D3DXVec3Cross(&line3, &line1, &line2);
-	*/
 	D3DXVECTOR3 line3;
 	if (count > 0)
 		line3 = (normal1+normal2+normal3+normal4+normal5)/float(count);
@@ -243,10 +221,9 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 	D3DXVec3Normalize(&cross,&cross);
 
-	D3DXQUATERNION quaternion;	
+	D3DXQUATERNION quaternion;
 	D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
 	m_tankState->SetOrientation(&quaternion);
-	//m_turretState->SetOrientation(&quaternion);
 
 	m_tankState->Update();
 	m_turretState->Update();
