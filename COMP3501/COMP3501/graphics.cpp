@@ -59,7 +59,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Text) return false;
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 4);
+	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 5);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
 		return false;
@@ -319,7 +319,8 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	if(!result) return false;
 
 	result = m_Text->SetVector3("Tank Position", m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
-	
+	if(!result) return false;
+
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 		
@@ -343,6 +344,9 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	}
 	
 	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);	
+
+	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch(), 4, m_D3D->GetDeviceContext());
+	if(!result) return false;
 
 	/*
 	// Mouse controls

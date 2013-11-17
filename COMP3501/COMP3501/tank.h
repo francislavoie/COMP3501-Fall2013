@@ -61,6 +61,8 @@ public:
 	ID3D11ShaderResourceView* GetTankTexture() { return baseTank->GetTexture(); }
 	ID3D11ShaderResourceView* GetTurretTexture() { return turret->GetTexture(); }
 
+	float GetPitch() { return pitch; }
+
 private:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;

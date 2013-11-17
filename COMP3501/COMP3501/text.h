@@ -43,6 +43,8 @@ public:
 	bool SetCpu(int, int, ID3D11DeviceContext*);
 	bool SetRenderCount(int, int, ID3D11DeviceContext*);
 	bool SetVector3(char*, D3DXVECTOR3*, int, ID3D11DeviceContext*);
+	bool SetInteger(char*, int, int, ID3D11DeviceContext*);
+	bool SetFloat(char*, float, int, ID3D11DeviceContext*);
 
 private:
 	bool InitializeSentence(SentenceType*, int, ID3D11Device*);
