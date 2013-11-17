@@ -408,6 +408,7 @@ bool Text::SetVector3(char* label, D3DXVECTOR3* vector, int index, ID3D11DeviceC
 	// Convert the x to string format.
 	wholeNum = int(vector->x);
 	decimalNum = (int) (abs(vector->x - wholeNum) * 10000);
+	if(vector->x < 0.0f && vector->x > -1.0f) strcat_s(string, "-");
 	_itoa_s(wholeNum, tempString, 10);
 	strcat_s(string, tempString);
 	strcat_s(string, ".");
@@ -418,6 +419,7 @@ bool Text::SetVector3(char* label, D3DXVECTOR3* vector, int index, ID3D11DeviceC
 	// Convert the y to string format.
 	wholeNum = int(vector->y);
 	decimalNum = (int) (abs(vector->y - wholeNum) * 10000);
+	if(vector->y < 0.0f && vector->y > -1.0f) strcat_s(string, "-");
 	_itoa_s(wholeNum, tempString, 10);
 	strcat_s(string, tempString);
 	strcat_s(string, ".");
@@ -428,6 +430,7 @@ bool Text::SetVector3(char* label, D3DXVECTOR3* vector, int index, ID3D11DeviceC
 	// Convert the z to string format.
 	wholeNum = int(vector->z);
 	decimalNum = int(abs(vector->z - wholeNum) * 10000);
+	if(vector->z < 0.0f && vector->z > -1.0f) strcat_s(string, "-");
 	_itoa_s(wholeNum, tempString, 10);
 	strcat_s(string, tempString);
 	strcat_s(string, ".");
@@ -475,6 +478,7 @@ bool Text::SetFloat(char* label, float floating, int index, ID3D11DeviceContext*
 	// Convert the x to string format.
 	wholeNum = int(floating);
 	decimalNum = (int) (abs(floating - wholeNum) * 10000);
+	if(floating < 0.0f && floating > -1.0f) strcat_s(string, "-");
 	_itoa_s(wholeNum, tempString, 10);
 	strcat_s(string, tempString);
 	strcat_s(string, ".");
