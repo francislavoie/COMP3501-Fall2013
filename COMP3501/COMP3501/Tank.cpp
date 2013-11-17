@@ -127,23 +127,27 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	} else {
 		m_tankState->SetStrafeVel(0.0f);
 	}*/
+
+	yaw += deltaX*0.01f;
 	
 	if(input->IsKeyPressed(DIK_A)) {
 		m_tankState->SetYaw(-0.005f * time);
+		yaw += 0.005f * time;
 		//m_turretState->SetYaw(0.005f * time);
 	} else if(input->IsKeyPressed(DIK_D)) {
 		m_tankState->SetYaw(0.005f * time);
+		yaw -= 0.005f * time;
 		//m_turretState->SetYaw(-0.005f * time);
 	} else {
 	}
 
 	//m_turretState->SetYaw(deltaX*0.01f);
-	yaw += deltaX*0.01f;
-	pitch += deltaY*0.01f;
+	
+	/*D3DXVECTOR3 *forward = m_turretState->GetForward();*/
+	if ((deltaY < 0 && pitch > -0.75) || (deltaY > 0 && pitch <0.75))
+		pitch += deltaY*0.005f;
 
-	/*D3DXVECTOR3 *forward = m_turretState->GetForward();
-	if ((deltaY < 0 && forward->y < 0.75) || (deltaY > 0 && forward->y >-0.75))
-		m_turretState->SetPitch(deltaY*0.01f);*/
+		//m_turretState->SetPitch(deltaY*0.01f);*/
 
 	//m_turretState->SetYaw(rotation);
 
@@ -249,7 +253,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	);
 
 	float diff = asin(m_turretState->GetForward()->y) - asin(m_front.y);
-	pitch += diff;
+	//pitch += diff;
 	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
 	orien = orien * *m_tankState->GetRotation();
 	m_turretState->SetOrientation(&orien);
