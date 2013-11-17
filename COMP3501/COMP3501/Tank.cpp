@@ -11,6 +11,9 @@ Tank::Tank() {
 	m_frontLeft = FRONTLEFT;
 	m_rearLeft = REARLEFT;
 	m_rearRight = REARRIGHT;
+	turretLookAt = D3DXVECTOR3(0,0,0);
+	yaw = 0;
+	pitch = 0;
 }
 
 
@@ -56,6 +59,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 
 	m_tankState->SetPosition(D3DXVECTOR3(3.0f, 0.0f, 3.0f));
 	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.22f, 0.0f));
+	turretLookAt = *m_turretState->GetForward() * RADIUS;
 
 	return true;
 }
@@ -133,10 +137,13 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	} else {
 	}
 
-	m_turretState->SetYaw(deltaX*0.01f);
-	D3DXVECTOR3 *forward = m_turretState->GetForward();
+	//m_turretState->SetYaw(deltaX*0.01f);
+	yaw += deltaX*0.01f;
+	pitch += deltaY*0.01f;
+
+	/*D3DXVECTOR3 *forward = m_turretState->GetForward();
 	if ((deltaY < 0 && forward->y < 0.75) || (deltaY > 0 && forward->y >-0.75))
-		m_turretState->SetPitch(deltaY*0.01f);
+		m_turretState->SetPitch(deltaY*0.01f);*/
 
 	//m_turretState->SetYaw(rotation);
 
@@ -226,9 +233,27 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 	D3DXQUATERNION quaternion;
 	D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
-	m_tankState->SetOrientation(&quaternion);
+	m_tankState->multiplyOrientation(&quaternion);
 
 	m_tankState->Update();
+
+	D3DXQUATERNION orien;
+	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
+
+
+	orien = orien * *m_tankState->GetRotation();
+	D3DXVECTOR3 m_front = D3DXVECTOR3(
+		2 * (orien.x * orien.z + orien.w * orien.y), 
+		2 * (orien.y * orien.z - orien.w * orien.x),
+		1 - 2 * (orien.x * orien.x + orien.y * orien.y)
+	);
+
+	float theta = asin((m_front.y - m_turretState->GetPosition()->y)/RADIUS);
+	float diff = theta - pitch;
+	pitch += diff;
+	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
+	orien = orien * *m_tankState->GetRotation();
+	m_turretState->SetOrientation(&orien);
 	m_turretState->Update();
 }
 

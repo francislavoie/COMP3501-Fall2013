@@ -31,6 +31,7 @@ struct VectorSortP {
 	}
 };
 
+const float RADIUS = 50;
 const D3DXVECTOR3 FRONTRIGHT = D3DXVECTOR3(0.55614f, 0.0f, 1.35747f);
 const D3DXVECTOR3 FRONTLEFT = D3DXVECTOR3(-0.55106f, 0.0f, 1.35747f);
 const D3DXVECTOR3 REARLEFT = D3DXVECTOR3(-0.55826f, 0.0f, -0.53326f);
@@ -63,6 +64,8 @@ public:
 private:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;
+	D3DXVECTOR3 turretLookAt;
+	float yaw,pitch;
 
 	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
 

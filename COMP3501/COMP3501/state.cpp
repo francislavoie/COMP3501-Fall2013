@@ -8,6 +8,7 @@ State::State(bool rotvel_on, State* follow) {
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXQuaternionIdentity(&m_rot);
+	D3DXQuaternionIdentity(&m_prevRot);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_friction = 0.0f;
@@ -56,8 +57,11 @@ void State::SetClimbVel(float vel) { m_posvel.y = vel; }
 void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 void State::SetOrientation(D3DXQUATERNION *orien) { 
-	m_rot *= *orien;
+	m_rot = *orien;
 }
+void State::multiplyOrientation(D3DXQUATERNION *orien){
+	m_rot *= *orien;
+};
 
 void State::ApplyForce(D3DXVECTOR3 force) {
 	m_acceleration += force;
@@ -95,7 +99,7 @@ void State::Update() {
 
 	if (m_follow)
 	{
-		D3DXQUATERNION xrot,yrot,zrot;
+		/*D3DXQUATERNION xrot,yrot,zrot;
 		D3DXQuaternionRotationAxis(&xrot,&m_right,m_rotvel.y);
 		D3DXQuaternionRotationAxis(&yrot,m_follow->GetUp(),m_rotvel.x);
 		rot = yrot * xrot;
@@ -103,8 +107,8 @@ void State::Update() {
 		static D3DXQUATERNION totalRot = rot;
 		totalRot *= rot;
 		D3DXQUATERNION temp;
-		temp = *m_follow->GetRotation();
-		m_rot = temp * totalRot;// * temp;
+		temp = *m_follow->GetRotation();*/
+		//m_rot = temp * totalRot;
 	}
 	else
 	{	
@@ -164,4 +168,6 @@ void State::Update() {
 
 	m_rotvel = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_acceleration = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	m_prevRot = m_rot;
 }

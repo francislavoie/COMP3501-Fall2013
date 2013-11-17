@@ -47,6 +47,7 @@ public:
 	float GetAcceleration() { return D3DXVec3Length(&m_acceleration); }
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetOrientation(D3DXQUATERNION *);
+	void multiplyOrientation(D3DXQUATERNION *);
 
 	void Update();
 
@@ -62,7 +63,7 @@ private:
 	D3DXVECTOR3 m_pos, m_rotvel, m_posvel, m_offset,
 				m_up, m_front, m_right;
 
-	D3DXQUATERNION m_rot;
+	D3DXQUATERNION m_rot, m_prevRot;
 };
 
 #endif
