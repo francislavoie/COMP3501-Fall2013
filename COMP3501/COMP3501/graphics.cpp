@@ -59,7 +59,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Text) return false;
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 5);
+	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, baseViewMatrix, screen, 20);
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
 		return false;
@@ -340,12 +340,17 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		else
 			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
 		m_Camera->toggleFirstPerson();
-
 	}
 	
-	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);	
+	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
 
-	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch(), 4, m_D3D->GetDeviceContext());
+	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
+	if(!result) return false;
+
+	result = m_Text->SetFloat("Yaw Angle", m_Tank->GetYaw() * float(180 / D3DX_PI), 5, m_D3D->GetDeviceContext());
+	if (!result) return false;
+
+	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	/*

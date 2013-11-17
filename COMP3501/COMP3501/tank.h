@@ -62,12 +62,13 @@ public:
 	ID3D11ShaderResourceView* GetTurretTexture() { return turret->GetTexture(); }
 
 	float GetPitch() { return pitch; }
+	float GetYaw() { return yaw; }
 
 private:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;
 	D3DXVECTOR3 turretLookAt;
-	float yaw,pitch;
+	float yaw, pitch;
 
 	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
 

@@ -111,7 +111,8 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
 		m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, 0.0001f));
 		//m_tankState->SetForwardVel(0.05f);
-	} else if(input->IsKeyPressed(DIK_S)){
+	}
+	if(input->IsKeyPressed(DIK_S)){
 		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
 		m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, -0.0001f));
@@ -147,7 +148,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	if ((deltaY < 0 && pitch > -0.75) || (deltaY > 0 && pitch <0.75))
 		pitch += deltaY*0.005f;
 
-		//m_turretState->SetPitch(deltaY*0.01f);*/
+	//m_turretState->SetPitch(deltaY*0.01f);*/
 
 	//m_turretState->SetYaw(rotation);
 
@@ -233,7 +234,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
 
-	D3DXVec3Normalize(&cross,&cross);
+	D3DXVec3Normalize(&cross, &cross);
 
 	D3DXQUATERNION quaternion;
 	D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
@@ -241,20 +242,30 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 
 	m_tankState->Update();
 
+
+
+
 	D3DXQUATERNION orien;
-	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
 
+	D3DXVECTOR3 slope, forward, turretProj;
+	D3DXVec3Cross(&slope, m_tankState->GetUp(), &D3DXVECTOR3(0, 1, 0));
+	D3DXVec3Normalize(&slope, &slope);
+	D3DXVec3Cross(&forward, m_tankState->GetUp(), &slope);
+	D3DXVec3Normalize(&forward, &forward);
+	D3DXVec3Cross(&turretProj, m_tankState->GetUp(), m_turretState->GetForward());
+	D3DXVec3Normalize(&turretProj, &turretProj);
+	D3DXVec3Cross(&turretProj, m_tankState->GetUp(), &turretProj);
+	D3DXVec3Normalize(&turretProj, &turretProj);
 
-	orien = orien * *m_tankState->GetRotation();
-	D3DXVECTOR3 m_front = D3DXVECTOR3(
-		2 * (orien.x * orien.z + orien.w * orien.y), 
-		2 * (orien.y * orien.z - orien.w * orien.x),
-		1 - 2 * (orien.x * orien.x + orien.y * orien.y)
-	);
+	float projangle = acos(abs(D3DXVec3Dot(&turretProj, &forward)));
+	if (D3DXVec3Dot(&turretProj, &forward) < 0) projangle = float(D3DX_PI - projangle);
 
-	float diff = asin(m_turretState->GetForward()->y) - asin(m_front.y);
-	//pitch += diff;
-	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
+	float slopeangle = acos(abs(D3DXVec3Dot(&D3DXVECTOR3(0, 1, 0), &forward)));
+	slopeangle = float(D3DX_PI/2 - slopeangle);
+
+	float pitchOffset = (1 - cos(projangle)) * slopeangle;
+
+	D3DXQuaternionRotationYawPitchRoll(&orien, yaw, pitch - pitchOffset, 0);
 	orien = orien * *m_tankState->GetRotation();
 	m_turretState->SetOrientation(&orien);
 	m_turretState->Update();
