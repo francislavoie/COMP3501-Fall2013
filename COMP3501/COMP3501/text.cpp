@@ -441,3 +441,49 @@ bool Text::SetVector3(char* label, D3DXVECTOR3* vector, int index, ID3D11DeviceC
 
 	return true;
 }
+
+
+bool Text::SetInteger(char* label, int integer, int index, ID3D11DeviceContext* deviceContext) {
+	char tempString[20];
+	char string[64];
+	bool result; 
+
+	strcpy_s(string, label);
+	strcat_s(string, ": ");
+
+	// Convert the integer to string format.
+	_itoa_s(integer, tempString, 10);
+	strcat_s(string, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(&m_sentences[index], string, D3DXVECTOR2(20.0f, float((index+1) * 20)), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), deviceContext);
+	if(!result) return false;
+
+	return true;
+}
+
+
+bool Text::SetFloat(char* label, float floating, int index, ID3D11DeviceContext* deviceContext) {
+	char tempString[20];
+	char string[64];
+	int wholeNum, decimalNum;
+	bool result; 
+
+	strcpy_s(string, label);
+	strcat_s(string, ": ");
+
+	// Convert the x to string format.
+	wholeNum = int(floating);
+	decimalNum = (int) (abs(floating - wholeNum) * 10000);
+	_itoa_s(wholeNum, tempString, 10);
+	strcat_s(string, tempString);
+	strcat_s(string, ".");
+	_itoa_s(decimalNum, tempString, 10);
+	strcat_s(string, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(&m_sentences[index], string, D3DXVECTOR2(20.0f, float((index+1) * 20)), D3DXVECTOR4(1.0f, 1.0f, 0.0f, 1.0f), deviceContext);
+	if(!result) return false;
+
+	return true;
+}
