@@ -248,8 +248,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 		1 - 2 * (orien.x * orien.x + orien.y * orien.y)
 	);
 
-	float theta = asin((m_front.y - m_turretState->GetPosition()->y)/RADIUS);
-	float diff = theta - pitch;
+	float diff = asin(m_turretState->GetForward()->y) - asin(m_front.y);
 	pitch += diff;
 	D3DXQuaternionRotationYawPitchRoll(&orien,yaw,pitch,0);
 	orien = orien * *m_tankState->GetRotation();
