@@ -147,6 +147,24 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	/*D3DXVECTOR3 *forward = m_turretState->GetForward();*/
 	if ((deltaY < 0 && pitch > -0.75) || (deltaY > 0 && pitch <0.75))
 		pitch += deltaY*0.005f;
+	
+	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage;
+	float height;	
+
+	m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
+	float gravity = -0.00003;
+	float y = m_tankState->GetPosition()->y;
+	if (y-(2.5+height)<0 && y-(1.5+height)>0)
+	{
+		gravity = 0;
+	}
+	else if (y-(1.5+height)<0)
+	{
+		//gravity = (979*pow(y,2) - 2959*y+2000)/200;
+		gravity = 0.00005;
+	}
+	float diff = m_tankState->GetPosition()->y-1;
+	m_tankState->ApplyForce(D3DXVECTOR3(0,gravity,0));
 
 	//m_turretState->SetPitch(deltaY*0.01f);*/
 
@@ -157,7 +175,8 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	D3DXQuaternionInverse(&inverse, &quat);
 	D3DXQUATERNION temp;
 	D3DXVECTOR3 output;
-	float garbage;	
+	
+	float garbage;
 
 	temp = quat * D3DXQUATERNION(FRONTRIGHT.x, FRONTRIGHT.y, FRONTRIGHT.z, 0.0f) * inverse;
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
@@ -180,14 +199,13 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	m_center = *m_tankState->GetPosition() + output;
 
 	bool result;
-	float height;
-	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage;
+	
 
 	// Get the height of the triangle that is directly underneath the given tank position.
 	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
 	if(result) {
 		// If there was a triangle under the tank then position the tank just above it by one unit.
-		getTankState()->SetPosition(D3DXVECTOR3(position.x, height + 1.0f, position.z));
+		getTankState()->SetPosition(D3DXVECTOR3(position.x,m_tankState->GetPosition()->y, position.z));
 	}
 
 	int count = 5;
