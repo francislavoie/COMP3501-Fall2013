@@ -9,6 +9,7 @@ Graphics::Graphics() {
 
 	m_Model = 0;
 	m_Model2 = 0;
+	m_Chase = 0;
 	m_Tank = 0;
 
 	m_ShaderManager = 0;
@@ -100,6 +101,17 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
 	}
+
+	m_Chase = new Model;
+	if(!m_Chase) return false;
+
+	// Initialize the model object.
+	result = m_Chase->Initialize(m_D3D->GetDevice(), "data/cube.txt", L"data/Am8.dds");
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
 
 	// Create the model object.
 	m_Tank = new Tank;
@@ -290,6 +302,11 @@ void Graphics::Shutdown() {
 		m_Model = 0;
 	}
 
+	if(m_Chase) {
+		m_Chase->Shutdown();
+		delete m_Chase;
+		m_Chase = 0;
+	}
 	// Release the camera object.
 	if(m_Camera) {
 		delete m_Camera;
@@ -553,6 +570,37 @@ bool Graphics::Render(float time) {
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
 
+
+	////////////////////////////////////////////////////////////////////////////
+	//			Chase Object
+	///////////////////////////////////////////////////////////////////////////
+	static D3DXVECTOR3 chasePosition = D3DXVECTOR3(50,2,50);
+	static float chaserotate = 0.0f;
+	chaserotate += time/1000;
+	D3DXMATRIX localWorldMatrix;
+	
+
+	if (D3DXVec3Length(&(*m_Tank->getTankState()->GetPosition()-chasePosition)) < sqrt(10))
+	{
+		float height;
+		D3DXVECTOR3 vgarbage;
+		chasePosition = D3DXVECTOR3((rand()%2550)/10, 0 ,(rand()%2550)/10);
+		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
+		chasePosition += D3DXVECTOR3(0,height+2,0);
+	}
+
+
+	D3DXMatrixRotationY(&worldMatrix, chaserotate);
+	D3DXMatrixTranslation(&localWorldMatrix,chasePosition.x,chasePosition.y,chasePosition.z);
+	D3DXMatrixMultiply(&localWorldMatrix,&worldMatrix,&localWorldMatrix);
+
+	m_Chase->Render(m_D3D->GetDeviceContext());
+	m_D3D->GetWorldMatrix(worldMatrix);
+
+	m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Chase->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
+		m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if(!result) return false;
 
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();

@@ -60,6 +60,7 @@ private:
 
 	Model* m_Model;
 	Model* m_Model2;
+	Model* m_Chase;
 
 	Bitmap* m_Bitmap;
 	MouseCursor* m_Cursor;
