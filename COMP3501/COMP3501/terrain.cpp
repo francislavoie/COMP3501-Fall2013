@@ -146,7 +146,7 @@ void Terrain::NormalizeHeightMap() {
 
 	for(j=0; j<m_terrainHeight; j++) {
 		for(i=0; i<m_terrainWidth; i++) {
-			m_heightMap[(m_terrainHeight * j) + i].y /= 15.0f;
+			m_heightMap[(m_terrainHeight * j) + i].y /= 10.0f;
 		}
 	}
 

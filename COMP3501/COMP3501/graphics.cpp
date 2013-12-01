@@ -191,7 +191,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Terrain) return false;
 
 	// Initialize the terrain object.
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/heightmap01.bmp", L"data/dirt01.dds");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/terrain04.bmp", L"data/dirt01.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
 		return false;
@@ -638,17 +638,27 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Chase Object
 	///////////////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
+=======
+	static D3DXVECTOR3 chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
+	if (chasePosition.y == -10.0f) {
+		float height;
+		D3DXVECTOR3 vgarbage;
+		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
+		chasePosition.y = height + 2.0f;
+	}
+>>>>>>> f6aa2b9177d7a2e051dae52e3978e42fa0347067
 	static float chaserotate = 0.0f;
-	chaserotate += time/1000;
+	chaserotate += time / 1000.0f;
 	D3DXMATRIX localWorldMatrix, scaleMatrix;
 	
 
 	if (D3DXVec3Length(&(*m_Tank->getTankState()->GetPosition()-chasePosition)) < sqrt(10))	{
 		float height;
 		D3DXVECTOR3 vgarbage;
-		chasePosition = D3DXVECTOR3((rand()%2550)/10, 0, (rand()%2550)/10);
+		chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, 2.0f, (rand() % 312) + 100.0f);
 		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
-		chasePosition += D3DXVECTOR3(0, height+2, 0);
+		chasePosition.y += height;
 	}
 	
 	D3DXMatrixRotationY(&worldMatrix, chaserotate);
@@ -659,12 +669,11 @@ bool Graphics::Render(float time) {
 	m_D3D->GetWorldMatrix(worldMatrix);
 
 	m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Chase->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
-		m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
+		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
 
 	D3DXMatrixScaling(&scaleMatrix, 2.0f, 100.0f, 2.0f);
-	D3DXMatrixRotationY(&worldMatrix, chaserotate);
 	D3DXMatrixTranslation(&localWorldMatrix, chasePosition.x, 0.0f, chasePosition.z);
 	localWorldMatrix = worldMatrix * scaleMatrix * localWorldMatrix;
 
