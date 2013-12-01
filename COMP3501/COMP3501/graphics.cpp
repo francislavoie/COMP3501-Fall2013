@@ -638,8 +638,6 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Chase Object
 	///////////////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
-=======
 	static D3DXVECTOR3 chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
 	if (chasePosition.y == -10.0f) {
 		float height;
@@ -647,7 +645,6 @@ bool Graphics::Render(float time) {
 		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
 		chasePosition.y = height + 2.0f;
 	}
->>>>>>> f6aa2b9177d7a2e051dae52e3978e42fa0347067
 	static float chaserotate = 0.0f;
 	chaserotate += time / 1000.0f;
 	D3DXMATRIX localWorldMatrix, scaleMatrix;
