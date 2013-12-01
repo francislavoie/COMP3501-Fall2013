@@ -22,6 +22,7 @@ Graphics::Graphics() {
 	m_Frustum = 0;
 	m_QuadTree = 0;
 	m_SkyDome = 0;
+	chasePosition = D3DXVECTOR3(50,2,50);
 }
 
 
@@ -377,6 +378,51 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Camera->toggleFirstPerson();
 	}
 	
+	if(input->IsKeyPressed(DIK_W)){
+		m_Tank->moveForward();
+	}
+	if(input->IsKeyPressed(DIK_S)){
+		m_Tank->moveBack();
+	}
+
+	if(input->IsKeyPressed(DIK_A)){
+		m_Tank->turnLeft();
+	}
+	if(input->IsKeyPressed(DIK_D)){
+		m_Tank->turnRight();
+	}
+	D3DXVECTOR3 normal;
+	D3DXVec3Normalize(&normal, &(D3DXVECTOR3(chasePosition.x, 0, chasePosition.z) - D3DXVECTOR3(m_Tank->getTankState()->GetPosition()->x, 0, m_Tank->getTankState()->GetPosition()->z)));
+	D3DXVECTOR3 noY = D3DXVECTOR3(m_Tank->getTankState()->GetForward()->x, 0, m_Tank->getTankState()->GetForward()->z);
+	float angle = acos(D3DXVec3Dot(&normal, &noY));
+
+	D3DXMATRIX turn;
+	D3DXMatrixRotationY(&turn, angle);
+
+	//check which way to rotate
+	D3DXVECTOR3 cross;
+	D3DXVec3Cross(&cross,&normal,&noY);
+	D3DXVec3Normalize(&cross, &cross);
+	if (angle>0.2)
+	{
+		if (cross.y > 0)
+		{
+			m_Tank->turnLeft();
+		}
+		if (cross.y < 0)
+		{
+			m_Tank->turnRight();
+		}
+	}
+
+	if (angle < 0.75)
+	{
+		m_Tank->moveForward();
+	}
+		
+	//else if (angle < -0.15)
+		//m_Tank->turnLeft();
+
 	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
 
 	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
@@ -385,7 +431,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetFloat("Yaw Angle", m_Tank->GetYaw() * float(180 / D3DX_PI), 5, m_D3D->GetDeviceContext());
 	if (!result) return false;
 
-	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
+	result = m_Text->SetFloat("Time", angle, 6, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	/*
@@ -592,7 +638,6 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Chase Object
 	///////////////////////////////////////////////////////////////////////////
-	static D3DXVECTOR3 chasePosition = D3DXVECTOR3(50,2,50);
 	static float chaserotate = 0.0f;
 	chaserotate += time/1000;
 	D3DXMATRIX localWorldMatrix, scaleMatrix;
