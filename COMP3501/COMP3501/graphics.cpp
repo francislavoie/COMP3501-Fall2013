@@ -22,7 +22,7 @@ Graphics::Graphics() {
 	m_Frustum = 0;
 	m_QuadTree = 0;
 	m_SkyDome = 0;
-	chasePosition = D3DXVECTOR3(50,2,50);
+	chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
 }
 
 
@@ -638,7 +638,6 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Chase Object
 	///////////////////////////////////////////////////////////////////////////
-	static D3DXVECTOR3 chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
 	if (chasePosition.y == -10.0f) {
 		float height;
 		D3DXVECTOR3 vgarbage;
