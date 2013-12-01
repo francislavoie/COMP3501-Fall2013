@@ -10,6 +10,7 @@ Graphics::Graphics() {
 	m_Model = 0;
 	m_Model2 = 0;
 	m_Chase = 0;
+	m_Spotlight = 0;
 	m_Tank = 0;
 
 	m_ShaderManager = 0;
@@ -112,6 +113,16 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+
+	m_Spotlight = new Model;
+	if (!m_Spotlight) return false;
+
+	// Initialize the model object.
+	result = m_Spotlight->Initialize(m_D3D->GetDevice(), "data/cylinder.bin", L"data/brightlight.dds");
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the model object.
 	m_Tank = new Tank;
@@ -302,11 +313,18 @@ void Graphics::Shutdown() {
 		m_Model = 0;
 	}
 
+	if (m_Spotlight) {
+		m_Spotlight->Shutdown();
+		delete m_Spotlight;
+		m_Spotlight = 0;
+	}
+
 	if(m_Chase) {
 		m_Chase->Shutdown();
 		delete m_Chase;
 		m_Chase = 0;
 	}
+
 	// Release the camera object.
 	if(m_Camera) {
 		delete m_Camera;
@@ -577,22 +595,20 @@ bool Graphics::Render(float time) {
 	static D3DXVECTOR3 chasePosition = D3DXVECTOR3(50,2,50);
 	static float chaserotate = 0.0f;
 	chaserotate += time/1000;
-	D3DXMATRIX localWorldMatrix;
+	D3DXMATRIX localWorldMatrix, scaleMatrix;
 	
 
-	if (D3DXVec3Length(&(*m_Tank->getTankState()->GetPosition()-chasePosition)) < sqrt(10))
-	{
+	if (D3DXVec3Length(&(*m_Tank->getTankState()->GetPosition()-chasePosition)) < sqrt(10))	{
 		float height;
 		D3DXVECTOR3 vgarbage;
-		chasePosition = D3DXVECTOR3((rand()%2550)/10, 0 ,(rand()%2550)/10);
+		chasePosition = D3DXVECTOR3((rand()%2550)/10, 0, (rand()%2550)/10);
 		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
-		chasePosition += D3DXVECTOR3(0,height+2,0);
+		chasePosition += D3DXVECTOR3(0, height+2, 0);
 	}
-
-
+	
 	D3DXMatrixRotationY(&worldMatrix, chaserotate);
-	D3DXMatrixTranslation(&localWorldMatrix,chasePosition.x,chasePosition.y,chasePosition.z);
-	D3DXMatrixMultiply(&localWorldMatrix,&worldMatrix,&localWorldMatrix);
+	D3DXMatrixTranslation(&localWorldMatrix, chasePosition.x, chasePosition.y, chasePosition.z);
+	D3DXMatrixMultiply(&localWorldMatrix, &worldMatrix, &localWorldMatrix);
 
 	m_Chase->Render(m_D3D->GetDeviceContext());
 	m_D3D->GetWorldMatrix(worldMatrix);
@@ -601,6 +617,27 @@ bool Graphics::Render(float time) {
 		m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
+
+	D3DXMatrixScaling(&scaleMatrix, 2.0f, 100.0f, 2.0f);
+	D3DXMatrixRotationY(&worldMatrix, chaserotate);
+	D3DXMatrixTranslation(&localWorldMatrix, chasePosition.x, 0.0f, chasePosition.z);
+	localWorldMatrix = worldMatrix * scaleMatrix * localWorldMatrix;
+
+	m_Spotlight->Render(m_D3D->GetDeviceContext());
+	m_D3D->GetWorldMatrix(worldMatrix);
+
+	// Turn on the alpha blending before rendering the text.
+	m_D3D->TurnOnAlphaBlending();
+
+	m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Spotlight->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, m_Spotlight->GetTexture());
+	if (!result) return false;
+
+	// Turn off alpha blending after rendering the text.
+	m_D3D->TurnOffAlphaBlending();
+	////////////////////////////////////////////////////////////////////////////
+	//			Chase Object
+	///////////////////////////////////////////////////////////////////////////
+
 
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();
