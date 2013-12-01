@@ -14,6 +14,8 @@ Tank::Tank() {
 	turretLookAt = D3DXVECTOR3(0,0,0);
 	yaw = 0;
 	pitch = 0;
+	forward = 0;
+	turn = 0;
 }
 
 
@@ -106,41 +108,13 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	int scroll;
 	input->GetWheelDelta(scroll);
 
-	if(input->IsKeyPressed(DIK_W)){
-		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, 0.0001f));
-		//m_tankState->SetForwardVel(0.05f);
-	}
-	if(input->IsKeyPressed(DIK_S)){
-		//D3DXVECTOR3 normalForward = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		//D3DXVec3Normalize(&normalForward, m_tankState->getForward());
-		m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, -0.0001f));
-		//m_tankState->SetForwardVel(-0.05f);
-	} else {
-		//m_tankState->SetForwardVel(0.0f);
-	}
-
-	/*if(input->IsKeyPressed(DIK_A)) {
-		m_tankState->SetStrafeVel(-0.05f);
-	} else if(input->IsKeyPressed(DIK_D)) {
-		m_tankState->SetStrafeVel(0.05f);
-	} else {
-		m_tankState->SetStrafeVel(0.0f);
-	}*/
-
+	m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, forward));
 	yaw += deltaX*0.01f;
-	
-	if(input->IsKeyPressed(DIK_A)) {
-		m_tankState->SetYaw(-0.005f * time);
-		yaw += 0.005f * time;
-		//m_turretState->SetYaw(0.005f * time);
-	} else if(input->IsKeyPressed(DIK_D)) {
-		m_tankState->SetYaw(0.005f * time);
-		yaw -= 0.005f * time;
-		//m_turretState->SetYaw(-0.005f * time);
-	} else {
-	}
+	m_tankState->SetYaw(turn * time);
+	yaw -= turn * time;
+
+	forward = 0;
+	turn    = 0;
 
 	//m_turretState->SetYaw(deltaX*0.01f);
 	

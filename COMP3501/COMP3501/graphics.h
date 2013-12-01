@@ -54,6 +54,7 @@ public:
 	bool Render(float);
 
 private:
+	D3DXVECTOR3 chasePosition;
 	int spaceBuffer;
 	D3D* m_D3D;
 	Camera* m_Camera;

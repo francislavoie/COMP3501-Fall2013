@@ -64,11 +64,18 @@ public:
 	float GetPitch() { return pitch; }
 	float GetYaw() { return yaw; }
 
+	void turnLeft(){turn = -0.005f;}
+	void turnRight(){turn = 0.005f;}
+
+	void moveForward(){forward = 0.0001f;}
+	void moveBack(){forward = -0.0001f;}
+
 private:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;
 	D3DXVECTOR3 turretLookAt;
 	float yaw, pitch;
+	float turn, forward;
 
 	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
 
