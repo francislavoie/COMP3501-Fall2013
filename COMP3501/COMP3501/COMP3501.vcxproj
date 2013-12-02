@@ -86,6 +86,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="colorshader.cpp" />
     <ClCompile Include="cpu.cpp" />
+    <ClCompile Include="EnemyTank.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="fontshader.cpp" />
     <ClCompile Include="fps.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="colorshader.h" />
     <ClInclude Include="cpu.h" />
+    <ClInclude Include="EnemyTank.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="fontshader.h" />
     <ClInclude Include="fps.h" />

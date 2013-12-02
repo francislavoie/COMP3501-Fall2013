@@ -25,7 +25,7 @@ Tank::Tank(const Tank& other) { }
 Tank::~Tank() { }
 
 
-bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
+bool Tank::Initialize(D3D* m_D3D, HWND hwnd, QuadTree *m_QuadTree) {
 	bool result;
 
 	// Create the model object.
@@ -58,8 +58,11 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd) {
 	// Create turret state
 	m_turretState = new State(false, m_tankState);
 	if(!m_turretState) return false;
-
-	m_tankState->SetPosition(D3DXVECTOR3(3.0f, 0.0f, 3.0f));
+	
+	float height;
+	D3DXVECTOR3 vgarbage, temp = D3DXVECTOR3((rand() % 312) + 100.0f,0,(rand() % 312) + 100.0f);
+	m_QuadTree->GetHeightAtPosition(temp.x, temp.z, height, vgarbage);
+	m_tankState->SetPosition(D3DXVECTOR3(temp.x, height+2, temp.z));
 	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.22f, 0.0f));
 	turretLookAt = *m_turretState->GetForward() * RADIUS;
 
