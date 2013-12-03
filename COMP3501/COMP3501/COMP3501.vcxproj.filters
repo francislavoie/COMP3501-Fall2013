@@ -190,6 +190,9 @@
     <ClCompile Include="EnemyTank.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="bullet.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mousecursor.h">
@@ -289,6 +292,9 @@
       <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="EnemyTank.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="bullet.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>

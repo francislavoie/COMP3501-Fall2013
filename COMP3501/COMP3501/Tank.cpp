@@ -33,7 +33,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd, QuadTree *m_QuadTree) {
 	if(!baseTank) return false;
 
 	// Initialize the model object.
-	result = baseTank->Initialize(m_D3D->GetDevice(), "data/tank.bin", L"data/bulletrust.dds");
+	result = baseTank->Initialize(m_D3D->GetDevice(), "data/tank.bin", L"data/camo.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
@@ -44,7 +44,7 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd, QuadTree *m_QuadTree) {
 	if(!turret) return false;
 
 	// Initialize the model object.
-	result = turret->Initialize(m_D3D->GetDevice(), "data/turret.bin", L"data/bulletrust.dds");
+	result = turret->Initialize(m_D3D->GetDevice(), "data/turret.bin", L"data/camo.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;

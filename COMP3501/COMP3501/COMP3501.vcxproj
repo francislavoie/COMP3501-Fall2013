@@ -81,6 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="bullet.cpp" />
     <ClCompile Include="bumpmapshader.cpp" />
     <ClCompile Include="bumpmodel.cpp" />
     <ClCompile Include="camera.cpp" />
@@ -116,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
+    <ClInclude Include="bullet.h" />
     <ClInclude Include="bumpmapshader.h" />
     <ClInclude Include="bumpmodel.h" />
     <ClInclude Include="camera.h" />
