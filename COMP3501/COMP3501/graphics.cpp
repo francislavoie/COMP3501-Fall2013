@@ -191,7 +191,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Terrain) return false;
 
 	// Initialize the terrain object.
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/terrain04.bmp", L"data/dirt01.dds");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/terrain05.bmp", L"data/dirt01.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
 		return false;

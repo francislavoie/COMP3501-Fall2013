@@ -17,6 +17,7 @@ const int MAX_TRIANGLES = 10000;
 #include "terrain.h"
 #include "frustum.h"
 #include "shadermanager.h"
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,8 +54,10 @@ public:
 
 private:
 	void CalculateMeshDimensions(int, float&, float&, float&);
-	void CreateTreeNode(NodeType*, float, float, float, ID3D11Device*);
-	int CountTriangles(float, float, float);
+	void CreateTreeNode(NodeType*, vector<int>*, float, float, float, ID3D11Device*);
+	int CountAndAddTrianglesFromVertices(vector<int>*, float, float, float);
+	int CountAndAddTriangles(vector<int>*, vector<int>*, float, float, float);
+	bool HasTrianglesInNode(vector<int>*, float, float, float);
 	bool IsTriangleContained(int, float, float, float);
 	void ReleaseNode(NodeType*);
 	void RenderNode(NodeType*, Frustum*, ID3D11DeviceContext*, ShaderManager*);

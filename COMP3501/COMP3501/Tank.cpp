@@ -126,7 +126,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	float height;	
 
 	m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
-	float gravity = -0.00003;
+	float gravity = -0.00003f;
 	float y = m_tankState->GetPosition()->y;
 	if (y-(2.5+height)<0 && y-(1.5+height)>0)
 	{
@@ -135,7 +135,7 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	else if (y-(1.5+height)<0)
 	{
 		//gravity = (979*pow(y,2) - 2959*y+2000)/200;
-		gravity = 0.00005;
+		gravity = 0.00005f;
 	}
 	float diff = m_tankState->GetPosition()->y-1;
 	m_tankState->ApplyForce(D3DXVECTOR3(0,gravity,0));

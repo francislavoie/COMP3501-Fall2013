@@ -2,6 +2,7 @@
 // Filename: quadtreeclass.h
 ////////////////////////////////////////////////////////////////////////////////
 #include "quadtree.h"
+#include <time.h>
 
 
 QuadTree::QuadTree() {
@@ -42,7 +43,7 @@ bool QuadTree::Initialize(Terrain* terrain, ID3D11Device* device) {
 	if(!m_parentNode) return false;
 
 	// Recursively build the quad tree based on the vertex list data and mesh dimensions.
-	CreateTreeNode(m_parentNode, centerX, centerZ, width, device);
+	CreateTreeNode(m_parentNode, 0, centerX, centerZ, width, device);
 
 	// Release the vertex list since the quad tree now has the vertices in each node.
 	if(m_vertexList) {
@@ -83,7 +84,6 @@ int QuadTree::GetDrawCount() {
 
 
 void QuadTree::CalculateMeshDimensions(int vertexCount, float& centerX, float& centerZ, float& meshWidth) {
-	int i;
 	float maxWidth, maxDepth, minWidth, minDepth, width, depth, maxX, maxZ;
 
 	// Initialize the center position of the mesh to zero.
@@ -91,7 +91,7 @@ void QuadTree::CalculateMeshDimensions(int vertexCount, float& centerX, float& c
 	centerZ = 0.0f;
 
 	// Sum all the vertices in the mesh.
-	for(i=0; i<vertexCount; i++) {
+	for(int i = 0; i < vertexCount; i++) {
 		centerX += m_vertexList[i].position.x;
 		centerZ += m_vertexList[i].position.z;
 	}
@@ -108,7 +108,7 @@ void QuadTree::CalculateMeshDimensions(int vertexCount, float& centerX, float& c
 	minDepth = fabsf(m_vertexList[0].position.z - centerZ);
 
 	// Go through all the vertices and find the maximum and minimum width and depth of the mesh.
-	for(i=0; i<vertexCount; i++) {
+	for(int i = 0; i < vertexCount; i++) {
 		width = fabsf(m_vertexList[i].position.x - centerX);	
 		depth = fabsf(m_vertexList[i].position.z - centerZ);	
 
@@ -129,15 +129,15 @@ void QuadTree::CalculateMeshDimensions(int vertexCount, float& centerX, float& c
 }
 
 
-void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, float width, ID3D11Device* device) {
-	int numTriangles, i, count, vertexCount, index, vertexIndex;
+void QuadTree::CreateTreeNode(NodeType* node, vector<int>* parent, float positionX, float positionZ, float width, ID3D11Device* device) {
+	int numTriangles, i, vertexCount, index, vertexIndex;
 	float offsetX, offsetZ;
 	VertexType* vertices;
 	unsigned long* indices;
-	bool result;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 
+	vector<int> vecindices;
 	
 	// Store the node position and size.
 	node->positionX = positionX;
@@ -161,28 +161,31 @@ void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, 
 	node->nodes[3] = 0;
 
 	// Count the number of triangles that are inside this node.
-	numTriangles = CountTriangles(positionX, positionZ, width);
+	numTriangles = (parent != 0) ? 
+		CountAndAddTriangles(&vecindices, parent, positionX, positionZ, width) : // If has parent
+		CountAndAddTrianglesFromVertices(&vecindices, positionX, positionZ, width); // Base case
 
 	// Case 1: If there are no triangles in this node then return as it is empty and requires no processing.
 	if(numTriangles == 0) return;
 
 	// Case 2: If there are too many triangles in this node then split it into four equal sized smaller tree nodes.
 	if(numTriangles > MAX_TRIANGLES) {
-		for(i=0; i<4; i++) {
+		for(i = 0; i < 4; i++) {
 			// Calculate the position offsets for the new child node.
 			offsetX = (((i % 2) < 1) ? -1.0f : 1.0f) * (width / 4.0f);
 			offsetZ = (((i % 4) < 2) ? -1.0f : 1.0f) * (width / 4.0f);
 
 			// See if there are any triangles in the new node.
-			count = CountTriangles((positionX + offsetX), (positionZ + offsetZ), (width / 2.0f));
-			if(count > 0) {
+			if (HasTrianglesInNode(&vecindices, (positionX + offsetX), (positionZ + offsetZ), (width / 2.0f))) {
 				// If there are triangles inside where this new node would be then create the child node.
 				node->nodes[i] = new NodeType;
 
 				// Extend the tree starting from this new child node now.
-				CreateTreeNode(node->nodes[i], (positionX + offsetX), (positionZ + offsetZ), (width / 2.0f), device);
+				CreateTreeNode(node->nodes[i], &vecindices, (positionX + offsetX), (positionZ + offsetZ), (width / 2.0f), device);
 			}
 		}
+
+		vecindices.clear();
 
 		return;
 	}
@@ -207,47 +210,43 @@ void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, 
 	index = 0;
 
 	// Go through all the triangles in the vertex list.
-	for(i = 0; i < m_triangleCount; i++) {
-		// If the triangle is inside this node then add it to the vertex array.
-		result = IsTriangleContained(i, positionX, positionZ, width);
-		if(result == true) {
-			// Calculate the index into the terrain vertex list.
-			vertexIndex = i * 3;
+	for (int i : vecindices) {
+		// Calculate the index into the terrain vertex list.
+		vertexIndex = i * 3;
 
-			// Get the three vertices of this triangle from the vertex list.
-			vertices[index].position = m_vertexList[vertexIndex].position;
-			vertices[index].texture = m_vertexList[vertexIndex].texture;
-			vertices[index].normal = m_vertexList[vertexIndex].normal;
-			indices[index] = index;
+		// Get the three vertices of this triangle from the vertex list.
+		vertices[index].position = m_vertexList[vertexIndex].position;
+		vertices[index].texture = m_vertexList[vertexIndex].texture;
+		vertices[index].normal = m_vertexList[vertexIndex].normal;
+		indices[index] = index;
 
-			// Also store the vertex position information in the node vertex array.
-			node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
-			node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
-			node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
-			index++;
-			vertexIndex++;
+		// Also store the vertex position information in the node vertex array.
+		node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
+		node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
+		node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
+		index++;
+		vertexIndex++;
 
-			// Do the same for the next point.
-			vertices[index].position = m_vertexList[vertexIndex].position;
-			vertices[index].texture = m_vertexList[vertexIndex].texture;
-			vertices[index].normal = m_vertexList[vertexIndex].normal;
-			indices[index] = index;
-			node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
-			node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
-			node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
-			index++;
-			vertexIndex++;
+		// Do the same for the next point.
+		vertices[index].position = m_vertexList[vertexIndex].position;
+		vertices[index].texture = m_vertexList[vertexIndex].texture;
+		vertices[index].normal = m_vertexList[vertexIndex].normal;
+		indices[index] = index;
+		node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
+		node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
+		node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
+		index++;
+		vertexIndex++;
 
-			// Do the same for the next point.
-			vertices[index].position = m_vertexList[vertexIndex].position;
-			vertices[index].texture = m_vertexList[vertexIndex].texture;
-			vertices[index].normal = m_vertexList[vertexIndex].normal;
-			indices[index] = index;
-			node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
-			node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
-			node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
-			index++;
-		}
+		// Do the same for the next point.
+		vertices[index].position = m_vertexList[vertexIndex].position;
+		vertices[index].texture = m_vertexList[vertexIndex].texture;
+		vertices[index].normal = m_vertexList[vertexIndex].normal;
+		indices[index] = index;
+		node->vertexArray[index].x = m_vertexList[vertexIndex].position.x;
+		node->vertexArray[index].y = m_vertexList[vertexIndex].position.y;
+		node->vertexArray[index].z = m_vertexList[vertexIndex].position.z;
+		index++;
 	}
 
 	// Set up the description of the vertex buffer.
@@ -293,21 +292,36 @@ void QuadTree::CreateTreeNode(NodeType* node, float positionX, float positionZ, 
 }
 
 
-int QuadTree::CountTriangles(float positionX, float positionZ, float width) {
-	int count, i;
-	bool result;
-	
-	// Initialize the count to zero.
-	count = 0;
-
+bool QuadTree::HasTrianglesInNode(vector<int>* node, float positionX, float positionZ, float width) {
 	// Go through all the triangles in the entire mesh and check which ones should be inside this node.
-	for(i = 0; i < m_triangleCount; i++) {
+	for (int i : *node) {
 		// If the triangle is inside the node then increment the count by one.
-		result = IsTriangleContained(i, positionX, positionZ, width);
-		if(result == true) count++;
+		if (IsTriangleContained(i, positionX, positionZ, width)) return true;
 	}
 
-	return count;
+	return false;
+}
+
+
+int QuadTree::CountAndAddTrianglesFromVertices(vector<int>* node, float positionX, float positionZ, float width) {
+	// Go through all the triangles in the entire mesh and check which ones should be inside this node.
+	for (int i = 0; i < m_triangleCount; i++) {
+		// If the triangle is inside the node then increment the count by one.
+		if (IsTriangleContained(i, positionX, positionZ, width)) node->push_back(i);
+	}
+
+	return node->size();
+}
+
+
+int QuadTree::CountAndAddTriangles(vector<int>* node, vector<int>* parent, float positionX, float positionZ, float width) {
+	// Go through all the triangles in the entire mesh and check which ones should be inside this node.
+	for (int i : *parent) {
+		// If the triangle is inside the node then increment the count by one.
+		if (IsTriangleContained(i, positionX, positionZ, width)) node->push_back(i);
+	}
+
+	return node->size();
 }
 
 

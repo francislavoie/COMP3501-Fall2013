@@ -146,7 +146,9 @@ void Terrain::NormalizeHeightMap() {
 
 	for(j=0; j<m_terrainHeight; j++) {
 		for(i=0; i<m_terrainWidth; i++) {
-			m_heightMap[(m_terrainHeight * j) + i].y /= 10.0f;
+			m_heightMap[(m_terrainHeight * j) + i].x *= 2.0f;
+			m_heightMap[(m_terrainHeight * j) + i].y /= 5.0f;
+			m_heightMap[(m_terrainHeight * j) + i].z *= 2.0f;
 		}
 	}
 
@@ -162,7 +164,7 @@ bool Terrain::CalculateNormals() {
 
 	// Create a temporary array to hold the un-normalized normal vectors.
 	normals = new VectorType[(m_terrainHeight-1) * (m_terrainWidth-1)];
-	if(!normals)	return false;
+	if(!normals) return false;
 
 	// Go through all the faces in the mesh and calculate their normals.
 	for(j=0; j<(m_terrainHeight-1); j++) {

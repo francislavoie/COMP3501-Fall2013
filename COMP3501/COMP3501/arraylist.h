@@ -157,16 +157,16 @@ void ArrayList<T>::shrinkIfShould()
 	if (arraySize < 5)
 		return;
 
-	if (size < 2 * arraySize)
+	if (size < arraySize / 2)
 	{
-		arraySize *= 2;
-		T** objects = new T* [arraySize];
-		for (int i=0;i<size;i++)
+		arraySize /= 2;
+		T** objects = new T*[arraySize];
+		for (int i = 0; i<size; i++)
 		{
 			objects[i] = items[i];
 		}
 
-		delete [] items;
+		delete[] items;
 		items = objects;
 	}
 }
