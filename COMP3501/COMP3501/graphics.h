@@ -4,6 +4,7 @@
 #ifndef _GRAPHICSCLASS_H_
 #define _GRAPHICSCLASS_H_
 
+const int NUM_ENEMYS = 5;
 
 ///////////////////////
 // MY CLASS INCLUDES //
@@ -26,7 +27,7 @@
 #include "tank.h"
 #include "terrain.h"
 #include "skydome.h"
-
+#include "EnemyTank.h"
 
 /////////////
 // GLOBALS //
@@ -71,10 +72,11 @@ private:
 	Light* m_Light;
 
 	Text* m_Text;
-	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
 	Tank* m_Tank;
+
+	EnemyTank *m_Enemies[NUM_ENEMYS];
 
 	Terrain* m_Terrain;
 	QuadTree* m_QuadTree;

@@ -18,7 +18,6 @@ Graphics::Graphics() {
 	m_Bitmap = 0;
 	m_Cursor = 0;
 	m_Text = 0;
-	m_ModelList = 0;
 	m_Frustum = 0;
 	m_QuadTree = 0;
 	m_SkyDome = 0;
@@ -125,19 +124,6 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
-	// Create the model object.
-	m_Tank = new Tank;
-	if(!m_Tank) return false;
-
-	// Initialize the model object.
-	result = m_Tank->Initialize(m_D3D, hwnd);
-	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the tank object.", L"Error", MB_OK);
-		return false;
-	}
-
-	m_Camera->setFollow(m_Tank->getTurretState());
-
 	// Create the light object.
 	m_Light = new Light;
 	if(!m_Light) return false;
@@ -168,17 +154,6 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	result = m_Cursor->Initialize(m_D3D->GetDevice(), screen, L"data/cursor.dds", baseViewMatrix, D3DXVECTOR2(25, 25));
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the model list object.
-	m_ModelList = new ModelList;
-	if(!m_ModelList) return false;
-
-	// Initialize the model list object.
-	result = m_ModelList->Initialize(500);
-	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the model list object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -219,6 +194,31 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+	// Create the model object.
+	m_Tank = new Tank;
+	if(!m_Tank) return false;
+
+	// Initialize the model object.
+	result = m_Tank->Initialize(m_D3D, hwnd, m_QuadTree);
+	if(!result) {
+		MessageBox(hwnd, L"Could not initialize the tank object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Camera->setFollow(m_Tank->getTurretState());
+
+	for (int i=0; i< NUM_ENEMYS; i++)
+	{
+		m_Enemies[i] = new EnemyTank();
+		if(!m_Enemies[i]) return false;
+			result = m_Enemies[i]->Initialize(m_D3D, hwnd, m_QuadTree);
+		if(!result) {
+			MessageBox(hwnd, L"Could not initialize the enemytank object.", L"Error", MB_OK);
+			return false;
+		}
+		m_Enemies[i]->setRelicPosition(&chasePosition);
+	}
+
 	return true;
 }
 
@@ -243,13 +243,6 @@ void Graphics::Shutdown() {
 	if(m_Frustum) {
 		delete m_Frustum;
 		m_Frustum = 0;
-	}
-
-	// Release the model list object.
-	if(m_ModelList) {
-		m_ModelList->Shutdown();
-		delete m_ModelList;
-		m_ModelList = 0;
 	}
 
 	// Release the text object.
@@ -299,6 +292,13 @@ void Graphics::Shutdown() {
 		delete m_Tank;
 		m_Tank = 0;
 	}
+
+	for (int i=0; i< NUM_ENEMYS; i++)
+	{
+		m_Enemies[i]->Shutdown();
+		delete m_Enemies[i];
+	}
+	//delete [] m_Enemies;
 
 	// Release the model object.
 	if(m_Model2) {
@@ -391,39 +391,12 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	if(input->IsKeyPressed(DIK_D)){
 		m_Tank->turnRight();
 	}
-	D3DXVECTOR3 normal;
-	D3DXVec3Normalize(&normal, &(D3DXVECTOR3(chasePosition.x, 0, chasePosition.z) - D3DXVECTOR3(m_Tank->getTankState()->GetPosition()->x, 0, m_Tank->getTankState()->GetPosition()->z)));
-	D3DXVECTOR3 noY = D3DXVECTOR3(m_Tank->getTankState()->GetForward()->x, 0, m_Tank->getTankState()->GetForward()->z);
-	float angle = acos(D3DXVec3Dot(&normal, &noY));
-
-	D3DXMATRIX turn;
-	D3DXMatrixRotationY(&turn, angle);
-
-	//check which way to rotate
-	D3DXVECTOR3 cross;
-	D3DXVec3Cross(&cross,&normal,&noY);
-	D3DXVec3Normalize(&cross, &cross);
-	if (angle>0.2)
-	{
-		if (cross.y > 0)
-		{
-			m_Tank->turnLeft();
-		}
-		if (cross.y < 0)
-		{
-			m_Tank->turnRight();
-		}
-	}
-
-	if (angle < 0.75)
-	{
-		m_Tank->moveForward();
-	}
-		
-	//else if (angle < -0.15)
-		//m_Tank->turnLeft();
-
+	
 	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		m_Enemies[i]->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
+	}
 
 	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
 	if(!result) return false;
@@ -431,7 +404,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetFloat("Yaw Angle", m_Tank->GetYaw() * float(180 / D3DX_PI), 5, m_D3D->GetDeviceContext());
 	if (!result) return false;
 
-	result = m_Text->SetFloat("Time", angle, 6, m_D3D->GetDeviceContext());
+	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
 	/*
@@ -535,67 +508,8 @@ bool Graphics::Render(float time) {
 	// Render the terrain using the quad tree and terrain shader.
 	m_QuadTree->Render(m_Frustum, m_D3D->GetDeviceContext(), m_ShaderManager);
 
-	// Get the number of models that will be rendered.
-	modelCount = m_ModelList->GetModelCount();
-
 	// Initialize the count of models that have been rendered.
 	renderCount = 0;
-
-	// Go through all the models and render them only if they can be seen by the camera view.
-	for(index=0; index < modelCount; index++) {
-		// Get the position and color of the sphere model at this index.
-		m_ModelList->GetData(index, position, color, rotation, visible, modelType, time);
-
-		// If the model is visible, display it
-		if (visible) {
-			// Set the radius of the sphere to 1.0 since this is already known.
-			radius = 1.0f;
-	
-			// Check if the asteroid model is in the view frustum.
-			renderModel = m_Frustum->CheckSphere(position.x, position.y, position.z, radius);
-	
-			// Check if asteroid collides with ship
-			if(m_ModelList->GetDistance(index, m_Camera->GetPosition()) < radius + 2.0f) {
-				m_ModelList->Hide(index);
-			}
-	
-			// Check if asteroid collides with tank
-			/*if(m_ModelList->GetDistance(index, tankPosition) < radius + 0.15f) {
-				m_ModelList->Hide(index);
-			}*/
-	
-			// If it can be seen then render it, if not skip this model and check the next sphere.
-			if(renderModel) {
-				D3DXMATRIX local, rot, tran;
-	
-				// Rotate the model
-				D3DXMatrixRotationQuaternion(&rot, &rotation);
-	
-				// Move the model to the location it should be rendered at.
-				D3DXMatrixTranslation(&tran, position.x, position.y, position.z); 
-	
-				// Compose the transformations
-				local = rot * tran * worldMatrix;
-	
-				// Draw model based on type
-				if(modelType == 0) {
-					m_Model->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
-						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-				} else {
-					m_Model2->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						m_Model2->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
-						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-				}
-	
-				
-				// Since this model was rendered then increase the count for this frame.
-				renderCount++;
-			}
-		}
-	}
 
 	// Set the number of models that was actually rendered this frame.
 	result = m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), 2, m_D3D->GetDeviceContext());
@@ -604,15 +518,15 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
-	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix;
+	D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix, localWorldMatrix;
 	D3DXMatrixRotationQuaternion(&rotationMatrix, m_Tank->getTankState()->GetRotation());
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
 	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTankState()->GetPosition()->x, m_Tank->getTankState()->GetPosition()->y, m_Tank->getTankState()->GetPosition()->z);
-	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+	localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 	
 	m_Tank->RenderTank(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTankIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTankIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
 		m_Tank->GetTankTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -621,10 +535,10 @@ bool Graphics::Render(float time) {
 	
 	m_D3D->GetWorldMatrix(worldMatrix);
 	D3DXMatrixTranslation(&translationMatrix, m_Tank->getTurretState()->GetPosition()->x, m_Tank->getTurretState()->GetPosition()->y, m_Tank->getTurretState()->GetPosition()->z);
-	worldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+	localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 
 	m_Tank->RenderTurret(m_D3D->GetDeviceContext());
-	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTurretIndexCount(), worldMatrix, viewMatrix, projectionMatrix, 
+	result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->GetTurretIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
 		m_Tank->GetTurretTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if(!result) return false;
@@ -633,6 +547,36 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Tank DRAWING
 	////////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////////////////
+	//			Enemy Tank DRAWING
+	////////////////////////////////////////////////////////////////////////////
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		D3DXMatrixRotationQuaternion(&rotationMatrix, m_Enemies[i]->getTankState()->GetRotation());
+	
+		m_D3D->GetWorldMatrix(worldMatrix);
+		D3DXMatrixTranslation(&translationMatrix, m_Enemies[i]->getTankState()->GetPosition()->x, m_Enemies[i]->getTankState()->GetPosition()->y,m_Enemies[i]->getTankState()->GetPosition()->z);
+		localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+	
+		m_Enemies[i]->RenderTank(m_D3D->GetDeviceContext());
+		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Enemies[i]->GetTankIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
+			m_Enemies[i]->GetTankTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+		if(!result) return false;
+
+		D3DXMatrixRotationQuaternion(&rotationMatrix, m_Enemies[i]->getTurretState()->GetRotation());
+	
+		m_D3D->GetWorldMatrix(worldMatrix);
+		D3DXMatrixTranslation(&translationMatrix, m_Enemies[i]->getTurretState()->GetPosition()->x, m_Enemies[i]->getTurretState()->GetPosition()->y, m_Enemies[i]->getTurretState()->GetPosition()->z);
+		localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+
+		m_Tank->RenderTurret(m_D3D->GetDeviceContext());
+		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Enemies[i]->GetTurretIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
+			m_Enemies[i]->GetTurretTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	}
 
 
 	////////////////////////////////////////////////////////////////////////////
@@ -646,7 +590,7 @@ bool Graphics::Render(float time) {
 	}
 	static float chaserotate = 0.0f;
 	chaserotate += time / 1000.0f;
-	D3DXMATRIX localWorldMatrix, scaleMatrix;
+	D3DXMATRIX scaleMatrix;
 	
 
 	if (D3DXVec3Length(&(*m_Tank->getTankState()->GetPosition()-chasePosition)) < sqrt(10))	{

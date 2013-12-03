@@ -48,11 +48,11 @@ public:
 	Tank(const Tank &);
 	~Tank();
 
-	bool Initialize(D3D*, HWND);
+	bool Initialize(D3D*, HWND, QuadTree *);
 	void Shutdown();
 	void RenderTank(ID3D11DeviceContext*);
 	void RenderTurret(ID3D11DeviceContext*);
-	void Update(Input*,float, float, bool, QuadTree *);
+	virtual void Update(Input*,float, float, bool, QuadTree *);
 	State *getTankState() {return m_tankState;}
 	State *getTurretState() {return m_turretState;}
 
@@ -70,7 +70,7 @@ public:
 	void moveForward(){forward = 0.0001f;}
 	void moveBack(){forward = -0.0001f;}
 
-private:
+protected:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;
 	D3DXVECTOR3 turretLookAt;

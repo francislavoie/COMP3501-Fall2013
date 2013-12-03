@@ -187,6 +187,9 @@
     <ClCompile Include="skydomeshader.cpp">
       <Filter>Source Files\Graphics\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyTank.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mousecursor.h">
@@ -284,6 +287,9 @@
     </ClInclude>
     <ClInclude Include="skydomeshader.h">
       <Filter>Header Files\Graphics\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyTank.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
