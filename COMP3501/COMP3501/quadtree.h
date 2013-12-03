@@ -8,7 +8,7 @@
 /////////////
 // GLOBALS //
 /////////////
-const int MAX_TRIANGLES = 10000;
+const int MAX_TRIANGLES = 2500;
 
 
 ///////////////////////

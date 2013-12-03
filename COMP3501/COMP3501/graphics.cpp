@@ -453,10 +453,8 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 bool Graphics::Render(float time) {
 	D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
-	bool renderModel, result, visible;
-	int modelCount, renderCount, index, modelType;
-	float radius;
-	D3DXVECTOR4 color;
+	bool result;
+	int renderCount;
 	D3DXVECTOR3 position, cameraPosition;
 	D3DXQUATERNION rotation;
 
