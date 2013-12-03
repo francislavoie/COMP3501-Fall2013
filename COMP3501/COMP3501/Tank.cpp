@@ -16,6 +16,8 @@ Tank::Tank() {
 	pitch = 0;
 	forward = 0;
 	turn = 0;
+	moveSpeed = 0.005f;
+	turnSpeed = 0.001f;
 }
 
 
@@ -286,4 +288,23 @@ int Tank::GetTankIndexCount() {
 
 int Tank::GetTurretIndexCount() {
 	return turret->GetIndexCount();
+}
+
+void Tank::checknResolveTankCollision(Tank* other)
+{
+	D3DXVECTOR3 plane = *m_tankState->GetPosition()-*other->getTankState()->GetPosition();
+	D3DXVECTOR3 thisperpendicular,thisparallel, otherperpendicular, otherparallel, result;
+	if (D3DXVec3Length(&plane) < sqrt(8))
+	{
+		D3DXVec3Normalize(&plane,&plane);
+		thisperpendicular = plane*D3DXVec3Dot(&plane, &(m_tankState->GetPosVel()));
+		thisparallel = m_tankState->GetPosVel() - thisperpendicular;
+		otherperpendicular = plane*D3DXVec3Dot(&plane, &(other->getTankState()->GetPosVel()));
+		otherparallel = other->getTankState()->GetPosVel() - otherperpendicular;
+
+		result = (thisperpendicular - otherperpendicular)*0.75;
+
+		m_tankState->SetPosVel(thisparallel - result);
+		other->getTankState()->SetPosVel(otherparallel + result);
+	}
 }

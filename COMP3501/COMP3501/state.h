@@ -28,6 +28,8 @@ public:
 	D3DXVECTOR3* GetPosition();
 	D3DXQUATERNION* GetRotation();
 
+	void SetPosVel(D3DXVECTOR3);
+
 	void SetOffset(D3DXVECTOR3);
 
 	void SetTime(float);

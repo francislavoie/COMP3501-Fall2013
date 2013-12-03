@@ -39,7 +39,10 @@ D3DXVECTOR3 State::GetOffset() { return m_offset; }
 D3DXVECTOR3 *State::GetPosition() { return &m_pos; }
 D3DXQUATERNION *State::GetRotation() { return &m_rot; }
 
-
+void State::SetPosVel(D3DXVECTOR3 newVel)
+{
+	m_posvel = newVel;
+}
 
 
 void State::SetOffset(D3DXVECTOR3 offset) { 

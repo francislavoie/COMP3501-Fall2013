@@ -407,6 +407,15 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		m_Tank->checknResolveTankCollision(m_Enemies[i]);
+		for (int j=i+1; j<NUM_ENEMYS; j++)
+		{
+			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
+		}
+	}
+
 	/*
 	// Mouse controls
 	m_Camera->Yaw(deltaX * 0.005f);
