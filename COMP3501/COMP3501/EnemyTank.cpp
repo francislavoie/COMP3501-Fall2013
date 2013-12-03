@@ -4,6 +4,8 @@ EnemyTank::EnemyTank()
 {
 	relicPosition = &D3DXVECTOR3(-1,0,0);
 	Tank();
+	moveSpeed *= 0.9f;
+	turnSpeed *= 0.9f;
 }
 EnemyTank::EnemyTank(const EnemyTank&){}
 EnemyTank::~EnemyTank(){}
@@ -26,7 +28,7 @@ void EnemyTank::Update(Input* input,float time, float rotation, bool firstPerson
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross,&normal,&noY);
 	D3DXVec3Normalize(&cross, &cross);
-	if (angle>0.2)
+/*	if (angle>0.2)
 	{
 		if (cross.y > 0)
 		{
@@ -37,7 +39,7 @@ void EnemyTank::Update(Input* input,float time, float rotation, bool firstPerson
 			turnRight();
 		}
 	}
-	moveForward();
+	moveForward();*/
 
 	Tank::Update(input,time,rotation,firstPerson,m_QuadTree);
 }

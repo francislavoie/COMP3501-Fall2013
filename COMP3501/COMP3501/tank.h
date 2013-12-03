@@ -70,12 +70,16 @@ public:
 	void moveForward(){forward = 0.0001f;}
 	void moveBack(){forward = -0.0001f;}
 
+	void checknResolveTankCollision(Tank*);
+
 protected:
 	Model *baseTank, *turret;
 	State *m_tankState, *m_turretState;
 	D3DXVECTOR3 turretLookAt;
 	float yaw, pitch;
 	float turn, forward;
+	float moveSpeed;
+	float turnSpeed;
 
 	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
 
