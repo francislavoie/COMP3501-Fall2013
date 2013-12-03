@@ -18,7 +18,6 @@ Graphics::Graphics() {
 	m_Bitmap = 0;
 	m_Cursor = 0;
 	m_Text = 0;
-	m_ModelList = 0;
 	m_Frustum = 0;
 	m_QuadTree = 0;
 	m_SkyDome = 0;
@@ -158,17 +157,6 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
-	// Create the model list object.
-	m_ModelList = new ModelList;
-	if(!m_ModelList) return false;
-
-	// Initialize the model list object.
-	result = m_ModelList->Initialize(500);
-	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the model list object.", L"Error", MB_OK);
-		return false;
-	}
-
 	// Create the frustum object.
 	m_Frustum = new Frustum;
 	if(!m_Frustum) return false;
@@ -255,13 +243,6 @@ void Graphics::Shutdown() {
 	if(m_Frustum) {
 		delete m_Frustum;
 		m_Frustum = 0;
-	}
-
-	// Release the model list object.
-	if(m_ModelList) {
-		m_ModelList->Shutdown();
-		delete m_ModelList;
-		m_ModelList = 0;
 	}
 
 	// Release the text object.
@@ -527,67 +508,8 @@ bool Graphics::Render(float time) {
 	// Render the terrain using the quad tree and terrain shader.
 	m_QuadTree->Render(m_Frustum, m_D3D->GetDeviceContext(), m_ShaderManager);
 
-	// Get the number of models that will be rendered.
-	modelCount = m_ModelList->GetModelCount();
-
 	// Initialize the count of models that have been rendered.
 	renderCount = 0;
-
-	// Go through all the models and render them only if they can be seen by the camera view.
-	for(index=0; index < modelCount; index++) {
-		// Get the position and color of the sphere model at this index.
-		m_ModelList->GetData(index, position, color, rotation, visible, modelType, time);
-
-		// If the model is visible, display it
-		if (visible) {
-			// Set the radius of the sphere to 1.0 since this is already known.
-			radius = 1.0f;
-	
-			// Check if the asteroid model is in the view frustum.
-			renderModel = m_Frustum->CheckSphere(position.x, position.y, position.z, radius);
-	
-			// Check if asteroid collides with ship
-			if(m_ModelList->GetDistance(index, m_Camera->GetPosition()) < radius + 2.0f) {
-				m_ModelList->Hide(index);
-			}
-	
-			// Check if asteroid collides with tank
-			/*if(m_ModelList->GetDistance(index, tankPosition) < radius + 0.15f) {
-				m_ModelList->Hide(index);
-			}*/
-	
-			// If it can be seen then render it, if not skip this model and check the next sphere.
-			if(renderModel) {
-				D3DXMATRIX local, rot, tran;
-	
-				// Rotate the model
-				D3DXMatrixRotationQuaternion(&rot, &rotation);
-	
-				// Move the model to the location it should be rendered at.
-				D3DXMatrixTranslation(&tran, position.x, position.y, position.z); 
-	
-				// Compose the transformations
-				local = rot * tran * worldMatrix;
-	
-				// Draw model based on type
-				if(modelType == 0) {
-					m_Model->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						m_Model->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
-						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-				} else {
-					m_Model2->Render(m_D3D->GetDeviceContext());
-					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix, 
-						m_Model2->GetTexture(), m_Light->GetDirection(), D3DXVECTOR4(color.x * 0.15f, color.y * 0.15f, color.z * 0.15f, 1.0f), color, 
-						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-				}
-	
-				
-				// Since this model was rendered then increase the count for this frame.
-				renderCount++;
-			}
-		}
-	}
 
 	// Set the number of models that was actually rendered this frame.
 	result = m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), 2, m_D3D->GetDeviceContext());

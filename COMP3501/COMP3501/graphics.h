@@ -72,7 +72,6 @@ private:
 	Light* m_Light;
 
 	Text* m_Text;
-	ModelList* m_ModelList;
 	Frustum* m_Frustum;
 
 	Tank* m_Tank;
