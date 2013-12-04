@@ -223,7 +223,7 @@ void Tank::Update(Input* input,float time, float rotation, QuadTree *m_QuadTree)
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->GetUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
 	angle /= 15.0f;// * time;
 
-	if (angle > 0.02f)
+	if (angle > 0.0175f)
 	{
 		D3DXVECTOR3 cross;
 		D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
@@ -289,19 +289,35 @@ int Tank::GetTurretIndexCount() {
 
 void Tank::checknResolveTankCollision(Tank* other)
 {
-	D3DXVECTOR3 plane = *m_tankState->GetPosition()-*other->getTankState()->GetPosition();
-	D3DXVECTOR3 thisperpendicular,thisparallel, otherperpendicular, otherparallel, result;
-	if (D3DXVec3Length(&plane) < 4)
+	State *otherState = other->getTankState();
+	D3DXVECTOR3 plane = *m_tankState->GetPosition()-*otherState->GetPosition();
+	float distance = D3DXVec3Length(&plane);
+	if (distance < 2)
 	{
 		D3DXVec3Normalize(&plane,&plane);
-		thisperpendicular = plane*D3DXVec3Dot(&plane, &(m_tankState->GetPosVel()));
-		thisparallel = m_tankState->GetPosVel() - thisperpendicular;
-		otherperpendicular = plane*D3DXVec3Dot(&plane, &(other->getTankState()->GetPosVel()));
-		otherparallel = other->getTankState()->GetPosVel() - otherperpendicular;
+		D3DXVECTOR3 thisperp,thispar,thisvel,otherperp,otherpar,othervel, result, thisnorm, othernorm, resultnorm;
+		thisvel = m_tankState->GetPosVel();
+		othervel = otherState->GetPosVel();
 
-		result = (thisperpendicular - otherperpendicular)*0.50;
+		thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
+		thispar = thisvel - thisperp;
 
-		m_tankState->SetPosVel(thisparallel - result);
-		other->getTankState()->SetPosVel(otherparallel + result);
+		otherperp = plane * D3DXVec3Dot(&plane,&othervel);
+		otherpar = othervel - otherperp;
+
+		result = (thisperp-otherperp) * 0.5f;
+
+		m_tankState->SetPosVel(thispar - result);
+		other->getTankState()->SetPosVel(otherpar + result);
+
+		//D3DXVec3Normalize(&thisnorm,&thisvel);
+		//D3DXVec3Normalize(&othernorm,&othervel);
+		//D3DXVec3Normalize(&resultnorm,&result);
+
+		//float ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
+
+		//m_tankState->AddtoPosition((resultnorm - thisnorm) * distance * ratio);
+		//otherState->AddtoPosition((othernorm - resultnorm) * distance * (1-ratio));
+
 	}
 }

@@ -396,6 +396,15 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	if(input->IsKeyPressed(DIK_D)){
 		m_Tank->turnRight();
 	}
+
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		m_Tank->checknResolveTankCollision(m_Enemies[i]);
+		for (int j=i+1; j<NUM_ENEMYS; j++)
+		{
+			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
+		}
+	}
 	
 	m_Tank->Update(input, time, rotation, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
@@ -411,15 +420,6 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
 	if(!result) return false;
-
-	for (int i=0; i<NUM_ENEMYS; i++)
-	{
-		m_Tank->checknResolveTankCollision(m_Enemies[i]);
-		for (int j=i+1; j<NUM_ENEMYS; j++)
-		{
-			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
-		}
-	}
 
 	/*
 	// Mouse controls

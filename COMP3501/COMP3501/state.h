@@ -38,9 +38,9 @@ public:
 	void SetPitch(float);
 	void SetRoll(float);
 
-	void SetStrafeVel(float);
-	void SetClimbVel(float);
-	void SetForwardVel(float);
+//	void SetStrafeVel(float);
+//	void SetClimbVel(float);
+//	void SetForwardVel(float);
 	void SetFriction(float rate) { m_friction = rate; }
 	void ApplyForce(D3DXVECTOR3);
 	D3DXVECTOR3* GetForward() { return &m_front; }
@@ -48,6 +48,7 @@ public:
 	D3DXVECTOR3* GetRight() { return &m_right; }
 	float GetAcceleration() { return D3DXVec3Length(&m_acceleration); }
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
+	void AddtoPosition(D3DXVECTOR3 change) {m_pos += change;}
 	void SetOrientation(D3DXQUATERNION *);
 	void multiplyOrientation(D3DXQUATERNION *);
 

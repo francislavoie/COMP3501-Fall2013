@@ -55,9 +55,9 @@ void State::SetYaw(float angle) { m_rotvel.x += angle; }
 void State::SetPitch(float angle) { m_rotvel.y += angle; }
 void State::SetRoll(float angle) { m_rotvel.z += angle; }
 
-void State::SetStrafeVel(float vel) { m_posvel.x = vel; }
-void State::SetClimbVel(float vel) { m_posvel.y = vel; }
-void State::SetForwardVel(float vel) { m_posvel.z = vel; }
+//void State::SetStrafeVel(float vel) { m_posvel.x = vel; }
+//void State::SetClimbVel(float vel) { m_posvel.y = vel; }
+//void State::SetForwardVel(float vel) { m_posvel.z = vel; }
 
 void State::SetOrientation(D3DXQUATERNION *orien) { 
 	m_rot = *orien;
