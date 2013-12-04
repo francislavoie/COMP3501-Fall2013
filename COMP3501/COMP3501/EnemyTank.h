@@ -10,7 +10,7 @@ public:
 	EnemyTank(const EnemyTank&);
 	~EnemyTank();
 	void setRelicPosition(D3DXVECTOR3 *);
-	void Update(Input*,float, float, bool, QuadTree *);
+	void Update(Input*,float, float, QuadTree *);
 private:
 	D3DXVECTOR3* relicPosition;
 

@@ -52,7 +52,7 @@ public:
 	void Shutdown();
 	void RenderTank(ID3D11DeviceContext*);
 	void RenderTurret(ID3D11DeviceContext*);
-	virtual void Update(Input*,float, float, bool, QuadTree *);
+	virtual void Update(Input*,float, float, QuadTree *);
 	State *getTankState() {return m_tankState;}
 	State *getTurretState() {return m_turretState;}
 

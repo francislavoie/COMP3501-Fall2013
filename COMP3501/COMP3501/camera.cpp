@@ -286,15 +286,16 @@ D3DXVECTOR3* Camera::TransformVector(D3DXQUATERNION *pOrientation, D3DXVECTOR3 *
 
 void Camera::CalculatePosition()
 {
-	/*float radius = tan(angle)*raiseDistance;
-	float x = cos(theta)*radius;
-	float y = raiseDistance;
-	float z = sin(theta)*radius;*/
+	D3DXVECTOR3 offset = D3DXVECTOR3(0,0,0);
+	if (firstPerson)
+	{
+		offset = D3DXVECTOR3(0,0.3,2);
+	}
+
 	if (follow != 0)
 	{
-		m_position = *follow->GetForward() * -2.5f * raiseDistance + *follow->GetPosition() + D3DXVECTOR3(0,raiseDistance,0);
-		//D3DXVECTOR3 look;
-		//D3DXVec3Normalize(&look, &D3DXVECTOR3(-x,0,-z)); 
+		m_position = *follow->GetForward() * (-2.5f+offset.z) * raiseDistance + *follow->GetPosition() + D3DXVECTOR3(0,raiseDistance + offset.y,0);
+
 		m_lookatPosition = *follow->GetPosition() + *follow->GetForward() * 50;//m_position + look*50;
 	}
 }

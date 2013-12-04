@@ -14,7 +14,7 @@ void EnemyTank::setRelicPosition(D3DXVECTOR3 *pos)
 {
 	relicPosition = pos;
 }
-void EnemyTank::Update(Input* input,float time, float rotation, bool firstPerson, QuadTree *m_QuadTree)
+void EnemyTank::Update(Input* input,float time, float rotation, QuadTree *m_QuadTree)
 {
 	D3DXVECTOR3 normal;
 	D3DXVec3Normalize(&normal, &(D3DXVECTOR3(relicPosition->x, 0, relicPosition->z) - D3DXVECTOR3(m_tankState->GetPosition()->x, 0, m_tankState->GetPosition()->z)));
@@ -41,5 +41,5 @@ void EnemyTank::Update(Input* input,float time, float rotation, bool firstPerson
 	}
 	moveForward();*/
 
-	Tank::Update(input,time,rotation,firstPerson,m_QuadTree);
+	Tank::Update(input,time,rotation,m_QuadTree);
 }

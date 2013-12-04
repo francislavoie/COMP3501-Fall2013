@@ -103,7 +103,7 @@ void Tank::Shutdown() {
 	return;
 }
 
-void Tank::Update(Input* input,float time, float rotation, bool firstPerson, QuadTree *m_QuadTree){
+void Tank::Update(Input* input,float time, float rotation, QuadTree *m_QuadTree){
 	int mouseX, mouseY, deltaX, deltaY;
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
@@ -131,19 +131,14 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	float height;	
 
 	m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
-	float gravity = -0.00003f;
+	float netforce = -0.00098f;
 	float y = m_tankState->GetPosition()->y;
-	if (y-(2.5+height)<0 && y-(1.5+height)>0)
+	if (y-(height+17)<0)
 	{
-		gravity = 0;
+		netforce -= (y-(height+17)) * 0.000065f;
 	}
-	else if (y-(1.5+height)<0)
-	{
-		//gravity = (979*pow(y,2) - 2959*y+2000)/200;
-		gravity = 0.00005f;
-	}
-	float diff = m_tankState->GetPosition()->y-1;
-	m_tankState->ApplyForce(D3DXVECTOR3(0,gravity,0));
+
+	m_tankState->ApplyForce(D3DXVECTOR3(0,netforce,0));
 
 	//m_turretState->SetPitch(deltaY*0.01f);*/
 
@@ -228,15 +223,17 @@ void Tank::Update(Input* input,float time, float rotation, bool firstPerson, Qua
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->GetUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
 	angle /= 15.0f;// * time;
 
-	D3DXVECTOR3 cross;
-	D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
+	if (angle > 0.02f)
+	{
+		D3DXVECTOR3 cross;
+		D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
 
-	D3DXVec3Normalize(&cross, &cross);
+		D3DXVec3Normalize(&cross, &cross);
 
-	D3DXQUATERNION quaternion;
-	D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
-	m_tankState->multiplyOrientation(&quaternion);
-
+		D3DXQUATERNION quaternion;
+		D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
+		m_tankState->multiplyOrientation(&quaternion);
+	}
 	m_tankState->Update();
 
 
@@ -294,7 +291,7 @@ void Tank::checknResolveTankCollision(Tank* other)
 {
 	D3DXVECTOR3 plane = *m_tankState->GetPosition()-*other->getTankState()->GetPosition();
 	D3DXVECTOR3 thisperpendicular,thisparallel, otherperpendicular, otherparallel, result;
-	if (D3DXVec3Length(&plane) < sqrt(8))
+	if (D3DXVec3Length(&plane) < 4)
 	{
 		D3DXVec3Normalize(&plane,&plane);
 		thisperpendicular = plane*D3DXVec3Dot(&plane, &(m_tankState->GetPosVel()));
@@ -302,7 +299,7 @@ void Tank::checknResolveTankCollision(Tank* other)
 		otherperpendicular = plane*D3DXVec3Dot(&plane, &(other->getTankState()->GetPosVel()));
 		otherparallel = other->getTankState()->GetPosVel() - otherperpendicular;
 
-		result = (thisperpendicular - otherperpendicular)*0.75;
+		result = (thisperpendicular - otherperpendicular)*0.50;
 
 		m_tankState->SetPosVel(thisparallel - result);
 		other->getTankState()->SetPosVel(otherparallel + result);

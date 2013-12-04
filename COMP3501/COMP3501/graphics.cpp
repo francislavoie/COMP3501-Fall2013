@@ -22,6 +22,8 @@ Graphics::Graphics() {
 	m_QuadTree = 0;
 	m_SkyDome = 0;
 	chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
+	m_toggleTimer = 0;
+	srand(NULL);
 }
 
 
@@ -370,12 +372,15 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-	if (input->IsKeyPressed(DIK_SPACE)){
+
+	m_toggleTimer += time;
+	if (input->IsKeyPressed(DIK_SPACE) && m_toggleTimer > 500){
 		if (m_Camera->isFirstPerson()) 
 			m_Camera->setFollow(m_Tank->getTurretState());
 		else
-			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
+			m_Camera->setFollow(m_Tank->getTurretState(),0.1f,0.1f);
 		m_Camera->toggleFirstPerson();
+		m_toggleTimer = 0;
 	}
 	
 	if(input->IsKeyPressed(DIK_W)){
@@ -392,10 +397,10 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->turnRight();
 	}
 	
-	m_Tank->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
+	m_Tank->Update(input, time, rotation, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
-		m_Enemies[i]->Update(input, time, rotation, m_Camera->isFirstPerson(), m_QuadTree);
+		m_Enemies[i]->Update(input, time, rotation, m_QuadTree);
 	}
 
 	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
