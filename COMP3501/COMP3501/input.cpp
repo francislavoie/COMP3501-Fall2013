@@ -124,6 +124,7 @@ bool Input::ReadKeyboard() {
 	HRESULT result;
 
 	// Read the keyboard device.
+	memcpy(m_keyboardOldState, m_keyboardState, sizeof(m_keyboardState));
 	result = m_keyboard->GetDeviceState(sizeof(m_keyboardState), (LPVOID)&m_keyboardState);
 	if(FAILED(result)) {
 		// If the keyboard lost focus or was not acquired then try to get control back.
@@ -139,6 +140,7 @@ bool Input::ReadMouse() {
 	HRESULT result;
 	
 	// Read the mouse device.
+	memcpy(&m_mouseOldState, &m_mouseState, sizeof(DIMOUSESTATE));
 	result = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), (LPVOID)&m_mouseState);
 	if(FAILED(result)) {
 		// If the mouse lost focus or was not acquired then try to get control back.
@@ -166,16 +168,20 @@ void Input::ProcessInput() {
 }
 
 
-bool Input::IsKeyPressed(int key) {
-	if(m_keyboardState[key] & 0x80) return true;
+bool Input::IsKeyDown(int key) {
+	return (m_keyboardState[key] & 0x80) != 0;
+}
 
-	return false;
+bool Input::IsKeyPressed(int key) {
+	return (m_keyboardState[key] & 0x80 && !(m_keyboardOldState[key] & 0x80)) != 0;
+}
+
+bool Input::IsMouseDown(int button) {
+	return (m_mouseState.rgbButtons[button] & 0x80) != 0;
 }
 
 bool Input::IsMousePressed(int button) {
-	if(m_mouseState.rgbButtons[button] & 0x80) return true;
-
-	return false;
+	return (m_mouseState.rgbButtons[button] & 0x80 && !(m_mouseOldState.rgbButtons[button] & 0x80)) != 0;
 }
 
 

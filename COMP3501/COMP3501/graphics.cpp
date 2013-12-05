@@ -22,7 +22,6 @@ Graphics::Graphics() {
 	m_QuadTree = 0;
 	m_SkyDome = 0;
 	chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
-	m_toggleTimer = 0;
 	srand(NULL);
 }
 
@@ -372,28 +371,25 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	float rotation = -float(m_Camera->getTheta() + D3DX_PI/2);
 
-
-	m_toggleTimer += time;
-	if (input->IsKeyPressed(DIK_SPACE) && m_toggleTimer > 500){
+	if (input->IsKeyPressed(DIK_SPACE)){
 		if (m_Camera->isFirstPerson()) 
 			m_Camera->setFollow(m_Tank->getTurretState());
 		else
-			m_Camera->setFollow(m_Tank->getTurretState(),0.1f,0.1f);
+			m_Camera->setFollow(m_Tank->getTurretState(), 0.1f, 0.1f);
 		m_Camera->toggleFirstPerson();
-		m_toggleTimer = 0;
 	}
 	
-	if(input->IsKeyPressed(DIK_W)){
+	if(input->IsKeyDown(DIK_W)){
 		m_Tank->moveForward();
 	}
-	if(input->IsKeyPressed(DIK_S)){
+	if (input->IsKeyDown(DIK_S)){
 		m_Tank->moveBack();
 	}
 
-	if(input->IsKeyPressed(DIK_A)){
+	if (input->IsKeyDown(DIK_A)){
 		m_Tank->turnLeft();
 	}
-	if(input->IsKeyPressed(DIK_D)){
+	if (input->IsKeyDown(DIK_D)){
 		m_Tank->turnRight();
 	}
 

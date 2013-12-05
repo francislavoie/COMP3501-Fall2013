@@ -33,10 +33,11 @@ void Bullet::Update(Input* input, float time, State* turret) {
 	if (input->IsMousePressed(MOUSE_LEFT)) {
 		// TODO: Create new Bullet
 		// Position should be current turret pos + rand(bulletOffsets)
-		//State* state = new State(false);
-		//state->SetPosition(*turret->GetPosition() + bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))]);
-		//state->SetOrientation(turret->GetRotation());
-		//m_bulletList.push_back(state);
+		State* state = new State(false);
+		state->SetPosition(*turret->GetPosition() + bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))]);
+		state->SetOrientation(turret->GetRotation());
+		state->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, -0.05f));
+		m_bulletList.push_back(state);
 	}
 
 	for (State state : m_bulletList) {
@@ -49,4 +50,9 @@ void Bullet::Update(Input* input, float time, State* turret) {
 
 
 	//m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, forward));
+}
+
+void Bullet::Render(ID3D11DeviceContext* device) {
+	m_bullet->Render(device);
+	return;
 }

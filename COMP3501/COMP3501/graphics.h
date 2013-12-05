@@ -55,7 +55,6 @@ public:
 	bool Render(float);
 
 private:
-	float m_toggleTimer;
 	D3DXVECTOR3 chasePosition;
 	int spaceBuffer;
 	D3D* m_D3D;

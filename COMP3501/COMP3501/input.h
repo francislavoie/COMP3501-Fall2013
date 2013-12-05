@@ -42,7 +42,9 @@ public:
 	bool Frame();
 
 	bool IsMousePressed(int);
+	bool IsMouseDown(int);
 	bool IsKeyPressed(int);
+	bool IsKeyDown(int);
 	void GetMouseLocation(int&, int&);
 	void GetMouseDelta(int&, int&);
 	void GetWheelDelta(int&);
@@ -57,8 +59,8 @@ private:
 	IDirectInputDevice8* m_keyboard;
 	IDirectInputDevice8* m_mouse;
 
-	unsigned char m_keyboardState[256];
-	DIMOUSESTATE m_mouseState;
+	unsigned char m_keyboardState[256], m_keyboardOldState[256];
+	DIMOUSESTATE m_mouseState, m_mouseOldState;
 
 	int m_screenWidth, m_screenHeight;
 	int m_mouseX, m_mouseY, m_mouseZ;
