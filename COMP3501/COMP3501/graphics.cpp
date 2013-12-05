@@ -348,17 +348,6 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	bool result;
 	int mouseX, mouseY, deltaX, deltaY;
 
-	// Set the frames per second.
-	result = m_Text->SetFps(fps, 0, m_D3D->GetDeviceContext());
-	if(!result) return false;
-
-	// Set the cpu usage.
-	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
-	if(!result) return false;
-
-	result = m_Text->SetVector3("Tank Position", m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
-	if(!result) return false;
-
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
 		
@@ -406,13 +395,22 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		}
 	}
 
-	m_Tank->Update(input, time, rotation, m_QuadTree);
+	m_Tank->Update(input, time, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
-		m_Enemies[i]->Update(input, time, rotation, m_QuadTree);
+		m_Enemies[i]->Update(input, time, m_QuadTree);
 	}
 
+	// Set the frames per second.
+	result = m_Text->SetFps(fps, 0, m_D3D->GetDeviceContext());
+	if(!result) return false;
 
+	// Set the cpu usage.
+	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
+	if(!result) return false;
+
+	result = m_Text->SetVector3("Tank Position", m_Tank->getTankState()->GetPosition(), 3, m_D3D->GetDeviceContext());
+	if(!result) return false;
 
 	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
 	if(!result) return false;
@@ -586,7 +584,7 @@ bool Graphics::Render(float time) {
 		D3DXMatrixTranslation(&translationMatrix, m_Enemies[i]->getTurretState()->GetPosition()->x, m_Enemies[i]->getTurretState()->GetPosition()->y, m_Enemies[i]->getTurretState()->GetPosition()->z);
 		localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 
-		m_Tank->RenderTurret(m_D3D->GetDeviceContext());
+		m_Enemies[i]->RenderTurret(m_D3D->GetDeviceContext());
 		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Enemies[i]->GetTurretIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix, 
 			m_Enemies[i]->GetTurretTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), 
 			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());

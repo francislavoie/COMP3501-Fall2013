@@ -105,7 +105,7 @@ void Tank::Shutdown() {
 	return;
 }
 
-void Tank::Update(Input* input,float time, float rotation, QuadTree *m_QuadTree){
+void Tank::Update(Input* input,float time, QuadTree *m_QuadTree){
 	int mouseX, mouseY, deltaX, deltaY;
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
