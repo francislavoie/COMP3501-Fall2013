@@ -340,16 +340,16 @@ void Tank::checknResolveTankCollision(Tank* other)
 		thisposplus = (2-distance) * ratio * (thisafter - thisafternorm);
 		otherposplus = (2-distance) * (1-ratio) * (otherafter - otherafternorm);
 
-		temp3 = thisposplus.x * *m_tankState->GetRight();
-		temp3 += thisposplus.y * *m_tankState->GetUp();
-		temp3 += thisposplus.z * *m_tankState->GetForward();
+		temp3 = otherposplus.x * *m_tankState->GetRight();
+		temp3 += otherposplus.y * *m_tankState->GetUp();
+		temp3 += otherposplus.z * *m_tankState->GetForward();
 
-		temp4 = otherposplus.x * *otherState->GetRight();
-		temp4 += otherposplus.y * *otherState->GetUp();
-		temp4 += otherposplus.z * *otherState->GetForward();
+		temp4 = thisposplus.x * *otherState->GetRight();
+		temp4 += thisposplus.y * *otherState->GetUp();
+		temp4 += thisposplus.z * *otherState->GetForward();
 
-		m_tankState->AddtoPosition( temp3);
-		otherState->AddtoPosition(temp4);
+		m_tankState->AddtoPosition( temp4);
+		otherState->AddtoPosition(temp3);
 
 		//m_tankState->SetPosVel(thispar + otherperp);
 		//other->getTankState()->SetPosVel(otherpar + thisperp);
