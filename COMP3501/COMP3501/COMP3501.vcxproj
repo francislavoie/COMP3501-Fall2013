@@ -99,6 +99,8 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modellist.cpp" />
     <ClCompile Include="mousecursor.cpp" />
+    <ClCompile Include="particle.cpp" />
+    <ClCompile Include="particleshader.cpp" />
     <ClCompile Include="quadtree.cpp" />
     <ClCompile Include="skydome.cpp" />
     <ClCompile Include="skydomeshader.cpp" />
@@ -136,6 +138,8 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="modellist.h" />
     <ClInclude Include="mousecursor.h" />
+    <ClInclude Include="particle.h" />
+    <ClInclude Include="particleshader.h" />
     <ClInclude Include="quadtree.h" />
     <ClInclude Include="skydome.h" />
     <ClInclude Include="skydomeshader.h" />

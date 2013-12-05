@@ -89,6 +89,12 @@
     <Filter Include="Resource Files\Shaders\Vertex">
       <UniqueIdentifier>{113fdeb9-d6a7-4a2a-9f33-acf31d6fdcd6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Particles">
+      <UniqueIdentifier>{ad04b02f-7d9a-4999-aea0-8cca562161c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Particle">
+      <UniqueIdentifier>{8e372c90-5275-41c5-8242-eb229637dc1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -193,6 +199,12 @@
     <ClCompile Include="bullet.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>Source Files\Graphics\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="particleshader.cpp">
+      <Filter>Source Files\Graphics\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mousecursor.h">
@@ -296,6 +308,12 @@
     </ClInclude>
     <ClInclude Include="bullet.h">
       <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>Header Files\Graphics\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="particleshader.h">
+      <Filter>Header Files\Graphics\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
