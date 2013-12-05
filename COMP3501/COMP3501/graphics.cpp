@@ -22,7 +22,7 @@ Graphics::Graphics() {
 	m_QuadTree = 0;
 	m_SkyDome = 0;
 	chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
-	srand(NULL);
+	srand(time(NULL));
 }
 
 
