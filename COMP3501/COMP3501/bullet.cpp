@@ -55,7 +55,6 @@ void Bullet::Update(Input* input, float time, State* turret) {
 		D3DXQuaternionInverse(&inverse, &quat);
 		float garbage;
 		D3DXVECTOR3 output, offset = bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))];
-
 		temp = quat * D3DXQUATERNION(offset.x, offset.y, offset.z, 0.0f) * inverse;
 		D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
 

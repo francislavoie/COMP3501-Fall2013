@@ -105,29 +105,28 @@ void Tank::Shutdown() {
 	return;
 }
 
+void Tank::orientTurret(float deltaX,float deltaY, float time)
+{
+	float anglelimit = acos(D3DXVec3Dot(&D3DXVECTOR3(0,1,0), m_tankState->GetUp()));
+
+	yaw += deltaX*0.01f;
+	if ((deltaY < 0 && pitch > -0.60 + anglelimit) || (deltaY > 0 && pitch <0.60 + anglelimit))
+		pitch += deltaY*0.005f;
+}
+
 void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
-	int mouseX, mouseY, deltaX, deltaY;
-	input->GetMouseLocation(mouseX, mouseY);
+	int deltaX, deltaY;
 	input->GetMouseDelta(deltaX, deltaY);
 	
 	m_tankState->SetTime(time);
-
-	int scroll;
-	input->GetWheelDelta(scroll);
-
+	
 	m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, forward));
-	yaw += deltaX*0.01f;
-	m_tankState->SetYaw(turn * time);
-	yaw -= turn * time;
-
 	forward = 0;
+
+	m_tankState->SetYaw(turn * time);
+	yaw -= turn * time;	
 	turn    = 0;
 
-	//m_turretState->SetYaw(deltaX*0.01f);
-	float anglelimit = acos(D3DXVec3Dot(&D3DXVECTOR3(0,1,0), m_tankState->GetUp()));
-	/*D3DXVECTOR3 *forward = m_turretState->GetForward();*/
-	if ((deltaY < 0 && pitch > -0.60 + anglelimit) || (deltaY > 0 && pitch <0.60 + anglelimit))
-		pitch += deltaY*0.005f;
 	
 	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage, normal5;
 	float height;	

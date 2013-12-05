@@ -396,6 +396,14 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->turnRight();
 	}
 
+	m_Tank->orientTurret(deltaX,deltaY,time);
+
+	m_Tank->Update(input, time, m_QuadTree);
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		m_Enemies[i]->Update(input, time, m_QuadTree);
+	}
+
 	m_Bullet->Update(input, time, m_Tank->getTurretState());
 
 	for (int i=0; i<NUM_ENEMYS; i++)
@@ -405,12 +413,6 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		{
 			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
 		}
-	}
-
-	m_Tank->Update(input, time, m_QuadTree);
-	for (int i=0; i<NUM_ENEMYS; i++)
-	{
-		m_Enemies[i]->Update(input, time, m_QuadTree);
 	}
 
 	// Set the frames per second.

@@ -70,6 +70,8 @@ public:
 	void moveForward(){forward = moveSpeed;}
 	void moveBack(){forward = -moveSpeed;}
 
+	void orientTurret(float,float,float);
+
 	void checknResolveTankCollision(Tank*);
 
 protected:
