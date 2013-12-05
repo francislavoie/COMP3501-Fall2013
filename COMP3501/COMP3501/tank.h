@@ -52,7 +52,7 @@ public:
 	void Shutdown();
 	void RenderTank(ID3D11DeviceContext*);
 	void RenderTurret(ID3D11DeviceContext*);
-	virtual void Update(Input*,float, float, QuadTree *);
+	virtual void Update(Input*,float, QuadTree *);
 	State *getTankState() {return m_tankState;}
 	State *getTurretState() {return m_turretState;}
 
@@ -64,11 +64,11 @@ public:
 	float GetPitch() { return pitch; }
 	float GetYaw() { return yaw; }
 
-	void turnLeft(){turn = -0.005f;}
-	void turnRight(){turn = 0.005f;}
+	void turnLeft(){turn = -turnSpeed;}
+	void turnRight(){turn = turnSpeed;}
 
-	void moveForward(){forward = 0.0001f;}
-	void moveBack(){forward = -0.0001f;}
+	void moveForward(){forward = moveSpeed;}
+	void moveBack(){forward = -moveSpeed;}
 
 	void checknResolveTankCollision(Tank*);
 

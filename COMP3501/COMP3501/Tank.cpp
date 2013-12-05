@@ -18,8 +18,8 @@ Tank::Tank() {
 	pitch = 0;
 	forward = 0;
 	turn = 0;
-	moveSpeed = 0.005f;
-	turnSpeed = 0.001f;
+	moveSpeed = 0.0001f;
+	turnSpeed = 0.004f;
 }
 
 
@@ -105,7 +105,7 @@ void Tank::Shutdown() {
 	return;
 }
 
-void Tank::Update(Input* input, float time, float rotation, QuadTree *m_QuadTree){
+void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	int mouseX, mouseY, deltaX, deltaY;
 	input->GetMouseLocation(mouseX, mouseY);
 	input->GetMouseDelta(deltaX, deltaY);
@@ -225,7 +225,7 @@ void Tank::Update(Input* input, float time, float rotation, QuadTree *m_QuadTree
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->GetUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
 	angle /= 15.0f;// * time;
 
-	if (angle > 0.0175f)
+	if (angle > 0.015f)
 	{
 		D3DXVECTOR3 cross;
 		D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
@@ -300,7 +300,7 @@ void Tank::checknResolveTankCollision(Tank* other)
 		collisions++;
 		ofstream myfile;
 		myfile.open("Debug.txt", ios::out | ios::app);
-		D3DXVECTOR3 thisvel,othervel,thisafter,otherafter, resultnorm, thisperp, otherperp;
+		D3DXVECTOR3 thisvel,othervel,thisafter,otherafter, thisperp, otherperp;
 
 		D3DXVec3Normalize(&plane,&plane);
 		thisvel = m_tankState->GetPosVel();
@@ -315,29 +315,53 @@ void Tank::checknResolveTankCollision(Tank* other)
 		//otherpar = othervel - otherperp;
 
 		//result = (thisperp-otherperp) * 0.5f;
-		//float ratio;
-		//ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
 
-		//D3DXVec3Normalize(&resultnorm,&result);
-		//D3DXVec3Normalize(&thisnorm,&thisvel);
-		//D3DXVec3Normalize(&othernorm,&othervel);
+		thisafter = thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane;
+		otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
 
-		//m_tankState->AddtoPosition(distance * ratio * (resultnorm - thisnorm));//newVelocity - distance1 * sphere->getVelocity());
-		//otherState->AddtoPosition(distance * (1-ratio) * (-resultnorm + othernorm));//newVelocity - distance1 * sphere->getVelocity());'
+		D3DXVECTOR3 temp1, temp2,temp3,temp4, thisposplus,otherposplus;
+		temp1 = thisafter.x * *m_tankState->GetRight();
+		temp1 += thisafter.y * *m_tankState->GetUp();
+		temp1 += thisafter.z * *m_tankState->GetForward();
+
+		temp2 = otherafter.x * *otherState->GetRight();
+		temp2 += otherafter.y * *otherState->GetUp();
+		temp2 += otherafter.z * *otherState->GetForward();
+
+		D3DXVECTOR3 thisnorm,othernorm,thisafternorm,otherafternorm;
+		float ratio;
+		ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
+
+		D3DXVec3Normalize(&thisafternorm,&thisafter);
+		D3DXVec3Normalize(&otherafternorm,&otherafternorm);
+		D3DXVec3Normalize(&thisnorm,&thisvel);
+		D3DXVec3Normalize(&othernorm,&othervel);
+
+		thisposplus = (2-distance) * ratio * (thisafter - thisafternorm);
+		otherposplus = (2-distance) * (1-ratio) * (otherafter - otherafternorm);
+
+		temp3 = thisposplus.x * *m_tankState->GetRight();
+		temp3 += thisposplus.y * *m_tankState->GetUp();
+		temp3 += thisposplus.z * *m_tankState->GetForward();
+
+		temp4 = otherposplus.x * *otherState->GetRight();
+		temp4 += otherposplus.y * *otherState->GetUp();
+		temp4 += otherposplus.z * *otherState->GetForward();
+
+		m_tankState->AddtoPosition( temp3);
+		otherState->AddtoPosition(temp4);
 
 		//m_tankState->SetPosVel(thispar + otherperp);
 		//other->getTankState()->SetPosVel(otherpar + thisperp);
-		thisafter = thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane;
-		otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
-		m_tankState->SetPosVel(thisafter);
-		other->getTankState()->SetPosVel(otherafter);
+		
+		m_tankState->SetPosVel(temp1);
+		other->getTankState()->SetPosVel(temp2);
 
 		myfile << "Collision #" << collisions << endl;
 		myfile << "thisvel: " << thisvel.x << "," << thisvel.y << "," << thisvel.z << endl;
 		myfile << "othervel: " << othervel.x << "," << othervel.y << "," << othervel.z << endl;
 		myfile << "thisafter: " << thisafter.x << "," << thisafter.y << "," << thisafter.z << endl;
 		myfile << "otherafter: " << otherafter.x << "," << otherafter.y << "," << otherafter.z << endl<<endl;
-
 
 		//D3DXVec3Normalize(&thisnorm,&thisvel);
 		//D3DXVec3Normalize(&othernorm,&othervel);
