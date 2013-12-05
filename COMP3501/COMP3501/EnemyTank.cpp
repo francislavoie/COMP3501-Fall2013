@@ -40,7 +40,7 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 		}
 	}
 	moveForward();*/
-	Tank::turn += time*0.00005;
+	//Tank::turn += time*0.00005;
 
 	Tank::Update(input,time,m_QuadTree);
 }

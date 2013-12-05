@@ -64,11 +64,11 @@ public:
 	float GetPitch() { return pitch; }
 	float GetYaw() { return yaw; }
 
-	void turnLeft(){turn = -0.005f;}
-	void turnRight(){turn = 0.005f;}
+	void turnLeft(){turn = -turnSpeed;}
+	void turnRight(){turn = turnSpeed;}
 
-	void moveForward(){forward = 0.0001f;}
-	void moveBack(){forward = -0.0001f;}
+	void moveForward(){forward = moveSpeed;}
+	void moveBack(){forward = -moveSpeed;}
 
 	void checknResolveTankCollision(Tank*);
 
