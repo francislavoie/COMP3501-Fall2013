@@ -351,6 +351,7 @@ void BumpMapShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCo
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
+	deviceContext->GSSetShader(NULL, NULL, 0);
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.

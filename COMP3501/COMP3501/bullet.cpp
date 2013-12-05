@@ -75,7 +75,6 @@ void Bullet::Update(Input* input, float time, State* turret) {
 		//	removelist.push_back(state);
 
 		state->Update();
-		int nothing = 0;
 	}
 
 	//set_difference(m_bulletList.begin(), m_bulletList.end(), removelist.begin(), removelist.end(), std::back_inserter(m_bulletList));

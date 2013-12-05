@@ -11,6 +11,7 @@ ShaderManager::ShaderManager() {
 	m_ColorShader = 0;
 	m_TerrainShader = 0;
 	m_SkyDomeShader = 0;
+	m_ParticleShader = 0;
 }
 
 
@@ -63,7 +64,7 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 	// Initialize the color shader object.
 	result = m_ColorShader->Initialize(device, hwnd);
 	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -74,7 +75,7 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 	// Initialize the terrain shader object.
 	result = m_TerrainShader->Initialize(device, hwnd);
 	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the terrain shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -85,7 +86,18 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 	// Initialize the sky dome shader object.
 	result = m_SkyDomeShader->Initialize(device, hwnd);
 	if(!result) {
-		MessageBox(hwnd, L"Could not initialize the bump map shader object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the sky dome shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the particle shader object.
+	m_ParticleShader = new ParticleShader;
+	if (!m_ParticleShader) return false;
+
+	// Initialize the particle shader object.
+	result = m_ParticleShader->Initialize(device, hwnd);
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the particle shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -94,6 +106,13 @@ bool ShaderManager::Initialize(ID3D11Device* device, HWND hwnd) {
 
 
 void ShaderManager::Shutdown() {
+	// Release the particle shader object.
+	if (m_ParticleShader) {
+		m_ParticleShader->Shutdown();
+		delete m_ParticleShader;
+		m_ParticleShader = 0;
+	}
+
 	// Release the sky dome shader object.
 	if(m_SkyDomeShader) {
 		m_SkyDomeShader->Shutdown();
@@ -140,8 +159,7 @@ void ShaderManager::Shutdown() {
 }
 
 
-bool ShaderManager::RenderTexture(ID3D11DeviceContext* device, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, 
-											 ID3D11ShaderResourceView* texture) {
+bool ShaderManager::RenderTexture(ID3D11DeviceContext* device, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture) {
 	bool result;
 	
 	// Render the model using the texture shader.
@@ -184,6 +202,18 @@ bool ShaderManager::RenderColor(ID3D11DeviceContext* deviceContext, int indexCou
 	// Render the model using the color shader.
 	result = m_ColorShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix);
 	if(!result) return false;
+
+	return true;
+}
+
+
+bool ShaderManager::RenderParticle(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
+	D3DXMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, D3DXVECTOR3 cameraPosition, D3DXVECTOR3 cameraUp, float time) {
+	bool result;
+
+	// Render the model using the color shader.
+	result = m_ParticleShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, cameraPosition, cameraUp, time);
+	if (!result) return false;
 
 	return true;
 }
