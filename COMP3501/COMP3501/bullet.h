@@ -61,6 +61,7 @@ public:
 	ID3D11ShaderResourceView* GetTexture() { return m_bullet->GetTexture(); }
 
 	vector<State*>* GetBullets() { return &m_bulletList; }
+	void removeBullets(vector<int>*);
 
 protected:
 	Model *m_bullet;
