@@ -28,11 +28,12 @@ const int NUM_ENEMYS = 5;
 #include "terrain.h"
 #include "skydome.h"
 #include "EnemyTank.h"
+#include "bullet.h"
 
 /////////////
 // GLOBALS //
 /////////////
-const bool FULL_SCREEN_WINDOWED = false;
+const bool FULL_SCREEN_WINDOWED = true;
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -75,6 +76,8 @@ private:
 	Frustum* m_Frustum;
 
 	Tank* m_Tank;
+
+	Bullet *m_Bullet;
 
 	EnemyTank *m_Enemies[NUM_ENEMYS];
 

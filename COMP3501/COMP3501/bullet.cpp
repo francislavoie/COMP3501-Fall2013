@@ -28,28 +28,62 @@ bool Bullet::Initialize(D3D* m_D3D, HWND hwnd) {
 }
 
 
+void Bullet::Shutdown() {
+
+	for (State* state : m_bulletList) {
+		delete state;
+		state = 0;
+	}
+
+	// Release the bullet object.
+	if (m_bullet) {
+		m_bullet->Shutdown();
+		delete m_bullet;
+		m_bullet = 0;
+	}
+
+	return;
+}
+
+
 void Bullet::Update(Input* input, float time, State* turret) {
 
 	if (input->IsMousePressed(MOUSE_LEFT)) {
-		// TODO: Create new Bullet
-		// Position should be current turret pos + rand(bulletOffsets)
 		State* state = new State(false);
-		state->SetPosition(*turret->GetPosition() + bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))]);
+
+		D3DXQUATERNION quat = *turret->GetRotation(), inverse, temp;
+		D3DXQuaternionInverse(&inverse, &quat);
+		float garbage;
+		D3DXVECTOR3 output, offset = bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))];
+
+		temp = quat * D3DXQUATERNION(offset.x, offset.y, offset.z, 0.0f) * inverse;
+		D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
+
+		state->SetPosition(*turret->GetPosition() + output);
 		state->SetOrientation(turret->GetRotation());
-		state->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, -0.05f));
+		state->SetFriction(0.0f);
+		state->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, 0.005f));
 		m_bulletList.push_back(state);
 	}
 
-	for (State state : m_bulletList) {
-		state.SetTime(time);
-		
-		// Move
+	//vector<State> removelist;
 
-		state.Update();
+	for (State* state : m_bulletList) {
+		state->SetTime(time);
+		
+		// Remove bullets outside of field
+		//if (state.GetPosition()->x > 512.0f || state.GetPosition()->x < 0.0f || state.GetPosition()->z > 512.0f || state.GetPosition()->z < 0.0f)
+		//	removelist.push_back(state);
+
+		state->Update();
+		int nothing = 0;
 	}
 
+	//set_difference(m_bulletList.begin(), m_bulletList.end(), removelist.begin(), removelist.end(), std::back_inserter(m_bulletList));
+}
 
-	//m_tankState->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, forward));
+int Bullet::GetIndexCount() {
+	return m_bullet->GetIndexCount();
 }
 
 void Bullet::Render(ID3D11DeviceContext* device) {

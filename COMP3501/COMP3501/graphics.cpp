@@ -12,6 +12,7 @@ Graphics::Graphics() {
 	m_Chase = 0;
 	m_Spotlight = 0;
 	m_Tank = 0;
+	m_Bullet = 0;
 
 	m_ShaderManager = 0;
 	m_Light = 0;
@@ -141,7 +142,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Bitmap) return false;
 
 	// Initialize the bitmap object.
-	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screen, L"data/crosshairs.dds", baseViewMatrix, D3DXVECTOR2(50, 50));
+	result = m_Bitmap->Initialize(m_D3D->GetDevice(), screen, L"data/crosshairsdark.dds", baseViewMatrix, D3DXVECTOR2(50, 50));
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
 		return false;
@@ -194,6 +195,12 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		MessageBox(hwnd, L"Could not initialize the sky dome object.", L"Error", MB_OK);
 		return false;
 	}
+
+	m_Bullet = new Bullet;
+	if (!m_Bullet) return false;
+
+	result = m_Bullet->Initialize(m_D3D, hwnd);
+	if (!result) return false;
 
 	// Create the model object.
 	m_Tank = new Tank;
@@ -294,6 +301,13 @@ void Graphics::Shutdown() {
 		m_Tank = 0;
 	}
 
+	// Release the tank object.
+	if (m_Bullet) {
+		m_Bullet->Shutdown();
+		delete m_Bullet;
+		m_Bullet = 0;
+	}
+
 	for (int i=0; i< NUM_ENEMYS; i++)
 	{
 		m_Enemies[i]->Shutdown();
@@ -381,6 +395,8 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	if (input->IsKeyDown(DIK_D)){
 		m_Tank->turnRight();
 	}
+
+	m_Bullet->Update(input, time, m_Tank->getTurretState());
 
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
@@ -639,6 +655,30 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			Chase Object
 	///////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////////////////
+	//			BULLET DRAWING
+	////////////////////////////////////////////////////////////////////////////
+	m_Bullet->Render(m_D3D->GetDeviceContext());
+	for (State* state : *m_Bullet->GetBullets()) {
+		D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix, localWorldMatrix;
+		D3DXMatrixRotationQuaternion(&rotationMatrix, state->GetRotation());
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+		D3DXMatrixTranslation(&translationMatrix, state->GetPosition()->x, state->GetPosition()->y, state->GetPosition()->z);
+		localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+
+		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix,
+			m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+		if (!result) return false;
+
+		m_D3D->GetWorldMatrix(worldMatrix);
+	}
+	////////////////////////////////////////////////////////////////////////////
+	//			BULLET DRAWING
+	////////////////////////////////////////////////////////////////////////////
 
 
 	// Turn off the Z buffer to begin all 2D rendering.
