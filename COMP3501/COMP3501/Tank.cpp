@@ -124,9 +124,9 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	turn    = 0;
 
 	//m_turretState->SetYaw(deltaX*0.01f);
-	
+	float anglelimit = acos(D3DXVec3Dot(&D3DXVECTOR3(0,1,0), m_tankState->GetUp()));
 	/*D3DXVECTOR3 *forward = m_turretState->GetForward();*/
-	if ((deltaY < 0 && pitch > -0.75) || (deltaY > 0 && pitch <0.75))
+	if ((deltaY < 0 && pitch > -0.60 + anglelimit) || (deltaY > 0 && pitch <0.60 + anglelimit))
 		pitch += deltaY*0.005f;
 	
 	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage, normal5;
