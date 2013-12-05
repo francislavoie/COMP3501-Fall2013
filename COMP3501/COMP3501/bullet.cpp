@@ -55,6 +55,7 @@ void Bullet::Update(Input* input, float time, State* turret) {
 		D3DXQuaternionInverse(&inverse, &quat);
 		float garbage;
 		D3DXVECTOR3 output, offset = bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))];
+
 		temp = quat * D3DXQUATERNION(offset.x, offset.y, offset.z, 0.0f) * inverse;
 		D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
 
@@ -87,4 +88,12 @@ int Bullet::GetIndexCount() {
 void Bullet::Render(ID3D11DeviceContext* device) {
 	m_bullet->Render(device);
 	return;
+}
+
+void Bullet::removeBullets(vector<int>* removals)
+{
+	for (int i=removals->size() -1; i >-1; i--)
+	{
+		m_bulletList.erase(m_bulletList.begin()+(*removals)[i]);
+	}
 }

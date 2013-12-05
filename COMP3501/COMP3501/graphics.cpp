@@ -406,9 +406,11 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 
 	m_Bullet->Update(input, time, m_Tank->getTurretState());
 
+	//m_Tank->checknResolveBulletCollision(m_Bullet);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
 		m_Tank->checknResolveTankCollision(m_Enemies[i]);
+		m_Enemies[i]->checknResolveBulletCollision(m_Bullet);
 		for (int j=i+1; j<NUM_ENEMYS; j++)
 		{
 			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);

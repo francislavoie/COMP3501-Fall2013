@@ -371,3 +371,50 @@ void Tank::checknResolveTankCollision(Tank* other)
 		myfile.close();
 	}
 }
+
+void Tank::checknResolveBulletCollision(Bullet* other)
+{
+	vector<State*> *bullets = other->GetBullets();
+	vector<int> *collisions = new vector<int>();
+	
+	for (int i= 0; i<bullets->size(); i++)
+	{
+		State *otherState = (*bullets)[i];
+
+		D3DXVECTOR3 plane = *otherState->GetPosition()-*m_tankState->GetPosition();
+		D3DXVECTOR3 plane2 = *otherState->GetPosition()-(*m_tankState->GetPosition() +  *m_tankState->GetForward()*0.75f);
+		float distance = min(D3DXVec3Length(&plane),D3DXVec3Length(&plane2));
+		if (distance < 1)
+		{
+			collisions->push_back(i);
+			D3DXVECTOR3 thisvel,othervel,thisafter,otherafter, thisperp, otherperp;
+
+			D3DXVec3Normalize(&plane,&plane);
+			thisvel = m_tankState->GetPosVel();
+			othervel = otherState->GetPosVel();
+
+			thisvel = thisvel.x * *m_tankState->GetRight() + thisvel.y * *m_tankState->GetUp() + thisvel.z * *m_tankState->GetForward();
+			othervel = othervel.x * *otherState->GetRight() + othervel.y * *otherState->GetUp() + othervel.z * *otherState->GetForward();
+
+
+			thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
+			//thispar = thisvel - thisperp;
+
+			otherperp = plane * D3DXVec3Dot(&plane,&othervel);
+			//otherpar = othervel - otherperp;
+
+			//result = (thisperp-otherperp) * 0.5f;
+
+			thisafter = thisvel + D3DXVec3Dot(&(othervel+thisvel),&plane) * plane;
+			//otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
+
+			thisafter.y = 0;	
+			thisafter = thisafter * 0.1f;
+		
+			m_tankState->SetPosVel(thisafter);
+			otherState->SetPosVel(D3DXVECTOR3(0,0,0));
+
+		}
+	}
+	other->removeBullets(collisions);
+}
