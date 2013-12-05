@@ -29,6 +29,7 @@ const int NUM_ENEMYS = 5;
 #include "skydome.h"
 #include "EnemyTank.h"
 #include "bullet.h"
+#include "particle.h"
 
 /////////////
 // GLOBALS //
@@ -85,6 +86,8 @@ private:
 	QuadTree* m_QuadTree;
 
 	SkyDome* m_SkyDome;
+
+	Particle* m_P1;
 };
 
 #endif

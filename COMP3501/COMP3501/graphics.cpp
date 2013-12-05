@@ -24,6 +24,8 @@ Graphics::Graphics() {
 	m_SkyDome = 0;
 	chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, -10.0f, (rand() % 312) + 100.0f);
 	srand((unsigned int) time(NULL));
+
+	m_P1 = 0;
 }
 
 
@@ -196,6 +198,16 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+	m_P1 = new Particle;
+	if (!m_P1) return false;
+
+	// Initialize the particle object.
+	result = m_P1->Initialize(m_D3D->GetDevice(), 500, D3DXVECTOR3(-5.0f, 0.0f, 0.0f), true, L"data/flame4x4.dds");
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the particle object.", L"Error", MB_OK);
+		return false;
+	}
+
 	m_Bullet = new Bullet;
 	if (!m_Bullet) return false;
 
@@ -232,6 +244,13 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 
 
 void Graphics::Shutdown() {
+
+	// Release the particle object.
+	if (m_P1) {
+		m_P1->Shutdown();
+		delete m_P1;
+		m_P1 = 0;
+	}
 
 	// Release the sky dome object.
 	if(m_SkyDome) {
@@ -685,11 +704,14 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 
 
-	// Turn off the Z buffer to begin all 2D rendering.
-	m_D3D->TurnZBufferOff();
-
-	// Turn on the alpha blending before rendering the text.
 	m_D3D->TurnOnAlphaBlending();
+	m_D3D->TurnZBufferWriteOff();
+
+	m_P1->Render(m_D3D->GetDeviceContext());
+	result = m_ShaderManager->RenderParticle(m_D3D->GetDeviceContext(), m_P1->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_P1->GetTexture(), m_Camera->GetPosition(), D3DXVECTOR3(0, 1, 0), time);
+	if (!result) return false;
+
+	m_D3D->TurnZBufferOff();
 
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenter());
