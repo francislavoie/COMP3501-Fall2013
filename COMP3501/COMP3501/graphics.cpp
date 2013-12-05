@@ -397,12 +397,6 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->turnRight();
 	}
 
-	m_Tank->Update(input, time, rotation, m_QuadTree);
-	for (int i=0; i<NUM_ENEMYS; i++)
-	{
-		m_Enemies[i]->Update(input, time, rotation, m_QuadTree);
-	}
-
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
 		m_Tank->checknResolveTankCollision(m_Enemies[i]);
@@ -411,6 +405,14 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
 		}
 	}
+
+	m_Tank->Update(input, time, rotation, m_QuadTree);
+	for (int i=0; i<NUM_ENEMYS; i++)
+	{
+		m_Enemies[i]->Update(input, time, rotation, m_QuadTree);
+	}
+
+
 
 	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
 	if(!result) return false;

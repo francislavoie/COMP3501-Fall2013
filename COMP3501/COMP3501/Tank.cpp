@@ -2,6 +2,8 @@
 // Filename: tank.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "tank.h"
+#include <iostream>
+#include <fstream>
 
 
 Tank::Tank() {
@@ -289,12 +291,16 @@ int Tank::GetTurretIndexCount() {
 
 void Tank::checknResolveTankCollision(Tank* other)
 {
+	static int collisions = 0;
 	State *otherState = other->getTankState();
 	D3DXVECTOR3 plane = *otherState->GetPosition()-*m_tankState->GetPosition();
 	float distance = D3DXVec3Length(&plane);
 	if (distance < 2)
 	{
-		D3DXVECTOR3 thisvel,othervel, resultnorm;
+		collisions++;
+		ofstream myfile;
+		myfile.open("Debug.txt", ios::out | ios::app);
+		D3DXVECTOR3 thisvel,othervel,thisafter,otherafter, resultnorm, thisperp, otherperp;
 
 		D3DXVec3Normalize(&plane,&plane);
 		thisvel = m_tankState->GetPosVel();
@@ -302,10 +308,10 @@ void Tank::checknResolveTankCollision(Tank* other)
 
 
 
-		//thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
+		thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
 		//thispar = thisvel - thisperp;
 
-		//otherperp = plane * D3DXVec3Dot(&plane,&othervel);
+		otherperp = plane * D3DXVec3Dot(&plane,&othervel);
 		//otherpar = othervel - otherperp;
 
 		//result = (thisperp-otherperp) * 0.5f;
@@ -321,9 +327,17 @@ void Tank::checknResolveTankCollision(Tank* other)
 
 		//m_tankState->SetPosVel(thispar + otherperp);
 		//other->getTankState()->SetPosVel(otherpar + thisperp);
+		thisafter = thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane;
+		otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
+		m_tankState->SetPosVel(thisafter);
+		other->getTankState()->SetPosVel(otherafter);
 
-		m_tankState->SetPosVel(thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane);
-		other->getTankState()->SetPosVel(othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane);
+		myfile << "Collision #" << collisions << endl;
+		myfile << "thisvel: " << thisvel.x << "," << thisvel.y << "," << thisvel.z << endl;
+		myfile << "othervel: " << othervel.x << "," << othervel.y << "," << othervel.z << endl;
+		myfile << "thisafter: " << thisafter.x << "," << thisafter.y << "," << thisafter.z << endl;
+		myfile << "otherafter: " << otherafter.x << "," << otherafter.y << "," << otherafter.z << endl<<endl;
+
 
 		//D3DXVec3Normalize(&thisnorm,&thisvel);
 		//D3DXVec3Normalize(&othernorm,&othervel);
@@ -333,6 +347,6 @@ void Tank::checknResolveTankCollision(Tank* other)
 
 		//m_tankState->AddtoPosition((resultnorm - thisnorm) * distance * ratio);
 		//otherState->AddtoPosition((othernorm - resultnorm) * distance * (1-ratio));
-
+		myfile.close();
 	}
 }

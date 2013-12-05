@@ -73,15 +73,12 @@ void State::ApplyForce(D3DXVECTOR3 force) {
 void State::Update() {
 	// TODO: Add decay speed
 	m_acceleration -= m_posvel * m_friction;
-	
-	D3DXVECTOR3 prevVelocity = m_posvel;
-	m_posvel += m_acceleration * m_time;
 
 	// Apply positional velocity
 	if(!m_follow) {
-		m_pos += (m_right * prevVelocity.x) * m_time + (1/2) * (m_right * m_acceleration.x) * pow(m_time, 2);
-		m_pos += (m_up * prevVelocity.y) * m_time + (1/2) * (m_right * m_acceleration.y) * pow(m_time, 2);
-		m_pos += (m_front * prevVelocity.z) * m_time + (1/2) * (m_right * m_acceleration.z) * pow(m_time, 2);
+		m_pos += (m_right * m_posvel.x) * m_time + (1/2) * (m_right * m_acceleration.x) * pow(m_time, 2);
+		m_pos += (m_up * m_posvel.y) * m_time + (1/2) * (m_up * m_acceleration.y) * pow(m_time, 2);
+		m_pos += (m_front * m_posvel.z) * m_time + (1/2) * (m_front * m_acceleration.z) * pow(m_time, 2);
 	} else {
 		m_pos = *m_follow->GetPosition();
 		m_pos += (*m_follow->GetRight() * m_offset.x);
@@ -89,6 +86,7 @@ void State::Update() {
 		m_pos += (*m_follow->GetForward() * m_offset.z);
 	}
 
+	m_posvel += m_acceleration * m_time;
 
 	D3DXQUATERNION rot;
 	D3DXQuaternionRotationYawPitchRoll(
