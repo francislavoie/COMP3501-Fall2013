@@ -129,14 +129,13 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	if ((deltaY < 0 && pitch > -0.75) || (deltaY > 0 && pitch <0.75))
 		pitch += deltaY*0.005f;
 	
-	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage;
+	D3DXVECTOR3 position = *getTankState()->GetPosition(), vgarbage, normal5;
 	float height;	
 
-	m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
+	m_QuadTree->GetHeightAtPosition(position.x, position.z, height, normal5);
 	float netforce = -0.00098f;
 	float y = m_tankState->GetPosition()->y;
-	if (y-(height+17)<0)
-	{
+	if (y-(height+17) < 0) {
 		netforce -= (y-(height+17)) * 0.000065f;
 	}
 
@@ -178,55 +177,56 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	
 
 	// Get the height of the triangle that is directly underneath the given tank position.
-	result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
-	if(result) {
+	//result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
+	//if(result) {
 		// If there was a triangle under the tank then position the tank just above it by one unit.
-		getTankState()->SetPosition(D3DXVECTOR3(position.x,m_tankState->GetPosition()->y, position.z));
-	}
+	//	getTankState()->SetPosition(D3DXVECTOR3(position.x,m_tankState->GetPosition()->y, position.z));
+	//}
 
 	int count = 5;
-	D3DXVECTOR3 normal1, normal2, normal3, normal4, normal5;
-	result = m_QuadTree->GetHeightAtPosition(m_frontRight.x, m_frontRight.z, height, normal1);
-	if(!result) {
-		normal1 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		count--;
-	}
+	//D3DXVECTOR3 normal1, normal2, normal3, normal4, normal5;
+	//result = m_QuadTree->GetHeightAtPosition(m_frontRight.x, m_frontRight.z, height, normal1);
+	//if(!result) {
+	//	normal1 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	count--;
+	//}
 
-	result = m_QuadTree->GetHeightAtPosition(m_frontLeft.x, m_frontLeft.z, height, normal2);
-	if(!result) {
-		normal2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		count--;
-	}
+	//result = m_QuadTree->GetHeightAtPosition(m_frontLeft.x, m_frontLeft.z, height, normal2);
+	//if(!result) {
+	//	normal2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	count--;
+	//}
 
-	result = m_QuadTree->GetHeightAtPosition(m_rearRight.x, m_rearRight.z, height, normal3);
-	if(!result) {
-		normal3 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		count--;
-	}
+	//result = m_QuadTree->GetHeightAtPosition(m_rearRight.x, m_rearRight.z, height, normal3);
+	//if(!result) {
+	//	normal3 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	count--;
+	//}
 
-	result = m_QuadTree->GetHeightAtPosition(m_rearLeft.x, m_rearLeft.z, height, normal4);
-	if(!result) {
-		normal4 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		count--;
-	}
+	//result = m_QuadTree->GetHeightAtPosition(m_rearLeft.x, m_rearLeft.z, height, normal4);
+	//if(!result) {
+	//	normal4 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	count--;
+	//}
 
-	result = m_QuadTree->GetHeightAtPosition(m_center.x, m_center.z, height, normal5);
-	if(!result) {
-		normal5 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		count--;
-	}
+	//result = m_QuadTree->GetHeightAtPosition(m_center.x, m_center.z, height, normal5);
+	//if(!result) {
+	//	normal5 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//	count--;
+	//}
 		
 	D3DXVECTOR3 line3;
 	if (count > 0)
-		line3 = (normal1+normal2+normal3+normal4+normal5)/float(count);
+		line3 = normal5;
+		//line3 = (normal1+normal2+normal3+normal4+normal5)/float(count);
 	else
 		line3 = *m_tankState->GetUp();
 
 	float angle = acos(D3DXVec3Dot(&line3, m_tankState->GetUp()));// assume normalized vectors /(D3DXVec3Length(&line3)*D3DXVec3Length(m_tankState->getUp())));
 	angle /= 15.0f;// * time;
 
-	if (angle > 0.015f)
-	{
+	//if (angle > 0.015f)
+	//{
 		D3DXVECTOR3 cross;
 		D3DXVec3Cross(&cross, &line3, m_tankState->GetUp());
 
@@ -235,7 +235,7 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 		D3DXQUATERNION quaternion;
 		D3DXQuaternionRotationAxis(&quaternion, &cross, -angle);
 		m_tankState->multiplyOrientation(&quaternion);
-	}
+	//}
 	m_tankState->Update();
 
 
@@ -337,8 +337,8 @@ void Tank::checknResolveTankCollision(Tank* other)
 		D3DXVec3Normalize(&thisnorm,&thisvel);
 		D3DXVec3Normalize(&othernorm,&othervel);
 
-		thisposplus = (2-distance) * ratio * (thisafter - thisafternorm);
-		otherposplus = (2-distance) * (1-ratio) * (otherafter - otherafternorm);
+		thisposplus = (2.0f - distance) * ratio * (thisafter - thisafternorm);
+		otherposplus = (2.0f - distance) * (1.0f - ratio) * (otherafter - otherafternorm);
 
 		temp3 = otherposplus.x * *m_tankState->GetRight();
 		temp3 += otherposplus.y * *m_tankState->GetUp();

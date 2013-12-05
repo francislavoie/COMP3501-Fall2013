@@ -289,7 +289,7 @@ void Camera::CalculatePosition()
 	D3DXVECTOR3 offset = D3DXVECTOR3(0,0,0);
 	if (firstPerson)
 	{
-		offset = D3DXVECTOR3(0,0.3,2);
+		offset = D3DXVECTOR3(0, 0.3f, 2);
 	}
 
 	if (follow != 0)
