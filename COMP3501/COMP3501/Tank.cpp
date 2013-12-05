@@ -290,34 +290,40 @@ int Tank::GetTurretIndexCount() {
 void Tank::checknResolveTankCollision(Tank* other)
 {
 	State *otherState = other->getTankState();
-	D3DXVECTOR3 plane = *m_tankState->GetPosition()-*otherState->GetPosition();
+	D3DXVECTOR3 plane = *otherState->GetPosition()-*m_tankState->GetPosition();
 	float distance = D3DXVec3Length(&plane);
 	if (distance < 2)
 	{
+		D3DXVECTOR3 thisvel,othervel, resultnorm;
+
 		D3DXVec3Normalize(&plane,&plane);
-		D3DXVECTOR3 thisperp,thispar,thisvel,otherperp,otherpar,othervel, result, thisnorm, othernorm, resultnorm;
 		thisvel = m_tankState->GetPosVel();
 		othervel = otherState->GetPosVel();
 
-		thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
-		thispar = thisvel - thisperp;
 
-		otherperp = plane * D3DXVec3Dot(&plane,&othervel);
-		otherpar = othervel - otherperp;
 
-		result = (thisperp-otherperp) * 0.5f;
-		float ratio;
-		ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
+		//thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
+		//thispar = thisvel - thisperp;
 
-		D3DXVec3Normalize(&resultnorm,&result);
-		D3DXVec3Normalize(&thisnorm,&thisvel);
-		D3DXVec3Normalize(&othernorm,&othervel);
+		//otherperp = plane * D3DXVec3Dot(&plane,&othervel);
+		//otherpar = othervel - otherperp;
 
-		m_tankState->AddtoPosition(distance * ratio * (resultnorm - thisnorm));//newVelocity - distance1 * sphere->getVelocity());
-		otherState->AddtoPosition(distance * (1-ratio) * (-resultnorm + othernorm));//newVelocity - distance1 * sphere->getVelocity());'
+		//result = (thisperp-otherperp) * 0.5f;
+		//float ratio;
+		//ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
 
-		m_tankState->SetPosVel(thispar - result);
-		other->getTankState()->SetPosVel(otherpar + result);
+		//D3DXVec3Normalize(&resultnorm,&result);
+		//D3DXVec3Normalize(&thisnorm,&thisvel);
+		//D3DXVec3Normalize(&othernorm,&othervel);
+
+		//m_tankState->AddtoPosition(distance * ratio * (resultnorm - thisnorm));//newVelocity - distance1 * sphere->getVelocity());
+		//otherState->AddtoPosition(distance * (1-ratio) * (-resultnorm + othernorm));//newVelocity - distance1 * sphere->getVelocity());'
+
+		//m_tankState->SetPosVel(thispar + otherperp);
+		//other->getTankState()->SetPosVel(otherpar + thisperp);
+
+		m_tankState->SetPosVel(thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane);
+		other->getTankState()->SetPosVel(othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane);
 
 		//D3DXVec3Normalize(&thisnorm,&thisvel);
 		//D3DXVec3Normalize(&othernorm,&othervel);
