@@ -306,6 +306,15 @@ void Tank::checknResolveTankCollision(Tank* other)
 		otherpar = othervel - otherperp;
 
 		result = (thisperp-otherperp) * 0.5f;
+		float ratio;
+		ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
+
+		D3DXVec3Normalize(&resultnorm,&result);
+		D3DXVec3Normalize(&thisnorm,&thisvel);
+		D3DXVec3Normalize(&othernorm,&othervel);
+
+		m_tankState->AddtoPosition(distance * ratio * (resultnorm - thisnorm));//newVelocity - distance1 * sphere->getVelocity());
+		otherState->AddtoPosition(distance * (1-ratio) * (-resultnorm + othernorm));//newVelocity - distance1 * sphere->getVelocity());'
 
 		m_tankState->SetPosVel(thispar - result);
 		other->getTankState()->SetPosVel(otherpar + result);
