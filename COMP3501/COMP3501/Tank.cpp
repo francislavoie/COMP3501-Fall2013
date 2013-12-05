@@ -291,10 +291,12 @@ int Tank::GetTurretIndexCount() {
 void Tank::checknResolveTankCollision(Tank* other)
 {
 	static int collisions = 0;
+	float mindistance = 1.75f;
 	State *otherState = other->getTankState();
 	D3DXVECTOR3 plane = *otherState->GetPosition()-*m_tankState->GetPosition();
-	float distance = D3DXVec3Length(&plane);
-	if (distance < 2)
+	D3DXVECTOR3 plane2 = (*otherState->GetPosition()+*otherState->GetForward()*0.75f)-(*m_tankState->GetPosition() +  *m_tankState->GetForward()*0.75f);
+	float distance = min(D3DXVec3Length(&plane),D3DXVec3Length(&plane2));
+	if (distance < mindistance)
 	{
 		collisions++;
 		ofstream myfile;
@@ -305,6 +307,8 @@ void Tank::checknResolveTankCollision(Tank* other)
 		thisvel = m_tankState->GetPosVel();
 		othervel = otherState->GetPosVel();
 
+		thisvel = thisvel.x * *m_tankState->GetRight() + thisvel.y * *m_tankState->GetUp() + thisvel.z * *m_tankState->GetForward();
+		othervel = othervel.x * *otherState->GetRight() + othervel.y * *otherState->GetUp() + othervel.z * *otherState->GetForward();
 
 
 		thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
@@ -318,43 +322,37 @@ void Tank::checknResolveTankCollision(Tank* other)
 		thisafter = thisvel + D3DXVec3Dot(&(othervel-thisvel),&plane) * plane;
 		otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
 
-		D3DXVECTOR3 temp1, temp2,temp3,temp4, thisposplus,otherposplus;
-		temp1 = thisafter.x * *m_tankState->GetRight();
-		temp1 += thisafter.y * *m_tankState->GetUp();
-		temp1 += thisafter.z * *m_tankState->GetForward();
+		D3DXVECTOR3 temp3,temp4, thisposplus,otherposplus;
 
-		temp2 = otherafter.x * *otherState->GetRight();
-		temp2 += otherafter.y * *otherState->GetUp();
-		temp2 += otherafter.z * *otherState->GetForward();
 
 		D3DXVECTOR3 thisnorm,othernorm,thisafternorm,otherafternorm;
 		float ratio;
 		ratio = D3DXVec3Length(&thisvel)/(D3DXVec3Length(&thisvel)+D3DXVec3Length(&othervel));
 
 		D3DXVec3Normalize(&thisafternorm,&thisafter);
-		D3DXVec3Normalize(&otherafternorm,&otherafternorm);
+		D3DXVec3Normalize(&otherafternorm,&otherafter);
 		D3DXVec3Normalize(&thisnorm,&thisvel);
 		D3DXVec3Normalize(&othernorm,&othervel);
 
-		thisposplus = (2.0f - distance) * ratio * (thisafter - thisafternorm);
-		otherposplus = (2.0f - distance) * (1.0f - ratio) * (otherafter - otherafternorm);
+		thisposplus = (mindistance - distance) * ratio * (thisafternorm - thisnorm);
+		otherposplus = (mindistance - distance) * (1.0f - ratio) * (otherafternorm - othernorm);
 
-		temp3 = otherposplus.x * *m_tankState->GetRight();
-		temp3 += otherposplus.y * *m_tankState->GetUp();
-		temp3 += otherposplus.z * *m_tankState->GetForward();
+	/*	temp3 = thisposplus.x * *m_tankState->GetRight();
+		temp3 += thisposplus.y * *m_tankState->GetUp();
+		temp3 += thisposplus.z * *m_tankState->GetForward();
 
-		temp4 = thisposplus.x * *otherState->GetRight();
-		temp4 += thisposplus.y * *otherState->GetUp();
-		temp4 += thisposplus.z * *otherState->GetForward();
+		temp4 = otherposplus.x * *otherState->GetRight();
+		temp4 += otherposplus.y * *otherState->GetUp();
+		temp4 += otherposplus.z * *otherState->GetForward();*/
 
-		m_tankState->AddtoPosition( temp4);
-		otherState->AddtoPosition(temp3);
+		m_tankState->AddtoPosition( thisposplus);
+		otherState->AddtoPosition(otherposplus);
 
 		//m_tankState->SetPosVel(thispar + otherperp);
 		//other->getTankState()->SetPosVel(otherpar + thisperp);
 		
-		m_tankState->SetPosVel(temp1);
-		other->getTankState()->SetPosVel(temp2);
+		m_tankState->SetPosVel(thisafter);
+		other->getTankState()->SetPosVel(otherafter);
 
 		myfile << "Collision #" << collisions << endl;
 		myfile << "thisvel: " << thisvel.x << "," << thisvel.y << "," << thisvel.z << endl;
