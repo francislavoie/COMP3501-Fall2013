@@ -80,8 +80,6 @@ private:
 
 	Tank* m_Tank;
 
-	Bullet *m_Bullet;
-
 	EnemyTank *m_Enemies[NUM_ENEMYS];
 
 	Terrain* m_Terrain;

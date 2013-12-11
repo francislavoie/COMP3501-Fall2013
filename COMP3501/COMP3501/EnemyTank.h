@@ -11,8 +11,10 @@ public:
 	~EnemyTank();
 	void setRelicPosition(D3DXVECTOR3 *);
 	void Update(Input*,float, QuadTree *);
+	void setTarget(D3DXVECTOR3*);
 private:
 	D3DXVECTOR3* relicPosition;
+	D3DXVECTOR3* targetPosition;
 
 };
 #endif

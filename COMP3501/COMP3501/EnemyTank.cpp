@@ -14,6 +14,12 @@ void EnemyTank::setRelicPosition(D3DXVECTOR3 *pos)
 {
 	relicPosition = pos;
 }
+
+void EnemyTank::setTarget(D3DXVECTOR3 *target)
+{
+	targetPosition = target;
+}
+
 void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 {
 	D3DXVECTOR3 normal;
@@ -40,7 +46,43 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 		}
 	}
 	moveForward();*/
-	//Tank::turn += time*0.00005;
+	int deltaX = 0,deltaY = 0;
+	if (targetPosition)
+	{
+		int yDiff = m_tankState->GetPosition()->y - targetPosition->y;
+		if ( yDiff < -0.0000001)
+		{
+			//deltaY = -2;
+		}
+		else if  (yDiff > 0.0000001)
+		{
+			//deltaY = 2;
+		}
+		D3DXVECTOR3 normal1;
+		D3DXVec3Normalize(&normal1, &(D3DXVECTOR3(targetPosition->x, 0, targetPosition->z) - D3DXVECTOR3(m_tankState->GetPosition()->x, 0, m_tankState->GetPosition()->z)));
+		D3DXVECTOR3 noY1 = D3DXVECTOR3(m_turretState->GetForward()->x, 0, m_turretState->GetForward()->z);
+		float angle1 = acos(D3DXVec3Dot(&normal1, &noY1));
+
+		D3DXMATRIX turn1;
+		D3DXMatrixRotationY(&turn1, angle1);
+
+		//check which way to rotate
+		D3DXVECTOR3 cross1;
+		D3DXVec3Cross(&cross1,&normal1,&noY1);
+		D3DXVec3Normalize(&cross1, &cross1);
+		if (angle1 > 0.2)
+		{
+			if (cross1.y > 0)
+			{
+				deltaX = -2;
+			}
+			if (cross1.y < 0)
+			{
+				deltaX = 2;
+			}
+		}
+		orientTurret(deltaX,deltaY,time);
+	}
 
 	Tank::Update(input,time,m_QuadTree);
 }
