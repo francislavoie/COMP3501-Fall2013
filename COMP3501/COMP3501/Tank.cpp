@@ -13,6 +13,7 @@ Tank::Tank() {
 	m_frontLeft = FRONTLEFT;
 	m_rearLeft = REARLEFT;
 	m_rearRight = REARRIGHT;
+	m_Bullet = 0;
 	turretLookAt = D3DXVECTOR3(0,0,0);
 	yaw = 0;
 	pitch = 0;
@@ -70,6 +71,12 @@ bool Tank::Initialize(D3D* m_D3D, HWND hwnd, QuadTree *m_QuadTree) {
 	m_turretState->SetOffset(D3DXVECTOR3(0.0f, 0.22f, 0.0f));
 	turretLookAt = *m_turretState->GetForward() * RADIUS;
 
+	m_Bullet = new Bullet;
+	if (!m_Bullet) return false;
+
+	result = m_Bullet->Initialize(m_D3D, hwnd);
+	if (!result) return false;
+
 	return true;
 }
 
@@ -101,6 +108,13 @@ void Tank::Shutdown() {
 		delete turret;
 		turret = 0;
 	}	
+
+	// Release the tank object.
+	if (m_Bullet) {
+		m_Bullet->Shutdown();
+		delete m_Bullet;
+		m_Bullet = 0;
+	}
 
 	return;
 }
@@ -264,6 +278,8 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	orien = orien * *m_tankState->GetRotation();
 	m_turretState->SetOrientation(&orien);
 	m_turretState->Update();
+
+	m_Bullet->Update(input, time, m_turretState);
 }
 
 

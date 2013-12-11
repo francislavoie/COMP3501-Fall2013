@@ -50,13 +50,13 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 	if (targetPosition)
 	{
 		int yDiff = m_tankState->GetPosition()->y - targetPosition->y;
-		if ( yDiff < -0.000001)
+		if ( yDiff < -0.0000001)
 		{
-			deltaY = -2;
+			//deltaY = -2;
 		}
-		else if  (yDiff > 0.000001)
+		else if  (yDiff > 0.0000001)
 		{
-			deltaY = 2;
+			//deltaY = 2;
 		}
 		D3DXVECTOR3 normal1;
 		D3DXVec3Normalize(&normal1, &(D3DXVECTOR3(targetPosition->x, 0, targetPosition->z) - D3DXVECTOR3(m_tankState->GetPosition()->x, 0, m_tankState->GetPosition()->z)));

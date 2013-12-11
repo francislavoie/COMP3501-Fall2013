@@ -75,6 +75,7 @@ public:
 
 	void checknResolveTankCollision(Tank*);
 	void checknResolveBulletCollision(Bullet*);
+	Bullet *getBullets() {return m_Bullet;}
 
 protected:
 	Model *baseTank, *turret;
@@ -86,7 +87,7 @@ protected:
 	float turnSpeed;
 
 	D3DXVECTOR3 m_frontRight, m_frontLeft, m_rearRight, m_rearLeft, m_center;
-
+	Bullet *m_Bullet;
 };
 
 #endif

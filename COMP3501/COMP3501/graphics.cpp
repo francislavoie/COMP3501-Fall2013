@@ -12,7 +12,6 @@ Graphics::Graphics() {
 	m_Chase = 0;
 	m_Spotlight = 0;
 	m_Tank = 0;
-	m_Bullet = 0;
 
 	m_ShaderManager = 0;
 	m_Light = 0;
@@ -208,12 +207,6 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
-	m_Bullet = new Bullet;
-	if (!m_Bullet) return false;
-
-	result = m_Bullet->Initialize(m_D3D, hwnd);
-	if (!result) return false;
-
 	// Create the model object.
 	m_Tank = new Tank;
 	if(!m_Tank) return false;
@@ -320,13 +313,6 @@ void Graphics::Shutdown() {
 		m_Tank = 0;
 	}
 
-	// Release the tank object.
-	if (m_Bullet) {
-		m_Bullet->Shutdown();
-		delete m_Bullet;
-		m_Bullet = 0;
-	}
-
 	for (int i=0; i< NUM_ENEMYS; i++)
 	{
 		m_Enemies[i]->Shutdown();
@@ -420,17 +406,16 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Tank->Update(input, time, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
+		
 		m_Enemies[i]->setTarget(m_Tank->getTankState()->GetPosition());
 		m_Enemies[i]->Update(input, time, m_QuadTree);
 	}
-
-	m_Bullet->Update(input, time, m_Tank->getTurretState());
 
 	//m_Tank->checknResolveBulletCollision(m_Bullet);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
 		m_Tank->checknResolveTankCollision(m_Enemies[i]);
-		m_Enemies[i]->checknResolveBulletCollision(m_Bullet);
+		m_Enemies[i]->checknResolveBulletCollision(m_Tank->getBullets());
 		for (int j=i+1; j<NUM_ENEMYS; j++)
 		{
 			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
@@ -684,8 +669,8 @@ bool Graphics::Render(float time) {
 	////////////////////////////////////////////////////////////////////////////
 	//			BULLET DRAWING
 	////////////////////////////////////////////////////////////////////////////
-	m_Bullet->Render(m_D3D->GetDeviceContext());
-	for (State* state : *m_Bullet->GetBullets()) {
+	m_Tank->getBullets()->Render(m_D3D->GetDeviceContext());
+	for (State* state : *m_Tank->getBullets()->GetBullets()) {
 		D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix, localWorldMatrix;
 		D3DXMatrixRotationQuaternion(&rotationMatrix, state->GetRotation());
 
@@ -693,12 +678,31 @@ bool Graphics::Render(float time) {
 		D3DXMatrixTranslation(&translationMatrix, state->GetPosition()->x, state->GetPosition()->y, state->GetPosition()->z);
 		localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
 
-		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Bullet->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix,
-			m_Bullet->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Tank->getBullets()->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix,
+			m_Tank->getBullets()->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 		if (!result) return false;
 
 		m_D3D->GetWorldMatrix(worldMatrix);
+	}
+	
+	for (int i = 0; i<NUM_ENEMYS; i++)
+	{
+		m_Enemies[i]->getBullets()->Render(m_D3D->GetDeviceContext());
+		for (State* state : *m_Enemies[i]->getBullets()->GetBullets()) {
+			D3DXMATRIX translationMatrix, scalingMatrix, rotationMatrix, localWorldMatrix;
+			D3DXMatrixRotationQuaternion(&rotationMatrix, state->GetRotation());
+
+			m_D3D->GetWorldMatrix(worldMatrix);
+			D3DXMatrixTranslation(&translationMatrix, state->GetPosition()->x, state->GetPosition()->y, state->GetPosition()->z);
+			localWorldMatrix = rotationMatrix * translationMatrix * worldMatrix;
+
+			result = m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Enemies[i]->getBullets()->GetIndexCount(), localWorldMatrix, viewMatrix, projectionMatrix,
+				m_Enemies[i]->getBullets()->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+				m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+			if (!result) return false;
+			m_D3D->GetWorldMatrix(worldMatrix);
+		}
 	}
 	////////////////////////////////////////////////////////////////////////////
 	//			BULLET DRAWING
