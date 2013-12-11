@@ -14,9 +14,11 @@ ModelList::ModelList(const ModelList& other) { }
 ModelList::~ModelList() { }
 
 
-bool ModelList::Initialize(int numModels) {
+bool ModelList::Initialize(int numModels, QuadTree* quadTree) {
 	int i;
 	float red, green, blue;
+	float height;
+	D3DXVECTOR3 garbage;
 
 	// Store the number of models.
 	m_modelCount = numModels;
@@ -38,23 +40,37 @@ bool ModelList::Initialize(int numModels) {
 		m_ModelInfoList[i].color = D3DXVECTOR4(red, green, blue, 1.0f);
 
 		// Generate a random position in front of the viewer for the mode.
-		m_ModelInfoList[i].position.x = (((float)rand()-(float)rand())/RAND_MAX) * 100.0f;
-		m_ModelInfoList[i].position.y = (((float)rand()-(float)rand())/RAND_MAX) * 100.0f;
-		m_ModelInfoList[i].position.z = (((float)rand()-(float)rand())/RAND_MAX) * 100.0f;
+		m_ModelInfoList[i].position.x = rand() % 512;
+		m_ModelInfoList[i].position.z = rand() % 512;
+		
+		quadTree->GetHeightAtPosition(m_ModelInfoList[i].position.x, m_ModelInfoList[i].position.z, height, garbage);
 
+		m_ModelInfoList[i].position.y = height;
+		
 		//m_ModelInfoList[i].velocity.x = ((float)(rand() % 10) / 50.0f) - 0.1f;
 		//m_ModelInfoList[i].velocity.y = ((float)(rand() % 10) / 50.0f) - 0.1f;
 		//m_ModelInfoList[i].velocity.z = ((float)(rand() % 10) / 50.0f) - 0.1f;
 
-		m_ModelInfoList[i].velocity.x = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
-		m_ModelInfoList[i].velocity.y = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
-		m_ModelInfoList[i].velocity.z = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
+		//m_ModelInfoList[i].velocity.x = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
+		//m_ModelInfoList[i].velocity.y = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
+		//m_ModelInfoList[i].velocity.z = (((float)rand()-(float)rand())/RAND_MAX) * 0.005f;
 
-		D3DXQuaternionIdentity(&m_ModelInfoList[i].rotation);
+		D3DXQuaternionRotationYawPitchRoll(
+			&m_ModelInfoList[i].rotation,
+			(rand()) / (RAND_MAX / (D3DX_PI * 2)),
+			(rand()) / (RAND_MAX / (D3DX_PI * 2)),
+			(rand()) / (RAND_MAX / (D3DX_PI * 2))
+		);
+
+		D3DXQuaternionNormalize(&m_ModelInfoList[i].rotation, &m_ModelInfoList[i].rotation);
+
+		m_ModelInfoList[i].velocity.x = 0.0f;
+		m_ModelInfoList[i].velocity.y = 0.0f;
+		m_ModelInfoList[i].velocity.z = 0.0f;
 
 		m_ModelInfoList[i].visible = true;
 
-		m_ModelInfoList[i].type = rand() % 2;
+		m_ModelInfoList[i].type = rand() % 1;
 	}
 
 	return true;

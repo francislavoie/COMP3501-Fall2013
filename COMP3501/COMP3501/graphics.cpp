@@ -13,6 +13,7 @@ Graphics::Graphics() {
 	m_Spotlight = 0;
 	m_Tank = 0;
 	m_Bullet = 0;
+	m_Objects = 0;
 
 	m_ShaderManager = 0;
 	m_Light = 0;
@@ -187,6 +188,17 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 		return false;
 	}
 
+	// Create the model list object.
+	m_Objects = new ModelList;
+	if (!m_Objects) return false;
+
+	// Initialize the model list object.
+	result = m_Objects->Initialize(50, m_QuadTree);
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the model list object.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Create the sky dome object.
 	m_SkyDome = new SkyDome;
 	if(!m_SkyDome) return false; 
@@ -327,12 +339,18 @@ void Graphics::Shutdown() {
 		m_Bullet = 0;
 	}
 
-	for (int i=0; i< NUM_ENEMYS; i++)
-	{
+	for (int i=0; i< NUM_ENEMYS; i++) {
 		m_Enemies[i]->Shutdown();
 		delete m_Enemies[i];
 	}
 	//delete [] m_Enemies;
+
+	// Release the model list object.
+	if (m_Objects) {
+		m_Objects->Shutdown();
+		delete m_Objects;
+		m_Objects = 0;
+	}
 
 	// Release the model object.
 	if(m_Model2) {
@@ -593,6 +611,74 @@ bool Graphics::Render(float time) {
 	m_D3D->GetWorldMatrix(worldMatrix);
 	////////////////////////////////////////////////////////////////////////////
 	//			Tank DRAWING
+	////////////////////////////////////////////////////////////////////////////
+
+	////////////////////////////////////////////////////////////////////////////
+	//			Static Objects DRAWING
+	////////////////////////////////////////////////////////////////////////////
+	// Get the number of models that will be rendered.
+	int modelCount = m_Objects->GetModelCount();
+	D3DXVECTOR4 color;
+	float radius;
+	bool visible, renderModel;
+	int modelType;
+	
+	// Go through all the models and render them only if they can be seen by the camera view.
+	for (int index = 0; index < modelCount; index++) {
+		// Get the position and color of the sphere model at this index.
+		m_Objects->GetData(index, position, color, rotation, visible, modelType, time);
+
+		// If the model is visible, display it
+		if (visible) {
+			// Set the radius of the sphere to 1.0 since this is already known.
+			radius = 5.0f;
+
+			// Check if the asteroid model is in the view frustum.
+			renderModel = m_Frustum->CheckSphere(position.x, position.y, position.z, radius);
+
+			// Check if asteroid collides with ship
+			//if (m_Objects->GetDistance(index, m_Camera->GetPosition()) < radius + 2.0f) {
+				//m_Objects->Hide(index);
+			//}
+
+			// Check if asteroid collides with tank
+			/*if(m_ModelList->GetDistance(index, tankPosition) < radius + 0.15f) {
+				m_ModelList->Hide(index);
+			}*/
+
+			// If it can be seen then render it, if not skip this model and check the next sphere.
+			if (renderModel) {
+				D3DXMATRIX local, rot, tran, scale;
+
+				D3DXMatrixScaling(&scale, radius, radius, radius);
+
+				// Rotate the model
+				D3DXMatrixRotationQuaternion(&rot, &rotation);
+
+				// Move the model to the location it should be rendered at.
+				D3DXMatrixTranslation(&tran, position.x, position.y, position.z);
+
+				// Compose the transformations
+				local = scale * rot * tran * worldMatrix;
+
+				// Draw model based on type
+				if (modelType == 0) {
+					m_Model->Render(m_D3D->GetDeviceContext());
+					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), local, viewMatrix, projectionMatrix,
+						m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+				}
+				else {
+					m_Model2->Render(m_D3D->GetDeviceContext());
+					m_ShaderManager->RenderLight(m_D3D->GetDeviceContext(), m_Model2->GetIndexCount(), local, viewMatrix, projectionMatrix,
+						m_Model2->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+						m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+				}
+			}
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////
+	//			Static Objects DRAWING
 	////////////////////////////////////////////////////////////////////////////
 
 

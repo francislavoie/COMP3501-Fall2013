@@ -8,9 +8,9 @@
 //////////////
 // INCLUDES //
 //////////////
-#include <d3dx10math.h>
 #include <stdlib.h>
 #include <time.h>
+#include "quadtree.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ public:
 	ModelList(const ModelList&);
 	~ModelList();
 
-	bool Initialize(int);
+	bool Initialize(int, QuadTree*);
 	void Shutdown();
 
 	int GetModelCount();
