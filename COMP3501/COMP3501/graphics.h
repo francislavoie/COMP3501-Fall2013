@@ -67,6 +67,8 @@ private:
 	Model* m_Chase;
 	Model* m_Spotlight;
 
+	ModelList* m_Objects;
+
 	Bitmap* m_Bitmap;
 	MouseCursor* m_Cursor;
 
