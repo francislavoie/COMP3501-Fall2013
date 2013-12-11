@@ -415,6 +415,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
 		m_Tank->checknResolveTankCollision(m_Enemies[i]);
+		m_Tank->checknResolveBulletCollision(m_Enemies[i]->getBullets());
 		m_Enemies[i]->checknResolveBulletCollision(m_Tank->getBullets());
 		for (int j=i+1; j<NUM_ENEMYS; j++)
 		{
