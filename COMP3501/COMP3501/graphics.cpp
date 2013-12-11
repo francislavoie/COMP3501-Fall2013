@@ -420,6 +420,7 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Tank->Update(input, time, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
+		m_Enemies[i]->setTarget(m_Tank->getTankState()->GetPosition());
 		m_Enemies[i]->Update(input, time, m_QuadTree);
 	}
 
