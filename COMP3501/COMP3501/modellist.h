@@ -41,6 +41,7 @@ public:
 	float GetDistance(int, D3DXVECTOR3&);
 
 	void Hide(int);
+	D3DXVECTOR3 GetModelPosition(int);
 
 private:
 	int m_modelCount;

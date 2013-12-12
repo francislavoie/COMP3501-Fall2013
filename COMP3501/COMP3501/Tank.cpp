@@ -315,8 +315,8 @@ void Tank::checknResolveTankCollision(Tank* other)
 	if (distance < mindistance)
 	{
 		collisions++;
-		ofstream myfile;
-		myfile.open("Debug.txt", ios::out | ios::app);
+		//ofstream myfile;
+		//myfile.open("Debug.txt", ios::out | ios::app);
 		D3DXVECTOR3 thisvel,othervel,thisafter,otherafter, thisperp, otherperp;
 
 		D3DXVec3Normalize(&plane,&plane);
@@ -370,11 +370,11 @@ void Tank::checknResolveTankCollision(Tank* other)
 		m_tankState->SetPosVel(thisafter);
 		other->getTankState()->SetPosVel(otherafter);
 
-		myfile << "Collision #" << collisions << endl;
-		myfile << "thisvel: " << thisvel.x << "," << thisvel.y << "," << thisvel.z << endl;
-		myfile << "othervel: " << othervel.x << "," << othervel.y << "," << othervel.z << endl;
-		myfile << "thisafter: " << thisafter.x << "," << thisafter.y << "," << thisafter.z << endl;
-		myfile << "otherafter: " << otherafter.x << "," << otherafter.y << "," << otherafter.z << endl<<endl;
+		//myfile << "Collision #" << collisions << endl;
+		//myfile << "thisvel: " << thisvel.x << "," << thisvel.y << "," << thisvel.z << endl;
+		//myfile << "othervel: " << othervel.x << "," << othervel.y << "," << othervel.z << endl;
+		//myfile << "thisafter: " << thisafter.x << "," << thisafter.y << "," << thisafter.z << endl;
+		//myfile << "otherafter: " << otherafter.x << "," << otherafter.y << "," << otherafter.z << endl<<endl;
 
 		//D3DXVec3Normalize(&thisnorm,&thisvel);
 		//D3DXVec3Normalize(&othernorm,&othervel);
@@ -384,7 +384,7 @@ void Tank::checknResolveTankCollision(Tank* other)
 
 		//m_tankState->AddtoPosition((resultnorm - thisnorm) * distance * ratio);
 		//otherState->AddtoPosition((othernorm - resultnorm) * distance * (1-ratio));
-		myfile.close();
+		//myfile.close();
 	}
 }
 
@@ -433,4 +433,53 @@ void Tank::checknResolveBulletCollision(Bullet* other)
 		}
 	}
 	other->removeBullets(collisions);
+}
+
+void Tank::checknResolveStaticCollision(ModelList *model)
+{
+	for (int i=0; i< model->GetModelCount(); i++)
+	{
+		D3DXVECTOR3 otherPosition = model->GetModelPosition(i);
+
+		D3DXVECTOR3 plane = otherPosition-*m_tankState->GetPosition();
+		if (D3DXVec3Length(&plane) < 6)
+		{
+			//ofstream myfile;
+			//myfile.open("Debug.txt", ios::out | ios::app);
+			D3DXVECTOR3 thisvel,thisafter, thisperp;
+
+			D3DXVec3Normalize(&plane,&plane);
+			thisvel = m_tankState->GetPosVel();
+
+			thisvel = thisvel.x * *m_tankState->GetRight() + thisvel.y * *m_tankState->GetUp() + thisvel.z * *m_tankState->GetForward();
+
+
+			thisperp = plane * D3DXVec3Dot(&plane,&thisvel);
+
+
+			thisafter = thisvel - (2 * thisperp);
+			//otherafter = othervel + D3DXVec3Dot(&(thisvel-othervel),&plane) * plane;
+
+			float distance = 6 - D3DXVec3Length(&plane);
+
+			float time = distance / D3DXVec3Length(&thisvel);
+
+			//thisvel.y=0;
+			//thisafter.y=0;
+			thisperp.y = 0;
+			D3DXVECTOR3 normal1,normal2,normal3;
+			D3DXVec3Normalize(&normal1,&thisperp);
+			D3DXVec3Normalize(&normal2,&thisafter);
+			D3DXVec3Normalize(&normal3,&thisvel);
+
+
+			//m_tankState->AddtoPosition(-3*thisperp*time);
+			//m_tankState->AddtoPosition((thisafter-thisvel)*time);
+			m_tankState->AddtoPosition((6 - distance) * 0.15 * (normal2 - normal3));
+
+			thisafter.y = 0;	
+		
+			m_tankState->SetPosVel(thisafter);
+		}
+	}
 }

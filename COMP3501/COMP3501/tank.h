@@ -25,6 +25,7 @@ using namespace std;
 #include "timer.h"
 #include "quadtree.h"
 #include "bullet.h"
+#include "modellist.h"
 
 struct VectorSortP {
 	bool operator()(const D3DXVECTOR3 a, const D3DXVECTOR3 b) const {
@@ -75,6 +76,7 @@ public:
 
 	void checknResolveTankCollision(Tank*);
 	void checknResolveBulletCollision(Bullet*);
+	void checknResolveStaticCollision(ModelList *);
 	Bullet *getBullets() {return m_Bullet;}
 
 protected:

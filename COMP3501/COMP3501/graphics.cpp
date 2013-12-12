@@ -435,11 +435,14 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->checknResolveTankCollision(m_Enemies[i]);
 		m_Tank->checknResolveBulletCollision(m_Enemies[i]->getBullets());
 		m_Enemies[i]->checknResolveBulletCollision(m_Tank->getBullets());
+		m_Enemies[i]->checknResolveStaticCollision(m_Objects);
 		for (int j=i+1; j<NUM_ENEMYS; j++)
 		{
 			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
 		}
 	}
+
+	m_Tank->checknResolveStaticCollision(m_Objects);
 
 	// Set the frames per second.
 	result = m_Text->SetFps(fps, 0, m_D3D->GetDeviceContext());

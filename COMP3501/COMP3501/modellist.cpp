@@ -92,6 +92,10 @@ int ModelList::GetModelCount() {
 	return m_modelCount;
 }
 
+D3DXVECTOR3 ModelList::GetModelPosition(int index)
+{
+	return m_ModelInfoList[index].position;
+}
 
 void ModelList::GetData(int index, D3DXVECTOR3& position, D3DXVECTOR4& color, D3DXQUATERNION& rotation, bool& visible, int& type, float time) {
 	position = m_ModelInfoList[index].position;
