@@ -304,7 +304,7 @@ int Tank::GetTurretIndexCount() {
 	return turret->GetIndexCount();
 }
 
-void Tank::checknResolveTankCollision(Tank* other)
+bool Tank::checknResolveTankCollision(Tank* other, D3DXVECTOR3& location)
 {
 	static int collisions = 0;
 	float mindistance = 1.75f;
@@ -385,13 +385,20 @@ void Tank::checknResolveTankCollision(Tank* other)
 		//m_tankState->AddtoPosition((resultnorm - thisnorm) * distance * ratio);
 		//otherState->AddtoPosition((othernorm - resultnorm) * distance * (1-ratio));
 		//myfile.close();
+
+		location = *other->getTankState()->GetPosition();
+
+		return true;
 	}
+	return false;
 }
 
-void Tank::checknResolveBulletCollision(Bullet* other)
+bool Tank::checknResolveBulletCollision(Bullet* other, D3DXVECTOR3& location)
 {
 	vector<State*> *bullets = other->GetBullets();
 	vector<int> *collisions = new vector<int>();
+
+	bool hascollision = false;
 	
 	for (int i= 0; i<bullets->size(); i++)
 	{
@@ -430,9 +437,13 @@ void Tank::checknResolveBulletCollision(Bullet* other)
 			m_tankState->SetPosVel(thisafter);
 			otherState->SetPosVel(D3DXVECTOR3(0,0,0));
 
+			location = *otherState->GetPosition();
+
+			hascollision = true;
 		}
 	}
 	other->removeBullets(collisions);
+	return hascollision;
 }
 
 void Tank::checknResolveStaticCollision(ModelList *model)

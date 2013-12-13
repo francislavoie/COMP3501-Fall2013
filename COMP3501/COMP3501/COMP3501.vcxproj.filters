@@ -95,6 +95,9 @@
     <Filter Include="Source Files\Graphics\Particle">
       <UniqueIdentifier>{8e372c90-5275-41c5-8242-eb229637dc1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\Geometry">
+      <UniqueIdentifier>{1658d413-bd55-4c5c-aaf8-6f8f8e907f44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -376,6 +379,15 @@
     </None>
     <None Include="data\turret.bin">
       <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="particle.ps.hlsl">
+      <Filter>Resource Files\Shaders\Pixel</Filter>
+    </None>
+    <None Include="particle.gs.hlsl">
+      <Filter>Resource Files\Shaders\Geometry</Filter>
+    </None>
+    <None Include="particle.vs.hlsl">
+      <Filter>Resource Files\Shaders\Vertex</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

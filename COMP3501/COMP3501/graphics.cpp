@@ -213,7 +213,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if (!m_P1) return false;
 
 	// Initialize the particle object.
-	result = m_P1->Initialize(m_D3D->GetDevice(), 500, D3DXVECTOR3(-5.0f, 0.0f, 0.0f), true, L"data/flame4x4.dds");
+	result = m_P1->Initialize(m_D3D->GetDevice(), L"data/star.dds");
 	if (!result) {
 		MessageBox(hwnd, L"Could not initialize the particle object.", L"Error", MB_OK);
 		return false;
@@ -424,25 +424,29 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	m_Tank->Update(input, time, m_QuadTree);
 	for (int i=0; i<NUM_ENEMYS; i++)
 	{
-		
 		m_Enemies[i]->setTarget(m_Tank->getTankState()->GetPosition());
 		m_Enemies[i]->Update(input, time, m_QuadTree);
 	}
 
+	D3DXVECTOR3 collisionlocation;
+	bool hascollision = false;
+
 	//m_Tank->checknResolveBulletCollision(m_Bullet);
-	for (int i=0; i<NUM_ENEMYS; i++)
-	{
-		m_Tank->checknResolveTankCollision(m_Enemies[i]);
-		m_Tank->checknResolveBulletCollision(m_Enemies[i]->getBullets());
-		m_Enemies[i]->checknResolveBulletCollision(m_Tank->getBullets());
+	for (int i=0; i<NUM_ENEMYS; i++) {
+		if (m_Tank->checknResolveTankCollision(m_Enemies[i], collisionlocation)) hascollision = true;
+		if (m_Tank->checknResolveBulletCollision(m_Enemies[i]->getBullets(), collisionlocation)) hascollision = true;
+		if (m_Enemies[i]->checknResolveBulletCollision(m_Tank->getBullets(), collisionlocation)) hascollision = true;
+		
 		m_Enemies[i]->checknResolveStaticCollision(m_Objects);
-		for (int j=i+1; j<NUM_ENEMYS; j++)
-		{
-			m_Enemies[i]->checknResolveTankCollision(m_Enemies[j]);
+		for (int j=i+1; j<NUM_ENEMYS; j++) {
+			if (m_Enemies[i]->checknResolveTankCollision(m_Enemies[j], collisionlocation)) hascollision = true;
 		}
 	}
 
 	m_Tank->checknResolveStaticCollision(m_Objects);
+
+	if (hascollision) m_P1->Frame(time, m_D3D->GetDeviceContext(), true, collisionlocation);
+	else m_P1->Frame(time, m_D3D->GetDeviceContext());
 
 	// Set the frames per second.
 	result = m_Text->SetFps(fps, 0, m_D3D->GetDeviceContext());

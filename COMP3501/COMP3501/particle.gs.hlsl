@@ -14,9 +14,9 @@ cbuffer MatrixBuffer {
 
 cbuffer CameraBuffer {
 	float3 cameraPosition;
+	float padding;
 	float3 cameraUp;
 	float time;
-	float padding;
 };
 
 //////////////
@@ -29,7 +29,7 @@ struct GeometryInputType {
 
 struct PixelInputType {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
+	float2 tex : TEXCOORD;
 	float3 viewDirection : NORMAL;
 };
 
@@ -44,7 +44,8 @@ void ParticleGeometryShader(point GeometryInputType gin[1], inout TriangleStream
 	float hHeight = 0.5;
 	float hWidth = 0.5;
 
-	float3 side = normalize(cross(cameraUp, gin[0].viewDirection)), up = normalize(cross(gin[0].viewDirection, side));
+	float3 side = normalize(cross(cameraUp, gin[0].viewDirection));
+	float3 up = normalize(cross(gin[0].viewDirection, side));
 
 	pos = gin[0].position - hWidth * side - hHeight * up;
 	v[0] = float4(pos.x, pos.y, pos.z, 1);
@@ -67,7 +68,7 @@ void ParticleGeometryShader(point GeometryInputType gin[1], inout TriangleStream
 	for (int i = 0; i < 4; i++) {
 		gout.position = mul(v[i], viewMatrix);
 		gout.position = mul(gout.position, projectionMatrix);
-		gout.tex = float2(floor(i / 2)*0.5, (float)(i % 2)*0.5);
+		gout.tex = float2(floor(i / 2), (float)(i % 2));
 		gout.viewDirection = gin[0].viewDirection;
 		triStream.Append(gout);
 	}
