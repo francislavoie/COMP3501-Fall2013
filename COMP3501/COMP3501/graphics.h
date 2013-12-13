@@ -57,6 +57,7 @@ public:
 	bool Render(float);
 
 private:
+	int scores[NUM_ENEMYS+1];
 	D3DXVECTOR3 chasePosition;
 	int spaceBuffer;
 	D3D* m_D3D;

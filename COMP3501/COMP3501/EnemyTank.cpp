@@ -34,7 +34,7 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 	D3DXVECTOR3 cross;
 	D3DXVec3Cross(&cross,&normal,&noY);
 	D3DXVec3Normalize(&cross, &cross);
-/*	if (angle>0.2)
+	if (angle>0.2)
 	{
 		if (cross.y > 0)
 		{
@@ -45,7 +45,7 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 			turnRight();
 		}
 	}
-	moveForward();*/
+	moveForward();
 	int deltaX = 0,deltaY = 0;
 	if (targetPosition)
 	{

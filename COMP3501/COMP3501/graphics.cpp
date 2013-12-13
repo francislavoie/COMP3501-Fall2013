@@ -726,8 +726,21 @@ bool Graphics::Render(float time) {
 		chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, 2.0f, (rand() % 312) + 100.0f);
 		m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
 		chasePosition.y += height;
+		scores[0]++;
 	}
 	
+	for (int i =0; i < NUM_ENEMYS; i++)
+	{
+		if (D3DXVec3Length(&(*m_Enemies[i]->getTankState()->GetPosition()-chasePosition)) < sqrt(10))	{
+			float height;
+			D3DXVECTOR3 vgarbage;
+			chasePosition = D3DXVECTOR3((rand() % 312) + 100.0f, 2.0f, (rand() % 312) + 100.0f);
+			m_QuadTree->GetHeightAtPosition(chasePosition.x, chasePosition.z, height, vgarbage);
+			chasePosition.y += height;
+			scores[i+1]++;
+		}
+	}
+
 	D3DXMatrixRotationY(&worldMatrix, chaserotate);
 	D3DXMatrixTranslation(&localWorldMatrix, chasePosition.x, chasePosition.y, chasePosition.z);
 	D3DXMatrixMultiply(&localWorldMatrix, &worldMatrix, &localWorldMatrix);
