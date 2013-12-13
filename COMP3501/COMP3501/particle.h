@@ -30,7 +30,7 @@ protected:
 	struct VertexType {
 		D3DXVECTOR3 pos;
 		D3DXVECTOR4 col;
-		float timeElapsed;
+		D3DXVECTOR2 timeElapsed;
 	};
 
 	struct ParticleType {

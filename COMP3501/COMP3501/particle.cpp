@@ -112,10 +112,7 @@ bool Particle::Frame(float frameTime, ID3D11DeviceContext* device, bool emit, D3
 
 	// Update the dynamic vertex buffer with the new position of each particle.
 	result = UpdateBuffers(device);
-	if (!result)
-	{
-		return false;
-	}
+	if (!result) return false;
 
 	return true;
 }
@@ -261,8 +258,7 @@ void Particle::ShutdownBuffers() {
 
 
 void Particle::EmitParticles(D3DXVECTOR3 emitPos, float frameTime) {
-	bool found;
-	int index, i, j;
+	int index;
 	D3DXVECTOR3 velocity;
 	D3DXVECTOR4 color;
 
@@ -272,19 +268,19 @@ void Particle::EmitParticles(D3DXVECTOR3 emitPos, float frameTime) {
 
 			float r = (((float)rand() - (float)rand()) / RAND_MAX) - 0.5f;
 			r = r * 10;
-			float theta = (((float)rand() - (float)rand()) / RAND_MAX) * D3DX_PI;
-			float phi = (((float)rand() - (float)rand()) / RAND_MAX) * 2.0f * D3DX_PI;
+			float theta = float ((((float)rand() - (float)rand()) / RAND_MAX) * D3DX_PI);
+			float phi = float ((((float)rand() - (float)rand()) / RAND_MAX) * 2.0f * D3DX_PI);
 
 			velocity = D3DXVECTOR3(
 				r * sin(theta) * cos(phi),
-				r * cos(theta) * cos(phi) + 2.5f,
+				r * cos(theta) * cos(phi) + 5.0f,
 				r * sin(phi)
 			);
 
 			color = D3DXVECTOR4(
-				(((float)rand() - (float)rand()) / RAND_MAX) + 0.5f,
-				(((float)rand() - (float)rand()) / RAND_MAX) + 0.5f,
-				(((float)rand() - (float)rand()) / RAND_MAX) + 0.5f,
+				((float)rand()) / ((float)RAND_MAX),// + 0.5f,
+				((float)rand()) / ((float)RAND_MAX),// + 0.5f,
+				((float)rand()) / ((float)RAND_MAX),// + 0.5f,
 				1.0f
 			);
 
@@ -311,7 +307,7 @@ void Particle::UpdateParticles(float time) {
 	for (int i = 0; i < m_particleCount; i++) {
 		m_Particles[i].timeElapsed += time / 1000.0f;
 		m_Particles[i].pos = m_Particles[i].start + m_Particles[i].vel * m_Particles[i].timeElapsed;
-		m_Particles[i].pos.y += (-0.98) *  m_Particles[i].timeElapsed * m_Particles[i].timeElapsed;
+		m_Particles[i].pos.y += (-9.8f) *  m_Particles[i].timeElapsed * m_Particles[i].timeElapsed;
 	}
 }
 
@@ -321,8 +317,9 @@ void Particle::KillParticles() {
 	
 	// Kill all the particles that have gone below a certain height range.
 	for (i = 0; i < m_maxParticles; i++) {
-		if ((m_Particles[i].active == true) && (m_Particles[i].timeElapsed > 3.0f)) {
+		if ((m_Particles[i].active == true) && (m_Particles[i].timeElapsed > 1.0f)) {
 			m_Particles[i].active = false;
+			m_Particles[i].timeElapsed = 0.0f;
 			m_particleCount--;
 
 			// Now shift all the live particles back up the array to erase the destroyed particle and keep the array sorted correctly.
@@ -341,8 +338,7 @@ void Particle::KillParticles() {
 }
 
 
-bool Particle::UpdateBuffers(ID3D11DeviceContext* deviceContext)
-{
+bool Particle::UpdateBuffers(ID3D11DeviceContext* deviceContext) {
 	int index, i;
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -357,8 +353,8 @@ bool Particle::UpdateBuffers(ID3D11DeviceContext* deviceContext)
 
 	for (i = 0; i < m_particleCount; i++) {
 		m_vertices[index].pos = m_Particles[i].pos;
-		m_vertices[index].timeElapsed = m_Particles[i].timeElapsed;
-		m_vertices[index].col = m_Particles[i].col;
+		m_vertices[index].col = D3DXVECTOR4(m_Particles[i].col.x, m_Particles[i].col.y, m_Particles[i].col.z, m_Particles[i].col.w);
+		m_vertices[index].timeElapsed = D3DXVECTOR2(m_Particles[i].timeElapsed, 0.0f);
 		index++;
 	}
 

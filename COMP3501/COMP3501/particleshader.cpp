@@ -61,7 +61,7 @@ bool ParticleShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vs
 	ID3DBlob* vertexShaderBuffer;
 	ID3DBlob* geometryShaderBuffer;
 	ID3DBlob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[4];
 	unsigned int numElements;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC matrixBufferDesc;
@@ -143,6 +143,14 @@ bool ParticleShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vs
 	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[2].InstanceDataStepRate = 0;
+
+	polygonLayout[3].SemanticName = "COLOR";
+	polygonLayout[3].SemanticIndex = 0;
+	polygonLayout[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[3].InputSlot = 0;
+	polygonLayout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[3].InstanceDataStepRate = 0;
 
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
@@ -266,7 +274,7 @@ void ParticleShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwn
 	bufferSize = errorMessage->GetBufferSize();
 
 	// Open a file to write the error message to.
-	fout.open("shader-error.txt");
+	fout.open("shader-error-particle.txt");
 
 	// Write out the error message.
 	for (i = 0; i<bufferSize; i++) {
