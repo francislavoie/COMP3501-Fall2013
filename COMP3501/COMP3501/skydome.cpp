@@ -35,7 +35,7 @@ bool SkyDome::Initialize(ID3D11Device* device) {
 	m_apexColor = D3DXVECTOR4(0.0f, 0.541f, 1.0f, 1.0f);
 	
 	// Set the color at the center of the sky dome.
-	m_centerColor =  D3DXVECTOR4(0.529f, 0.807f, 0.980f, 1.0f);
+	m_centerColor =  D3DXVECTOR4(0.329f, 0.607f, 0.780f, 1.0f);
 	
 	return true;
 }

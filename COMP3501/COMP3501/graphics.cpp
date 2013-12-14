@@ -137,7 +137,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Light) return false;
 
 	// Initialize the light object.
-	m_Light->SetAmbientColor(0.05f, 0.05f, 0.05f, 1.0f);
+	m_Light->SetAmbientColor(0.35f, 0.35f, 0.35f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(-0.5f, -1.0f, 0.0f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -196,7 +196,7 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	if(!m_Terrain) return false;
 
 	// Initialize the terrain object.
-	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/terrain05.bmp", L"data/dirt01.dds");
+	result = m_Terrain->Initialize(m_D3D->GetDevice(), "data/terrain05.bmp", L"data/road.dds");
 	if(!result) {
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
 		return false;
