@@ -73,6 +73,9 @@ private:
 	Bitmap* m_Bitmap;
 	MouseCursor* m_Cursor;
 
+	Bitmap* m_Victory;
+	Bitmap* m_Defeat;
+
 	ShaderManager* m_ShaderManager;
 	Light* m_Light;
 

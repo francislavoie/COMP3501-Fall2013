@@ -155,6 +155,28 @@ bool Graphics::Initialize(D3DXVECTOR2 screen, HWND hwnd)
 	}
 
 	// Create the bitmap object.
+	m_Victory = new Bitmap;
+	if (!m_Victory) return false;
+
+	// Initialize the bitmap object.
+	result = m_Victory->Initialize(m_D3D->GetDevice(), screen, L"data/victory.dds", baseViewMatrix, D3DXVECTOR2(710, 293));
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the bitmap object.
+	m_Defeat = new Bitmap;
+	if (!m_Defeat) return false;
+
+	// Initialize the bitmap object.
+	result = m_Defeat->Initialize(m_D3D->GetDevice(), screen, L"data/defeat.dds", baseViewMatrix, D3DXVECTOR2(710, 293));
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the bitmap object.
 	m_Cursor = new MouseCursor;
 	if(!m_Cursor) return false;
 
@@ -460,10 +482,10 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_Text->SetFractionInt("Player Score", scores[0], 10, 2, m_D3D->GetDeviceContext());
+	result = m_Text->SetFractionInt("Player Score", scores[0], 10, 3, m_D3D->GetDeviceContext());
 	if (!result) return false;
 
-	for (int i = 0, j = 3; i < NUM_ENEMYS; i++, j++) {
+	for (int i = 0, j = 4; i < NUM_ENEMYS; i++, j++) {
 		char string[] = "Enemy %d Score";
 		char string2[64];
 		sprintf_s(string2, string, i+1);
@@ -839,13 +861,39 @@ bool Graphics::Render(float time) {
 
 	m_D3D->TurnZBufferOff();
 
-	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenter());
-	if(!result) return false;
+	if (scores[0] >= 10) {
+		result = m_Victory->Render(m_D3D->GetDeviceContext(), m_Victory->GetCenter());
+		if (!result) return false;
 
-	// Render the bitmap with the texture shader.
-	result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
-	if(!result) return false;
+		result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Victory->GetIndexCount(), worldMatrix, m_Victory->GetViewMatrix(), orthoMatrix, m_Victory->GetTexture());
+		if (!result) return false;
+	}
+	else {
+		bool enemywins = false;
+		for (int i = 0; i < NUM_ENEMYS; i++) {
+			if (scores[i + 1] >= 10) {
+				enemywins = true;
+				break;
+			}
+		}
+		if (enemywins) {
+			result = m_Defeat->Render(m_D3D->GetDeviceContext(), m_Defeat->GetCenter());
+			if (!result) return false;
+
+			result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Defeat->GetIndexCount(), worldMatrix, m_Defeat->GetViewMatrix(), orthoMatrix, m_Defeat->GetTexture());
+			if (!result) return false;
+		}
+		else {
+			// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
+			result = m_Bitmap->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetCenter());
+			if (!result) return false;
+
+			// Render the bitmap with the texture shader.
+			result = m_ShaderManager->RenderTexture(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, m_Bitmap->GetViewMatrix(), orthoMatrix, m_Bitmap->GetTexture());
+			if (!result) return false;
+		}
+
+	}
 
 	// Render the text strings.
 	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
