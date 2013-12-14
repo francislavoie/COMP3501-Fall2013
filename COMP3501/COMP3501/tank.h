@@ -72,6 +72,7 @@ public:
 
 	void moveForward(){forward = moveSpeed;}
 	void moveBack(){forward = -moveSpeed;}
+	void shoot() {if (m_Bullet && m_turretState) m_Bullet->addBullet(m_turretState);}
 
 	void orientTurret(float,float,float);
 

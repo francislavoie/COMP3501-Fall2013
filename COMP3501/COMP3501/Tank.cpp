@@ -279,9 +279,8 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	m_turretState->SetOrientation(&orien);
 	m_turretState->Update();
 
-	m_Bullet->Update(input, time, m_turretState);
+	m_Bullet->Update(time);
 }
-
 
 void Tank::RenderTank(ID3D11DeviceContext* device) {
 	baseTank->Render(device);
