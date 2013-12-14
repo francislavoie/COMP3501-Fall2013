@@ -40,8 +40,8 @@ bool ModelList::Initialize(int numModels, QuadTree* quadTree) {
 		m_ModelInfoList[i].color = D3DXVECTOR4(red, green, blue, 1.0f);
 
 		// Generate a random position in front of the viewer for the mode.
-		m_ModelInfoList[i].position.x = rand() % 512;
-		m_ModelInfoList[i].position.z = rand() % 512;
+		m_ModelInfoList[i].position.x = (float)(rand() % 512);
+		m_ModelInfoList[i].position.z = (float)(rand() % 512);
 		
 		quadTree->GetHeightAtPosition(m_ModelInfoList[i].position.x, m_ModelInfoList[i].position.z, height, garbage);
 
@@ -57,9 +57,9 @@ bool ModelList::Initialize(int numModels, QuadTree* quadTree) {
 
 		D3DXQuaternionRotationYawPitchRoll(
 			&m_ModelInfoList[i].rotation,
-			(rand()) / (RAND_MAX / (D3DX_PI * 2)),
-			(rand()) / (RAND_MAX / (D3DX_PI * 2)),
-			(rand()) / (RAND_MAX / (D3DX_PI * 2))
+			float((rand()) / (RAND_MAX / (D3DX_PI * 2))),
+			float((rand()) / (RAND_MAX / (D3DX_PI * 2))),
+			float((rand()) / (RAND_MAX / (D3DX_PI * 2)))
 		);
 
 		D3DXQuaternionNormalize(&m_ModelInfoList[i].rotation, &m_ModelInfoList[i].rotation);

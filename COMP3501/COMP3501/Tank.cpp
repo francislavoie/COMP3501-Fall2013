@@ -186,9 +186,6 @@ void Tank::Update(Input* input, float time, QuadTree *m_QuadTree){
 	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
 	m_center = *m_tankState->GetPosition() + output;
 
-	bool result;
-	
-
 	// Get the height of the triangle that is directly underneath the given tank position.
 	//result = m_QuadTree->GetHeightAtPosition(position.x, position.z, height, vgarbage);
 	//if(result) {
@@ -399,7 +396,7 @@ bool Tank::checknResolveBulletCollision(Bullet* other, D3DXVECTOR3& location)
 
 	bool hascollision = false;
 	
-	for (int i= 0; i<bullets->size(); i++)
+	for (unsigned int i = 0; i < bullets->size(); i++)
 	{
 		State *otherState = (*bullets)[i];
 
