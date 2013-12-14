@@ -26,6 +26,10 @@ Graphics::Graphics() {
 	srand((unsigned int) time(NULL));
 
 	m_P1 = 0;
+
+	for (int i = 0; i < NUM_ENEMYS+1; i++) {
+		scores[i] = 0;
+	}
 }
 
 
@@ -456,17 +460,27 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 	result = m_Text->SetCpu(cpu, 1, m_D3D->GetDeviceContext());
 	if(!result) return false;
 
-	result = m_Text->SetVector3("Tank Position", &(*m_Enemies[1]->getTankState()->GetPosition() - *m_Tank->getTankState()->GetPosition()), 3, m_D3D->GetDeviceContext());
-	if(!result) return false;
-
-	result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
-	if(!result) return false;
-
-	result = m_Text->SetFloat("Yaw Angle", m_Tank->GetYaw() * float(180 / D3DX_PI), 5, m_D3D->GetDeviceContext());
+	result = m_Text->SetFractionInt("Player Score", scores[0], 10, 2, m_D3D->GetDeviceContext());
 	if (!result) return false;
 
-	result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
-	if(!result) return false;
+	for (int i = 0, j = 3; i < NUM_ENEMYS; i++, j++) {
+		char string[] = "Enemy %d Score";
+		char string2[64];
+		sprintf_s(string2, string, i+1);
+		result = m_Text->SetFractionInt(string2, scores[i+1], 10, j, m_D3D->GetDeviceContext());
+		if (!result) return false;
+	}
+	//result = m_Text->SetVector3("Tank Position", &(*m_Enemies[1]->getTankState()->GetPosition() - *m_Tank->getTankState()->GetPosition()), 3, m_D3D->GetDeviceContext());
+	//if(!result) return false;
+
+	//result = m_Text->SetFloat("Pitch Angle", m_Tank->GetPitch() * float(180 / D3DX_PI), 4, m_D3D->GetDeviceContext());
+	//if(!result) return false;
+
+	//result = m_Text->SetFloat("Yaw Angle", m_Tank->GetYaw() * float(180 / D3DX_PI), 5, m_D3D->GetDeviceContext());
+	//if (!result) return false;
+
+	//result = m_Text->SetFloat("Time", time, 6, m_D3D->GetDeviceContext());
+	//if(!result) return false;
 
 	/*
 	// Mouse controls
@@ -571,8 +585,8 @@ bool Graphics::Render(float time) {
 	renderCount = 0;
 
 	// Set the number of models that was actually rendered this frame.
-	result = m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), 2, m_D3D->GetDeviceContext());
-	if(!result) return false;
+	//result = m_Text->SetRenderCount(m_QuadTree->GetDrawCount(), 2, m_D3D->GetDeviceContext());
+	//if(!result) return false;
 
 	////////////////////////////////////////////////////////////////////////////
 	//			Tank DRAWING

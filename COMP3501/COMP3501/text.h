@@ -44,6 +44,7 @@ public:
 	bool SetRenderCount(int, int, ID3D11DeviceContext*);
 	bool SetVector3(char*, D3DXVECTOR3*, int, ID3D11DeviceContext*);
 	bool SetInteger(char*, int, int, ID3D11DeviceContext*);
+	bool SetFractionInt(char*, int, int, int, ID3D11DeviceContext*);
 	bool SetFloat(char*, float, int, ID3D11DeviceContext*);
 
 private:
