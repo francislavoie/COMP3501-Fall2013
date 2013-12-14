@@ -45,26 +45,27 @@ void Bullet::Shutdown() {
 	return;
 }
 
+void Bullet::addBullet(State* turret)
+{
+	State* state = new State(false);
 
-void Bullet::Update(Input* input, float time, State* turret) {
+	D3DXQUATERNION quat = *turret->GetRotation(), inverse, temp;
+	D3DXQuaternionInverse(&inverse, &quat);
+	float garbage;
+	D3DXVECTOR3 output, offset = bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))];
 
-	if (input->IsMousePressed(MOUSE_LEFT)) {
-		State* state = new State(false);
+	temp = quat * D3DXQUATERNION(offset.x, offset.y, offset.z, 0.0f) * inverse;
+	D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
 
-		D3DXQUATERNION quat = *turret->GetRotation(), inverse, temp;
-		D3DXQuaternionInverse(&inverse, &quat);
-		float garbage;
-		D3DXVECTOR3 output, offset = bulletOffsets[rand() % (sizeof(bulletOffsets) / sizeof(*bulletOffsets))];
+	state->SetPosition(*turret->GetPosition() + output);
+	state->SetOrientation(turret->GetRotation());
+	state->SetFriction(0.0f);
+	state->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, 0.005f));
+	m_bulletList.push_back(state);
+}
 
-		temp = quat * D3DXQUATERNION(offset.x, offset.y, offset.z, 0.0f) * inverse;
-		D3DXQuaternionToAxisAngle(&temp, &output, &garbage);
 
-		state->SetPosition(*turret->GetPosition() + output);
-		state->SetOrientation(turret->GetRotation());
-		state->SetFriction(0.0f);
-		state->ApplyForce(D3DXVECTOR3(0.0f, 0.0f, 0.005f));
-		m_bulletList.push_back(state);
-	}
+void Bullet::Update(float time) {
 
 	//vector<State> removelist;
 

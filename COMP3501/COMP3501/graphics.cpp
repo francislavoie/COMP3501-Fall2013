@@ -445,6 +445,10 @@ bool Graphics::Frame(int fps, int cpu, float time, Input* input) {
 		m_Tank->turnRight();
 	}
 
+	if (input->IsMousePressed(MOUSE_LEFT)) {
+		m_Tank->shoot();	
+	}
+
 	m_Tank->orientTurret(deltaX,deltaY,time);
 
 	m_Tank->Update(input, time, m_QuadTree);

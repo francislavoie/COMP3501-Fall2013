@@ -55,13 +55,14 @@ public:
 	bool Initialize(D3D*, HWND);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
-	virtual void Update(Input*, float, State*);
+	virtual void Update(float);
 
 	int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture() { return m_bullet->GetTexture(); }
 
 	vector<State*>* GetBullets() { return &m_bulletList; }
 	void removeBullets(vector<int>*);
+	void addBullet(State*);
 
 protected:
 	Model *m_bullet;

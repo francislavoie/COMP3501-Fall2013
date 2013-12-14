@@ -84,5 +84,13 @@ void EnemyTank::Update(Input* input,float time, QuadTree *m_QuadTree)
 		orientTurret(deltaX,deltaY,time);
 	}
 
+	static int countdown = 250 + (rand()%500);
+	countdown -= time;
+	if (countdown < 0)
+	{
+		shoot();
+		countdown = 250 + (rand()%500);
+	}
+
 	Tank::Update(input,time,m_QuadTree);
 }
