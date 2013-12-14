@@ -256,7 +256,7 @@ bool D3D::Initialize(D3DXVECTOR2 screen, bool vsync, HWND hwnd, bool fullscreen,
 	// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
 	depthReadOnlyStencilState.DepthEnable = true;
 	depthReadOnlyStencilState.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	depthReadOnlyStencilState.DepthFunc = D3D11_COMPARISON_ALWAYS;
+	depthReadOnlyStencilState.DepthFunc = D3D11_COMPARISON_LESS;
 	depthReadOnlyStencilState.StencilEnable = true;
 	depthReadOnlyStencilState.StencilReadMask = 0xFF;
 	depthReadOnlyStencilState.StencilWriteMask = 0xFF;
